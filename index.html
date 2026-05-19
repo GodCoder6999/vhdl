@@ -326,6 +326,10 @@
   <button class="gate-tab" onclick="showGate('nor')">NOR</button>
   <button class="gate-tab" onclick="showGate('xor')">XOR</button>
   <button class="gate-tab" onclick="showGate('dec24')" style="border-color:var(--yellow);color:var(--yellow);">2:4 DEC</button>
+  <button class="gate-tab" onclick="showGate('exp1')" style="border-color:var(--orange);color:var(--orange);">EXP-1</button>
+  <button class="gate-tab" onclick="showGate('exp2')" style="border-color:#ff6eb4;color:#ff6eb4;">EXP-2</button>
+  <button class="gate-tab" onclick="showGate('halfsub')" style="border-color:var(--green);color:var(--green);">HALF SUB</button>
+  <button class="gate-tab" onclick="showGate('mux8')" style="border-color:#b388ff;color:#b388ff;">8:1 MUX</button>
 </nav>
 
 <!-- ═══════════════════════════════════════════ OVERVIEW ═══ -->
@@ -2367,11 +2371,1073 @@
 </div>
 </div>
 
+<!-- EXPRESSION 1 SECTION -->
+<div id="section-exp1" class="gate-section">
+<div class="container">
+  <div class="info-bar">
+    <div class="gate-name-big" style="background:linear-gradient(135deg,#fff,var(--orange));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Expression 1</div>
+    <div class="tag" style="border-color:var(--orange);color:var(--orange);">3-INPUT</div>
+    <div class="tag">entity: Expression_1</div>
+  </div>
+  <div class="logic-expr">F = AB + BC + CA</div>
+  <p class="gate-desc">Sum of three 2-input AND products. Output HIGH when any two or all three inputs are HIGH. Implements symmetric majority logic — exactly F=1 when at least 2 of 3 inputs are 1.</p>
+
+  <div class="three-col">
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Expression Simulator</div>
+      <div style="display:flex;gap:24px;align-items:center;justify-content:center;flex-wrap:wrap;">
+        <div class="inputs-col">
+          <div class="input-toggle">
+            <span class="input-label">A</span>
+            <div class="toggle-btn" id="exp1-A-toggle" onclick="toggleExp1('A')"></div>
+            <div class="bit-display" id="exp1-A-bit">0</div>
+          </div>
+          <div class="input-toggle">
+            <span class="input-label">B</span>
+            <div class="toggle-btn" id="exp1-B-toggle" onclick="toggleExp1('B')"></div>
+            <div class="bit-display" id="exp1-B-bit">0</div>
+          </div>
+          <div class="input-toggle">
+            <span class="input-label">C</span>
+            <div class="toggle-btn" id="exp1-C-toggle" onclick="toggleExp1('C')"></div>
+            <div class="bit-display" id="exp1-C-bit">0</div>
+          </div>
+        </div>
+        <div style="font-size:28px;color:var(--accent2);">→</div>
+        <div class="output-col">
+          <span class="output-label">F</span>
+          <div class="output-bit" id="exp1-output">0</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;text-align:center;font-size:11px;color:var(--muted);padding:8px;background:rgba(255,149,0,0.05);border-radius:6px;border:1px solid rgba(255,149,0,0.2);">
+        F = (A·B) OR (B·C) OR (C·A)
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Truth Table</div>
+      <table>
+        <thead><tr><th>A</th><th>B</th><th>C</th><th>F</th></tr></thead>
+        <tbody id="exp1-table">
+          <tr class="highlighted"><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="one">1</td><td class="one">1</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.8;">
+        <span style="color:var(--green);">■</span> F=1 when ≥2 inputs HIGH<br>
+        <span style="color:var(--red);">■</span> F=0 when ≤1 input HIGH
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ VHDL Code — Expression_1.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('exp1-code')">COPY</button>
+        <pre id="exp1-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">Expression_1</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">A</span> : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">B</span> : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">C</span> : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">F</span> : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> Expression_1;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span>
+              Expression_1 <span class="kw">is</span>
+<span class="kw">begin</span>
+  <span class="signal">F</span> <span class="op">&lt;=</span> (A <span class="op">and</span> B) <span class="op">or</span>
+       (B <span class="op">and</span> C) <span class="op">or</span>
+       (C <span class="op">and</span> A);
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — Expression_1</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="140" viewBox="0 0 380 140" style="filter:drop-shadow(0 0 10px rgba(255,149,0,0.2))">
+          <line x1="10" y1="40" x2="100" y2="40" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="70" x2="100" y2="70" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="100" x2="100" y2="100" stroke="#4a6080" stroke-width="2"/>
+          <text x="4" y="36" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">A</text>
+          <text x="4" y="66" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">B</text>
+          <text x="4" y="96" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">C</text>
+          <text x="18" y="34" fill="#4a6080" font-size="9" font-family="Courier New">STD_LOGIC</text>
+          <text x="18" y="64" fill="#4a6080" font-size="9" font-family="Courier New">STD_LOGIC</text>
+          <text x="18" y="94" fill="#4a6080" font-size="9" font-family="Courier New">STD_LOGIC</text>
+          <rect x="100" y="15" width="180" height="110" rx="8" fill="#0f1628" stroke="#ff9500" stroke-width="2"/>
+          <text x="190" y="55" fill="#ff9500" font-size="13" font-family="Courier New" font-weight="bold" text-anchor="middle">Expression_1</text>
+          <text x="190" y="73" fill="#7b2fff" font-size="12" font-family="Courier New" text-anchor="middle">F=AB+BC+CA</text>
+          <text x="190" y="112" fill="#4a6080" font-size="10" font-family="Courier New" text-anchor="middle">Behavioral Architecture</text>
+          <line x1="280" y1="70" x2="370" y2="70" stroke="#4a6080" stroke-width="2"/>
+          <text x="354" y="66" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">F</text>
+          <text x="284" y="64" fill="#4a6080" font-size="9" font-family="Courier New">STD_LOGIC</text>
+          <circle cx="100" cy="40" r="3" fill="#ff9500"/>
+          <circle cx="100" cy="70" r="3" fill="#ff9500"/>
+          <circle cx="100" cy="100" r="3" fill="#ff9500"/>
+          <circle cx="280" cy="70" r="3" fill="#00ff88"/>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);padding:0 4px;line-height:1.8;">
+        <span style="color:var(--orange);">Inputs:</span> A, B, C — STD_LOGIC &nbsp;|&nbsp;
+        <span style="color:var(--green);">Output:</span> F — STD_LOGIC
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Gate-Level Circuit — F = AB + BC + CA</div>
+      <div style="display:flex;justify-content:center;padding:8px 0;">
+        <svg width="420" height="210" viewBox="0 0 420 210" style="filter:drop-shadow(0 0 8px rgba(255,149,0,0.2))">
+          <!-- Vertical input rails -->
+          <line x1="20" y1="20" x2="20" y2="190" stroke="#2a4060" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="45" y1="20" x2="45" y2="190" stroke="#2a4060" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="65" y1="20" x2="65" y2="190" stroke="#2a4060" stroke-width="1" stroke-dasharray="4,4"/>
+          <!-- Input labels -->
+          <text x="14" y="16" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">A</text>
+          <text x="39" y="16" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">B</text>
+          <text x="59" y="16" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">C</text>
+
+          <!-- AND Gate I0 (A·B) at y=50 -->
+          <circle cx="20" cy="48" r="3" fill="#ff9500"/>
+          <circle cx="45" cy="62" r="3" fill="#ff9500"/>
+          <line x1="20" y1="48" x2="85" y2="48" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="45" y1="62" x2="85" y2="62" stroke="#4a6080" stroke-width="1.5"/>
+          <path d="M85,42 L108,42 Q124,42 124,55 Q124,68 108,68 L85,68 Z" fill="#0f1628" stroke="#7b2fff" stroke-width="1.8"/>
+          <text x="90" y="59" fill="#7b2fff" font-size="9" font-family="Courier New">AND</text>
+          <text x="82" y="39" fill="#4a6080" font-size="8" font-family="Courier New">I0(AB)</text>
+          <line x1="124" y1="55" x2="290" y2="55" stroke="#4a6080" stroke-width="1.5"/>
+
+          <!-- AND Gate I1 (B·C) at y=115 -->
+          <circle cx="45" cy="108" r="3" fill="#ff9500"/>
+          <circle cx="65" cy="122" r="3" fill="#ff9500"/>
+          <line x1="45" y1="108" x2="85" y2="108" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="65" y1="122" x2="85" y2="122" stroke="#4a6080" stroke-width="1.5"/>
+          <path d="M85,102 L108,102 Q124,102 124,115 Q124,128 108,128 L85,128 Z" fill="#0f1628" stroke="#7b2fff" stroke-width="1.8"/>
+          <text x="90" y="119" fill="#7b2fff" font-size="9" font-family="Courier New">AND</text>
+          <text x="82" y="99" fill="#4a6080" font-size="8" font-family="Courier New">I1(BC)</text>
+          <line x1="124" y1="115" x2="290" y2="115" stroke="#4a6080" stroke-width="1.5"/>
+
+          <!-- AND Gate I2 (C·A) at y=168 -->
+          <circle cx="65" cy="162" r="3" fill="#ff9500"/>
+          <circle cx="20" cy="176" r="3" fill="#ff9500"/>
+          <line x1="65" y1="162" x2="85" y2="162" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="20" y1="176" x2="85" y2="176" stroke="#4a6080" stroke-width="1.5"/>
+          <path d="M85,156 L108,156 Q124,156 124,168 Q124,180 108,180 L85,180 Z" fill="#0f1628" stroke="#7b2fff" stroke-width="1.8"/>
+          <text x="90" y="172" fill="#7b2fff" font-size="9" font-family="Courier New">AND</text>
+          <text x="82" y="153" fill="#4a6080" font-size="8" font-family="Courier New">I2(CA)</text>
+          <line x1="124" y1="168" x2="290" y2="168" stroke="#4a6080" stroke-width="1.5"/>
+
+          <!-- 3-input OR Gate -->
+          <line x1="290" y1="55" x2="290" y2="100" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="290" y1="168" x2="290" y2="130" stroke="#4a6080" stroke-width="1.5"/>
+          <path d="M290,92 Q298,92 312,92 Q338,92 348,115 Q338,138 312,138 Q298,138 290,138 Q302,126 302,115 Q302,104 290,92 Z" fill="#0f1628" stroke="#00d4ff" stroke-width="1.8"/>
+          <text x="308" y="119" fill="#00d4ff" font-size="9" font-family="Courier New">OR</text>
+          <line x1="348" y1="115" x2="408" y2="115" stroke="#00ff88" stroke-width="2.5"/>
+          <circle cx="408" cy="115" r="5" fill="#00ff88" opacity="0.6"/>
+          <text x="394" y="109" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">F</text>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.8;padding:0 4px;">
+        I0(AND): A·B &nbsp;|&nbsp; I1(AND): B·C &nbsp;|&nbsp; I2(AND): C·A &nbsp;→&nbsp; 3-input OR → F
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Testbench — exp1_tb.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('exp1-tb')">COPY</button>
+        <pre id="exp1-tb"><span class="kw">ENTITY</span> <span class="entity-name">exp1_tb</span> <span class="kw">IS END</span> exp1_tb;
+<span class="kw">ARCHITECTURE</span> behavior <span class="kw">OF</span> exp1_tb <span class="kw">IS</span>
+  <span class="kw">COMPONENT</span> Expression_1
+    <span class="kw">PORT</span>(A: <span class="kw">IN</span> std_logic;
+         B: <span class="kw">IN</span> std_logic;
+         C: <span class="kw">IN</span> std_logic;
+         F: <span class="kw">OUT</span> std_logic);
+  <span class="kw">END COMPONENT</span>;
+  <span class="kw">signal</span> <span class="signal">A</span>,<span class="signal">B</span>,<span class="signal">C</span> : std_logic := <span class="str">'0'</span>;
+  <span class="kw">signal</span> <span class="signal">F</span> : std_logic;
+<span class="kw">BEGIN</span>
+  uut: Expression_1 <span class="kw">PORT MAP</span>
+    (A=&gt;A, B=&gt;B, C=&gt;C, F=&gt;F);
+  stim_proc: <span class="kw">process begin</span>
+    A&lt;=<span class="str">'0'</span>;B&lt;=<span class="str">'0'</span>;C&lt;=<span class="str">'0'</span>; <span class="kw">wait for</span> 100 ns;
+    A&lt;=<span class="str">'0'</span>;B&lt;=<span class="str">'0'</span>;C&lt;=<span class="str">'1'</span>; <span class="kw">wait for</span> 100 ns;
+    A&lt;=<span class="str">'0'</span>;B&lt;=<span class="str">'1'</span>;C&lt;=<span class="str">'0'</span>; <span class="kw">wait for</span> 100 ns;
+    A&lt;=<span class="str">'0'</span>;B&lt;=<span class="str">'1'</span>;C&lt;=<span class="str">'1'</span>; <span class="kw">wait for</span> 100 ns;
+    A&lt;=<span class="str">'1'</span>;B&lt;=<span class="str">'0'</span>;C&lt;=<span class="str">'0'</span>; <span class="kw">wait for</span> 100 ns;
+    A&lt;=<span class="str">'1'</span>;B&lt;=<span class="str">'0'</span>;C&lt;=<span class="str">'1'</span>; <span class="kw">wait for</span> 100 ns;
+    A&lt;=<span class="str">'1'</span>;B&lt;=<span class="str">'1'</span>;C&lt;=<span class="str">'0'</span>; <span class="kw">wait for</span> 100 ns;
+    A&lt;=<span class="str">'1'</span>;B&lt;=<span class="str">'1'</span>;C&lt;=<span class="str">'1'</span>; <span class="kw">wait for</span> 100 ns;
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+<span class="kw">END</span>;</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Execution Steps — Xilinx ISE</div>
+      <div class="steps-container">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><strong>Open ISE Project Navigator</strong><div class="substep">File → New Project → Name: <code>Expression1_Project</code>, HDL</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><strong>Create Design File</strong><div class="substep">Project → New Source → VHDL Module → Name: <code>Expression_1</code></div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Enter VHDL Code</strong><div class="substep">Type entity + architecture with <code>F &lt;= (A and B) or (B and C) or (C and A);</code></div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Check Syntax</strong><div class="substep">Synthesize-XST → Check Syntax → confirm 0 errors</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><strong>Create Testbench</strong><div class="substep">New Source → VHDL Test Bench → Name: <code>exp1_tb</code>, associate with Expression_1</div></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-content"><strong>Enter Stimulus</strong><div class="substep">Set A,B,C for all 8 input combos with 100 ns intervals</div></div></div>
+        <div class="step"><div class="step-num">7</div><div class="step-content"><strong>Launch ISim</strong><div class="substep">Sim view → Simulate Behavioral Model → ISim opens</div></div></div>
+        <div class="step"><div class="step-num">8</div><div class="step-content"><strong>Run Simulation</strong><div class="substep">ISim toolbar: Run for 1000 ns, observe waveform</div></div></div>
+        <div class="step"><div class="step-num">9</div><div class="step-content"><strong>Verify Output</strong><div class="substep">F=0 for rows 0-2, F=1 for rows 3,5,6,7 (≥2 inputs HIGH)</div></div></div>
+        <div class="step"><div class="step-num">10</div><div class="step-content"><strong>Save Waveform</strong><div class="substep">File → Save Waveform Config (.wcfg) for submission</div></div></div>
+      </div>
+      <div class="note-box" style="margin-top:14px;border-color:var(--orange);">
+        <strong style="color:var(--orange);">EXAM NOTE:</strong> F=AB+BC+CA is a symmetric function. F=1 iff the number of 1s in {A,B,C} ≥ 2. Both SOP and factored forms give identical truth table.
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- EXPRESSION 2 SECTION -->
+<div id="section-exp2" class="gate-section">
+<div class="container">
+  <div class="info-bar">
+    <div class="gate-name-big" style="background:linear-gradient(135deg,#fff,#ff6eb4);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Expression 2</div>
+    <div class="tag" style="border-color:#ff6eb4;color:#ff6eb4;">3-INPUT</div>
+    <div class="tag">entity: Expression_2</div>
+  </div>
+  <div class="logic-expr" style="color:#ff6eb4;">F = A'BC + AB'C + ABC' + ABC</div>
+  <p class="gate-desc">Sum of four 3-input AND products, each covering one minterm where at least two inputs are HIGH. Produces same truth table as Expression 1 — demonstrates equivalent Boolean representations.</p>
+
+  <div class="three-col">
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Expression Simulator</div>
+      <div style="display:flex;gap:24px;align-items:center;justify-content:center;flex-wrap:wrap;">
+        <div class="inputs-col">
+          <div class="input-toggle">
+            <span class="input-label">A</span>
+            <div class="toggle-btn" id="exp2-A-toggle" onclick="toggleExp2('A')"></div>
+            <div class="bit-display" id="exp2-A-bit">0</div>
+          </div>
+          <div class="input-toggle">
+            <span class="input-label">B</span>
+            <div class="toggle-btn" id="exp2-B-toggle" onclick="toggleExp2('B')"></div>
+            <div class="bit-display" id="exp2-B-bit">0</div>
+          </div>
+          <div class="input-toggle">
+            <span class="input-label">C</span>
+            <div class="toggle-btn" id="exp2-C-toggle" onclick="toggleExp2('C')"></div>
+            <div class="bit-display" id="exp2-C-bit">0</div>
+          </div>
+        </div>
+        <div style="font-size:28px;color:var(--accent2);">→</div>
+        <div class="output-col">
+          <span class="output-label">F</span>
+          <div class="output-bit" id="exp2-output">0</div>
+        </div>
+      </div>
+      <div style="margin-top:14px;text-align:center;font-size:10px;color:var(--muted);padding:8px;background:rgba(255,110,180,0.05);border-radius:6px;border:1px solid rgba(255,110,180,0.2);">
+        F = (A'BC) OR (AB'C) OR (ABC') OR (ABC)
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Truth Table</div>
+      <table>
+        <thead><tr><th>A</th><th>B</th><th>C</th><th>F</th></tr></thead>
+        <tbody id="exp2-table">
+          <tr class="highlighted"><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="one">1</td><td class="one">1</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.8;">
+        <span style="color:#ff6eb4);">■</span> Minterms: m3, m5, m6, m7<br>
+        <span style="color:var(--muted);">Identical output to Expression 1</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ VHDL Code — Expression_2.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('exp2-code')">COPY</button>
+        <pre id="exp2-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">Expression_2</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">A</span> : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">B</span> : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">C</span> : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">F</span> : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> Expression_2;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span>
+              Expression_2 <span class="kw">is</span>
+<span class="kw">begin</span>
+  <span class="signal">F</span> <span class="op">&lt;=</span> ((not A) <span class="op">and</span> B <span class="op">and</span> C) <span class="op">or</span>
+       ((A <span class="op">and</span> (not B)) <span class="op">and</span> C) <span class="op">or</span>
+       (A <span class="op">and</span> B <span class="op">and</span> (not C)) <span class="op">or</span>
+       (A <span class="op">and</span> B <span class="op">and</span> C);
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — Expression_2</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="140" viewBox="0 0 380 140" style="filter:drop-shadow(0 0 10px rgba(255,110,180,0.2))">
+          <line x1="10" y1="40" x2="100" y2="40" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="70" x2="100" y2="70" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="100" x2="100" y2="100" stroke="#4a6080" stroke-width="2"/>
+          <text x="4" y="36" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">A</text>
+          <text x="4" y="66" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">B</text>
+          <text x="4" y="96" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">C</text>
+          <rect x="100" y="15" width="180" height="110" rx="8" fill="#0f1628" stroke="#ff6eb4" stroke-width="2"/>
+          <text x="190" y="50" fill="#ff6eb4" font-size="13" font-family="Courier New" font-weight="bold" text-anchor="middle">Expression_2</text>
+          <text x="190" y="67" fill="#7b2fff" font-size="9" font-family="Courier New" text-anchor="middle">A'BC+AB'C</text>
+          <text x="190" y="80" fill="#7b2fff" font-size="9" font-family="Courier New" text-anchor="middle">+ABC'+ABC</text>
+          <text x="190" y="112" fill="#4a6080" font-size="10" font-family="Courier New" text-anchor="middle">Behavioral Architecture</text>
+          <line x1="280" y1="70" x2="370" y2="70" stroke="#4a6080" stroke-width="2"/>
+          <text x="354" y="66" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">F</text>
+          <circle cx="100" cy="40" r="3" fill="#ff6eb4"/>
+          <circle cx="100" cy="70" r="3" fill="#ff6eb4"/>
+          <circle cx="100" cy="100" r="3" fill="#ff6eb4"/>
+          <circle cx="280" cy="70" r="3" fill="#00ff88"/>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);padding:0 4px;line-height:1.8;">
+        <span style="color:#ff6eb4;">Inputs:</span> A, B, C — STD_LOGIC &nbsp;|&nbsp;
+        <span style="color:var(--green);">Output:</span> F — STD_LOGIC
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Gate-Level Circuit — A'BC + AB'C + ABC' + ABC</div>
+      <div style="display:flex;justify-content:center;padding:8px 0;">
+        <svg width="440" height="250" viewBox="0 0 440 250" style="filter:drop-shadow(0 0 8px rgba(255,110,180,0.2))">
+          <!-- NOT gates for complements -->
+          <!-- NOT A at y=30 -->
+          <line x1="10" y1="30" x2="30" y2="30" stroke="#4a6080" stroke-width="1.5"/>
+          <polygon points="30,23 50,30 30,37" fill="#0f1628" stroke="#ff3366" stroke-width="1.5"/>
+          <circle cx="53" cy="30" r="4" fill="#0f1628" stroke="#ff3366" stroke-width="1.5"/>
+          <text x="2" y="26" fill="#ffd700" font-size="10" font-family="Courier New" font-weight="bold">A</text>
+          <!-- NOT B at y=60 -->
+          <line x1="10" y1="60" x2="30" y2="60" stroke="#4a6080" stroke-width="1.5"/>
+          <polygon points="30,53 50,60 30,67" fill="#0f1628" stroke="#ff3366" stroke-width="1.5"/>
+          <circle cx="53" cy="60" r="4" fill="#0f1628" stroke="#ff3366" stroke-width="1.5"/>
+          <text x="2" y="56" fill="#ffd700" font-size="10" font-family="Courier New" font-weight="bold">B</text>
+          <!-- NOT C at y=90 -->
+          <line x1="10" y1="90" x2="30" y2="90" stroke="#4a6080" stroke-width="1.5"/>
+          <polygon points="30,83 50,90 30,97" fill="#0f1628" stroke="#ff3366" stroke-width="1.5"/>
+          <circle cx="53" cy="90" r="4" fill="#0f1628" stroke="#ff3366" stroke-width="1.5"/>
+          <text x="2" y="86" fill="#ffd700" font-size="10" font-family="Courier New" font-weight="bold">C</text>
+
+          <!-- Vertical rails for A,B,C and complements -->
+          <line x1="10" y1="30" x2="10" y2="240" stroke="#2a4060" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="57" y1="30" x2="57" y2="240" stroke="#2a4060" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="10" y1="60" x2="10" y2="240" stroke="none"/>
+          <line x1="57" y1="60" x2="57" y2="240" stroke="none"/>
+          <line x1="75" y1="60" x2="75" y2="240" stroke="#2a4060" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="57" y1="90" x2="57" y2="240" stroke="none"/>
+          <line x1="93" y1="90" x2="93" y2="240" stroke="#2a4060" stroke-width="1" stroke-dasharray="3,3"/>
+
+          <!-- AND Gate I0: A'·B·C at y=125 -->
+          <circle cx="57" cy="118" r="3" fill="#ff6eb4"/>
+          <circle cx="75" cy="126" r="3" fill="#ff6eb4"/>
+          <circle cx="93" cy="132" r="3" fill="#ff6eb4"/>
+          <line x1="57" y1="118" x2="110" y2="118" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="75" y1="126" x2="110" y2="126" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="93" y1="132" x2="110" y2="132" stroke="#4a6080" stroke-width="1.5"/>
+          <path d="M110,114 L135,114 Q152,114 152,125 Q152,136 135,136 L110,136 Z" fill="#0f1628" stroke="#7b2fff" stroke-width="1.8"/>
+          <text x="115" y="129" fill="#7b2fff" font-size="9" font-family="Courier New">AND</text>
+          <text x="108" y="111" fill="#4a6080" font-size="7" font-family="Courier New">I0(A'BC)</text>
+          <line x1="152" y1="125" x2="320" y2="125" stroke="#4a6080" stroke-width="1.5"/>
+
+          <!-- AND Gate I1: A·B'·C at y=158 -->
+          <circle cx="10" cy="150" r="3" fill="#ff6eb4"/>
+          <circle cx="57" cy="158" r="3" fill="#ff6eb4"/>
+          <circle cx="93" cy="165" r="3" fill="#ff6eb4"/>
+          <line x1="10" y1="150" x2="110" y2="150" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="57" y1="158" x2="110" y2="158" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="93" y1="165" x2="110" y2="165" stroke="#4a6080" stroke-width="1.5"/>
+          <path d="M110,146 L135,146 Q152,146 152,158 Q152,170 135,170 L110,170 Z" fill="#0f1628" stroke="#7b2fff" stroke-width="1.8"/>
+          <text x="115" y="162" fill="#7b2fff" font-size="9" font-family="Courier New">AND</text>
+          <text x="108" y="143" fill="#4a6080" font-size="7" font-family="Courier New">I1(AB'C)</text>
+          <line x1="152" y1="158" x2="320" y2="158" stroke="#4a6080" stroke-width="1.5"/>
+
+          <!-- AND Gate I2: A·B·C' at y=191 -->
+          <circle cx="10" cy="183" r="3" fill="#ff6eb4"/>
+          <circle cx="75" cy="191" r="3" fill="#ff6eb4"/>
+          <circle cx="93" cy="198" r="3" fill="#ff6eb4"/>
+          <line x1="10" y1="183" x2="110" y2="183" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="75" y1="191" x2="110" y2="191" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="93" y1="198" x2="110" y2="198" stroke="#4a6080" stroke-width="1.5"/>
+          <path d="M110,179 L135,179 Q152,179 152,191 Q152,203 135,203 L110,203 Z" fill="#0f1628" stroke="#7b2fff" stroke-width="1.8"/>
+          <text x="115" y="195" fill="#7b2fff" font-size="9" font-family="Courier New">AND</text>
+          <text x="108" y="176" fill="#4a6080" font-size="7" font-family="Courier New">I2(ABC')</text>
+          <line x1="152" y1="191" x2="320" y2="191" stroke="#4a6080" stroke-width="1.5"/>
+
+          <!-- AND Gate I3: A·B·C at y=223 -->
+          <circle cx="10" cy="215" r="3" fill="#ff6eb4"/>
+          <circle cx="75" cy="222" r="3" fill="#ff6eb4"/>
+          <circle cx="93" cy="228" r="3" fill="#ff6eb4"/>
+          <line x1="10" y1="215" x2="110" y2="215" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="75" y1="222" x2="110" y2="222" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="93" y1="228" x2="110" y2="228" stroke="#4a6080" stroke-width="1.5"/>
+          <path d="M110,211 L135,211 Q152,211 152,222 Q152,234 135,234 L110,234 Z" fill="#0f1628" stroke="#7b2fff" stroke-width="1.8"/>
+          <text x="115" y="226" fill="#7b2fff" font-size="9" font-family="Courier New">AND</text>
+          <text x="108" y="208" fill="#4a6080" font-size="7" font-family="Courier New">I3(ABC)</text>
+          <line x1="152" y1="222" x2="320" y2="222" stroke="#4a6080" stroke-width="1.5"/>
+
+          <!-- 4-input OR Gate -->
+          <line x1="320" y1="125" x2="320" y2="158" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="320" y1="222" x2="320" y2="191" stroke="#4a6080" stroke-width="1.5"/>
+          <path d="M320,140 Q330,140 346,140 Q368,140 378,175 Q368,210 346,210 Q330,210 320,210 Q334,196 334,175 Q334,154 320,140 Z" fill="#0f1628" stroke="#ff6eb4" stroke-width="1.8"/>
+          <text x="338" y="179" fill="#ff6eb4" font-size="9" font-family="Courier New">OR</text>
+          <line x1="378" y1="175" x2="432" y2="175" stroke="#00ff88" stroke-width="2.5"/>
+          <circle cx="432" cy="175" r="5" fill="#00ff88" opacity="0.6"/>
+          <text x="418" y="169" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">F</text>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.8;padding:0 4px;">
+        3 NOT gates → 4 three-input AND gates (I0–I3) → 4-input OR → F
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Testbench — exp2_tb.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('exp2-tb')">COPY</button>
+        <pre id="exp2-tb"><span class="kw">ENTITY</span> <span class="entity-name">exp2_tb</span> <span class="kw">IS END</span> exp2_tb;
+<span class="kw">ARCHITECTURE</span> behavior <span class="kw">OF</span> exp2_tb <span class="kw">IS</span>
+  <span class="kw">COMPONENT</span> Expression_2
+    <span class="kw">PORT</span>(A: <span class="kw">IN</span> std_logic;
+         B: <span class="kw">IN</span> std_logic;
+         C: <span class="kw">IN</span> std_logic;
+         F: <span class="kw">OUT</span> std_logic);
+  <span class="kw">END COMPONENT</span>;
+  <span class="kw">signal</span> <span class="signal">A</span>,<span class="signal">B</span>,<span class="signal">C</span> : std_logic := <span class="str">'0'</span>;
+  <span class="kw">signal</span> <span class="signal">F</span> : std_logic;
+<span class="kw">BEGIN</span>
+  uut: Expression_2 <span class="kw">PORT MAP</span>
+    (A=&gt;A, B=&gt;B, C=&gt;C, F=&gt;F);
+  stim_proc: <span class="kw">process begin</span>
+    A&lt;=<span class="str">'0'</span>;B&lt;=<span class="str">'0'</span>;C&lt;=<span class="str">'0'</span>; <span class="kw">wait for</span> 100 ns;
+    A&lt;=<span class="str">'0'</span>;B&lt;=<span class="str">'0'</span>;C&lt;=<span class="str">'1'</span>; <span class="kw">wait for</span> 100 ns;
+    A&lt;=<span class="str">'0'</span>;B&lt;=<span class="str">'1'</span>;C&lt;=<span class="str">'0'</span>; <span class="kw">wait for</span> 100 ns;
+    A&lt;=<span class="str">'0'</span>;B&lt;=<span class="str">'1'</span>;C&lt;=<span class="str">'1'</span>; <span class="kw">wait for</span> 100 ns;
+    A&lt;=<span class="str">'1'</span>;B&lt;=<span class="str">'0'</span>;C&lt;=<span class="str">'0'</span>; <span class="kw">wait for</span> 100 ns;
+    A&lt;=<span class="str">'1'</span>;B&lt;=<span class="str">'0'</span>;C&lt;=<span class="str">'1'</span>; <span class="kw">wait for</span> 100 ns;
+    A&lt;=<span class="str">'1'</span>;B&lt;=<span class="str">'1'</span>;C&lt;=<span class="str">'0'</span>; <span class="kw">wait for</span> 100 ns;
+    A&lt;=<span class="str">'1'</span>;B&lt;=<span class="str">'1'</span>;C&lt;=<span class="str">'1'</span>; <span class="kw">wait for</span> 100 ns;
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+<span class="kw">END</span>;</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Execution Steps — Xilinx ISE</div>
+      <div class="steps-container">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><strong>New ISE Project</strong><div class="substep">File → New Project → Name: <code>Expression2_Project</code>, HDL</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><strong>Create VHDL File</strong><div class="substep">New Source → VHDL Module → Name: <code>Expression_2</code></div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Enter VHDL Code</strong><div class="substep">Type all 4 AND terms with NOT operators using parentheses as shown</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Syntax Check</strong><div class="substep">Synthesize-XST → Check Syntax → 0 errors expected</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><strong>Create Testbench</strong><div class="substep">New Source → VHDL Test Bench → Name: <code>exp2_tb</code></div></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-content"><strong>Add Stimulus</strong><div class="substep">All 8 combinations of A, B, C with 100 ns each</div></div></div>
+        <div class="step"><div class="step-num">7</div><div class="step-content"><strong>Run ISim</strong><div class="substep">Simulate Behavioral Model → Run 1000 ns</div></div></div>
+        <div class="step"><div class="step-num">8</div><div class="step-content"><strong>Verify Minterms</strong><div class="substep">F=1 at t=300,500,600,700 ns (minterms m3,m5,m6,m7)</div></div></div>
+        <div class="step"><div class="step-num">9</div><div class="step-content"><strong>Compare with Exp1</strong><div class="substep">Waveforms must be identical — both implement same function</div></div></div>
+        <div class="step"><div class="step-num">10</div><div class="step-content"><strong>Save &amp; Export</strong><div class="substep">File → Save Waveform Config; screenshot for submission</div></div></div>
+      </div>
+      <div class="note-box" style="margin-top:14px;border-color:#ff6eb4;">
+        <strong style="color:#ff6eb4;">EXAM NOTE:</strong> Expression 2 is the canonical SOP (sum of minterms) form. Expression 1 = simplified/factored form. Both are logically equivalent — key Boolean algebra concept tested in exams.
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- HALF SUBTRACTOR SECTION -->
+<div id="section-halfsub" class="gate-section">
+<div class="container">
+  <div class="info-bar">
+    <div class="gate-name-big" style="background:linear-gradient(135deg,#fff,var(--green));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Half Subtractor</div>
+    <div class="tag" style="border-color:var(--green);color:var(--green);">STRUCTURAL</div>
+    <div class="tag">entity: hs_ab</div>
+  </div>
+  <div class="logic-expr" style="color:var(--green);">d = a XOR b &nbsp;|&nbsp; b_out = a' · b</div>
+  <p class="gate-desc">Subtracts two 1-bit numbers (a − b). Produces Difference (d) and Borrow (b_out). Uses structural architecture with 3 component instances: XOR gate for difference, NOT+AND gates for borrow generation.</p>
+
+  <div class="three-col">
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Half Subtractor Simulator</div>
+      <div style="display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;">
+        <div class="inputs-col">
+          <div class="input-toggle">
+            <span class="input-label">a</span>
+            <div class="toggle-btn" id="hs-a-toggle" onclick="toggleHS('a')"></div>
+            <div class="bit-display" id="hs-a-bit">0</div>
+          </div>
+          <div class="input-toggle">
+            <span class="input-label">b</span>
+            <div class="toggle-btn" id="hs-b-toggle" onclick="toggleHS('b')"></div>
+            <div class="bit-display" id="hs-b-bit">0</div>
+          </div>
+        </div>
+        <div style="font-size:28px;color:var(--accent2);">→</div>
+        <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+          <div class="output-col">
+            <div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:4px;">d (diff)</div>
+            <div class="output-bit" id="hs-d-output">0</div>
+          </div>
+          <div class="output-col">
+            <div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:4px;">b_out</div>
+            <div class="output-bit" id="hs-bout-output">0</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;text-align:center;font-size:11px;color:var(--muted);padding:8px;background:rgba(0,255,136,0.05);border-radius:6px;border:1px solid rgba(0,255,136,0.2);">
+        d = a XOR b &nbsp;|&nbsp; b_out = (NOT a) AND b
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Truth Table</div>
+      <table>
+        <thead><tr><th>a</th><th>b</th><th>d</th><th>b_out</th></tr></thead>
+        <tbody id="hs-table">
+          <tr class="highlighted"><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="zero">0</td><td class="zero">0</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.8;">
+        <span style="color:var(--green);">■</span> b_out=1 only when 0−1 (borrow needed)<br>
+        <span style="color:var(--accent);">■</span> d = XOR (difference bit)
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ VHDL Code — hs_ab.vhd (Structural)</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('hs-code')">COPY</button>
+        <pre id="hs-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">hs_ab</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">a</span>     : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">b</span>     : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">d</span>     : <span class="kw">out</span> STD_LOGIC;
+    <span class="signal">b_out</span> : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> hs_ab;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span> hs_ab <span class="kw">is</span>
+
+<span class="kw">component</span> xor_ab <span class="kw">is</span>
+  <span class="kw">Port</span> (a: <span class="kw">in</span>  STD_LOGIC;
+        b: <span class="kw">in</span>  STD_LOGIC;
+        y: <span class="kw">out</span> STD_LOGIC);
+<span class="kw">end component</span>;
+
+<span class="kw">component</span> not_ab <span class="kw">is</span>
+  <span class="kw">Port</span> (a: <span class="kw">in</span>  STD_LOGIC;
+        y: <span class="kw">out</span> STD_LOGIC);
+<span class="kw">end component</span>;
+
+<span class="kw">component</span> and_ab <span class="kw">is</span>
+  <span class="kw">Port</span> (a: <span class="kw">in</span>  STD_LOGIC;
+        b: <span class="kw">in</span>  STD_LOGIC;
+        y: <span class="kw">out</span> STD_LOGIC);
+<span class="kw">end component</span>;
+
+<span class="kw">signal</span> <span class="signal">s1</span> : std_logic;
+<span class="kw">begin</span>
+  I0: xor_ab <span class="kw">port map</span> (a, b, d);
+  I1: not_ab <span class="kw">port map</span> (a, s1);
+  I2: and_ab <span class="kw">port map</span> (s1, b, b_out);
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — Half Subtractor (hs_ab)</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="130" viewBox="0 0 380 130" style="filter:drop-shadow(0 0 10px rgba(0,255,136,0.2))">
+          <line x1="10" y1="45" x2="100" y2="45" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="85" x2="100" y2="85" stroke="#4a6080" stroke-width="2"/>
+          <text x="4" y="41" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">a</text>
+          <text x="4" y="81" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">b</text>
+          <text x="18" y="39" fill="#4a6080" font-size="9" font-family="Courier New">STD_LOGIC</text>
+          <text x="18" y="79" fill="#4a6080" font-size="9" font-family="Courier New">STD_LOGIC</text>
+          <rect x="100" y="20" width="180" height="90" rx="8" fill="#0f1628" stroke="#00ff88" stroke-width="2"/>
+          <text x="190" y="52" fill="#00ff88" font-size="14" font-family="Courier New" font-weight="bold" text-anchor="middle">hs_ab</text>
+          <text x="190" y="70" fill="#7b2fff" font-size="11" font-family="Courier New" text-anchor="middle">Half Subtractor</text>
+          <text x="190" y="100" fill="#4a6080" font-size="9" font-family="Courier New" text-anchor="middle">Structural Architecture</text>
+          <line x1="280" y1="50" x2="370" y2="50" stroke="#4a6080" stroke-width="2"/>
+          <line x1="280" y1="80" x2="370" y2="80" stroke="#4a6080" stroke-width="2"/>
+          <text x="344" y="46" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">d</text>
+          <text x="284" y="44" fill="#4a6080" font-size="9" font-family="Courier New">diff</text>
+          <text x="316" y="76" fill="#ffd700" font-size="10" font-family="Courier New" font-weight="bold">b_out</text>
+          <text x="284" y="76" fill="#4a6080" font-size="9" font-family="Courier New">borrow</text>
+          <circle cx="100" cy="45" r="3" fill="#00ff88"/>
+          <circle cx="100" cy="85" r="3" fill="#00ff88"/>
+          <circle cx="280" cy="50" r="3" fill="#00d4ff"/>
+          <circle cx="280" cy="80" r="3" fill="#ff9500"/>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);padding:0 4px;line-height:1.8;">
+        <span style="color:var(--green);">Inputs:</span> a, b — STD_LOGIC &nbsp;|&nbsp;
+        <span style="color:var(--accent);">d</span> = difference &nbsp;|&nbsp; <span style="color:var(--orange);">b_out</span> = borrow
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Gate-Level Circuit — Structural (I0, I1, I2)</div>
+      <div style="display:flex;justify-content:center;padding:8px 0;">
+        <svg width="420" height="180" viewBox="0 0 420 180" style="filter:drop-shadow(0 0 8px rgba(0,255,136,0.2))">
+          <!-- Input lines -->
+          <line x1="10" y1="50" x2="300" y2="50" stroke="#2a4060" stroke-width="1" stroke-dasharray="4,4"/>
+          <line x1="10" y1="130" x2="300" y2="130" stroke="#2a4060" stroke-width="1" stroke-dasharray="4,4"/>
+          <text x="2" y="46" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">a</text>
+          <text x="2" y="126" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">b</text>
+
+          <!-- I0: XOR gate (a, b → d) at top -->
+          <circle cx="30" cy="50" r="3" fill="#00d4ff"/>
+          <circle cx="30" cy="130" r="3" fill="#00d4ff"/>
+          <line x1="30" y1="50" x2="75" y2="50" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="30" y1="130" x2="75" y2="130" stroke="#4a6080" stroke-width="1.5"/>
+          <!-- XOR gate shape (with double curved input) -->
+          <path d="M72,38 Q82,38 96,38 Q114,38 122,50 Q114,62 96,62 Q82,62 72,62 Q84,56 84,50 Q84,44 72,38 Z" fill="#0f1628" stroke="#00d4ff" stroke-width="1.8"/>
+          <path d="M68,38 Q78,44 78,50 Q78,56 68,62" fill="none" stroke="#00d4ff" stroke-width="1.8"/>
+          <text x="88" y="54" fill="#00d4ff" font-size="9" font-family="Courier New">XOR</text>
+          <text x="69" y="35" fill="#4a6080" font-size="8" font-family="Courier New">I0(xor_ab)</text>
+          <line x1="122" y1="50" x2="200" y2="50" stroke="#00d4ff" stroke-width="1.8"/>
+          <line x1="75" y1="130" x2="75" y2="58" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="75" y1="58" x2="75" y2="62" stroke="#4a6080" stroke-width="1.5"/>
+          <circle cx="200" cy="50" r="5" fill="#00d4ff" opacity="0.7"/>
+          <text x="206" y="46" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">d</text>
+
+          <!-- I1: NOT gate (a → s1) in middle -->
+          <circle cx="130" cy="50" r="3" fill="#ff3366"/>
+          <line x1="130" y1="50" x2="130" y2="95" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="130" y1="95" x2="155" y2="95" stroke="#4a6080" stroke-width="1.5"/>
+          <polygon points="155,87 175,95 155,103" fill="#0f1628" stroke="#ff3366" stroke-width="1.8"/>
+          <circle cx="179" cy="95" r="5" fill="#0f1628" stroke="#ff3366" stroke-width="1.8"/>
+          <text x="156" y="90" fill="#4a6080" font-size="8" font-family="Courier New">I1(not_ab)</text>
+          <!-- s1 wire from NOT output to AND input -->
+          <line x1="184" y1="95" x2="225" y2="95" stroke="#ff3366" stroke-width="1.5"/>
+          <text x="195" y="90" fill="#ff3366" font-size="9" font-family="Courier New">s1</text>
+
+          <!-- I2: AND gate (s1, b → b_out) -->
+          <circle cx="240" cy="130" r="3" fill="#ff9500"/>
+          <line x1="240" y1="130" x2="240" y2="106" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="240" y1="106" x2="260" y2="106" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="225" y1="95" x2="260" y2="95" stroke="#4a6080" stroke-width="1.5"/>
+          <path d="M260,91 L285,91 Q300,91 300,101 Q300,111 285,111 L260,111 Z" fill="#0f1628" stroke="#00ff88" stroke-width="1.8"/>
+          <text x="265" y="105" fill="#00ff88" font-size="9" font-family="Courier New">AND</text>
+          <text x="258" y="88" fill="#4a6080" font-size="8" font-family="Courier New">I2(and_ab)</text>
+          <line x1="300" y1="101" x2="380" y2="101" stroke="#00ff88" stroke-width="2"/>
+          <circle cx="380" cy="101" r="5" fill="#00ff88" opacity="0.7"/>
+          <text x="344" y="96" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">b_out</text>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.8;padding:0 4px;">
+        I0(xor_ab): a⊕b→d &nbsp;|&nbsp; I1(not_ab): a→s1 &nbsp;|&nbsp; I2(and_ab): s1·b→b_out
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Testbench — hs_tb.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('hs-tb')">COPY</button>
+        <pre id="hs-tb"><span class="kw">ENTITY</span> <span class="entity-name">hs_tb</span> <span class="kw">IS END</span> hs_tb;
+<span class="kw">ARCHITECTURE</span> behavior <span class="kw">OF</span> hs_tb <span class="kw">IS</span>
+  <span class="kw">COMPONENT</span> hs_ab
+    <span class="kw">PORT</span>(a:     <span class="kw">IN</span>  std_logic;
+         b:     <span class="kw">IN</span>  std_logic;
+         d:     <span class="kw">OUT</span> std_logic;
+         b_out: <span class="kw">OUT</span> std_logic);
+  <span class="kw">END COMPONENT</span>;
+  <span class="kw">signal</span> <span class="signal">a</span>, <span class="signal">b</span>     : std_logic := <span class="str">'0'</span>;
+  <span class="kw">signal</span> <span class="signal">d</span>, <span class="signal">b_out</span> : std_logic;
+<span class="kw">BEGIN</span>
+  uut: hs_ab <span class="kw">PORT MAP</span>
+    (a=&gt;a, b=&gt;b, d=&gt;d, b_out=&gt;b_out);
+  stim_proc: <span class="kw">process begin</span>
+    a&lt;=<span class="str">'0'</span>; b&lt;=<span class="str">'0'</span>; <span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'0'</span>; b&lt;=<span class="str">'1'</span>; <span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'1'</span>; b&lt;=<span class="str">'0'</span>; <span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'1'</span>; b&lt;=<span class="str">'1'</span>; <span class="kw">wait for</span> 100 ns;
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+<span class="kw">END</span>;</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Execution Steps — Xilinx ISE (Structural)</div>
+      <div class="steps-container">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><strong>Create ISE Project</strong><div class="substep">File → New Project → Name: <code>HalfSubtractor_Project</code>, HDL</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><strong>Create Sub-Components First</strong><div class="substep">New 3 VHDL files: <code>xor_ab.vhd</code>, <code>not_ab.vhd</code>, <code>and_ab.vhd</code></div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Enter Component Code</strong><div class="substep">Each sub-component: entity + behavioral arch with basic gate operation</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Create Top-Level hs_ab</strong><div class="substep">New Source → VHDL Module → Name: <code>hs_ab</code> — declare 3 components + signal s1</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><strong>Enter Port Maps</strong><div class="substep">I0: xor_ab(a,b,d); I1: not_ab(a,s1); I2: and_ab(s1,b,b_out)</div></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-content"><strong>Check Syntax</strong><div class="substep">Synthesize-XST → Check Syntax on hs_ab — verify 0 errors</div></div></div>
+        <div class="step"><div class="step-num">7</div><div class="step-content"><strong>Create Testbench</strong><div class="substep">New Source → VHDL Test Bench → Name: <code>hs_tb</code>, associate with hs_ab</div></div></div>
+        <div class="step"><div class="step-num">8</div><div class="step-content"><strong>Add Stimulus</strong><div class="substep">Apply a=0/1, b=0/1 for all 4 combos, 100 ns each</div></div></div>
+        <div class="step"><div class="step-num">9</div><div class="step-content"><strong>Launch ISim</strong><div class="substep">Sim view → Simulate Behavioral Model → Run 500 ns</div></div></div>
+        <div class="step"><div class="step-num">10</div><div class="step-content"><strong>Verify Results</strong><div class="substep">d: 0,1,1,0 — b_out: 0,1,0,0 (borrow only when 0−1)</div></div></div>
+      </div>
+      <div class="note-box" style="margin-top:14px;border-color:var(--green);">
+        <strong style="color:var(--green);">EXAM NOTE:</strong> Half Subtractor uses STRUCTURAL architecture — component instantiation with port mapping. This is different from behavioral style used in other experiments. xor_ab, not_ab, and_ab must be compiled separately before hs_ab.
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- 8:1 MUX SECTION -->
+<div id="section-mux8" class="gate-section">
+<div class="container">
+  <div class="info-bar">
+    <div class="gate-name-big" style="background:linear-gradient(135deg,#fff,#b388ff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">8:1 Multiplexer</div>
+    <div class="tag" style="border-color:#b388ff;color:#b388ff;">STRUCTURAL</div>
+    <div class="tag">entity: mux_8</div>
+    <div class="tag">Dipak.xise</div>
+  </div>
+  <div class="logic-expr" style="color:#b388ff;">x = d[ s2·s1·s0 ]</div>
+  <p class="gate-desc">Selects 1 of 8 data inputs (d[7:0]) based on 3-bit select (s[2:0]). Built structurally from two MUX_4 sub-components, one NOT, two AND, one OR. s[2] picks lower or upper half; s[1:0] picks within that half.</p>
+
+  <div class="three-col">
+    <!-- Simulator -->
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live 8:1 MUX Simulator</div>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+        <div>
+          <div style="font-size:10px;color:#b388ff;letter-spacing:2px;margin-bottom:8px;text-align:center;">SELECT s[2:1:0]</div>
+          <div class="inputs-col">
+            <div class="input-toggle">
+              <span class="input-label">s2</span>
+              <div class="toggle-btn" id="mux8-s2-toggle" onclick="toggleMux8S(2)"></div>
+              <div class="bit-display" id="mux8-s2-bit">0</div>
+            </div>
+            <div class="input-toggle">
+              <span class="input-label">s1</span>
+              <div class="toggle-btn" id="mux8-s1-toggle" onclick="toggleMux8S(1)"></div>
+              <div class="bit-display" id="mux8-s1-bit">0</div>
+            </div>
+            <div class="input-toggle">
+              <span class="input-label">s0</span>
+              <div class="toggle-btn" id="mux8-s0-toggle" onclick="toggleMux8S(0)"></div>
+              <div class="bit-display" id="mux8-s0-bit">0</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:8px;text-align:center;">DATA d[7:0]</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;">
+            <div id="mux8-d0-btn" class="toggle-btn" style="width:36px;height:20px;font-size:9px;display:flex;align-items:center;justify-content:center;color:var(--muted);" onclick="toggleMux8D(0)">d0</div>
+            <div id="mux8-d1-btn" class="toggle-btn" style="width:36px;height:20px;font-size:9px;display:flex;align-items:center;justify-content:center;color:var(--muted);" onclick="toggleMux8D(1)">d1</div>
+            <div id="mux8-d2-btn" class="toggle-btn" style="width:36px;height:20px;font-size:9px;display:flex;align-items:center;justify-content:center;color:var(--muted);" onclick="toggleMux8D(2)">d2</div>
+            <div id="mux8-d3-btn" class="toggle-btn" style="width:36px;height:20px;font-size:9px;display:flex;align-items:center;justify-content:center;color:var(--muted);" onclick="toggleMux8D(3)">d3</div>
+            <div id="mux8-d4-btn" class="toggle-btn" style="width:36px;height:20px;font-size:9px;display:flex;align-items:center;justify-content:center;color:var(--muted);" onclick="toggleMux8D(4)">d4</div>
+            <div id="mux8-d5-btn" class="toggle-btn" style="width:36px;height:20px;font-size:9px;display:flex;align-items:center;justify-content:center;color:var(--muted);" onclick="toggleMux8D(5)">d5</div>
+            <div id="mux8-d6-btn" class="toggle-btn" style="width:36px;height:20px;font-size:9px;display:flex;align-items:center;justify-content:center;color:var(--muted);" onclick="toggleMux8D(6)">d6</div>
+            <div id="mux8-d7-btn" class="toggle-btn" style="width:36px;height:20px;font-size:9px;display:flex;align-items:center;justify-content:center;color:var(--muted);" onclick="toggleMux8D(7)">d7</div>
+          </div>
+        </div>
+        <div class="output-col" style="align-self:center;">
+          <span class="output-label">x</span>
+          <div class="output-bit" id="mux8-output">0</div>
+          <div id="mux8-sel-label" style="margin-top:8px;font-size:10px;color:#b388ff;text-align:center;">→ d0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Truth Table -->
+    <div class="card">
+      <div class="card-title">▸ Selection Table</div>
+      <table>
+        <thead><tr><th>s2</th><th>s1</th><th>s0</th><th>x</th></tr></thead>
+        <tbody id="mux8-table">
+          <tr class="highlighted"><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td style="color:#b388ff;">d0</td></tr>
+          <tr><td class="zero">0</td><td class="zero">0</td><td class="one">1</td><td style="color:#b388ff;">d1</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="zero">0</td><td style="color:#b388ff;">d2</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td style="color:#b388ff;">d3</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td style="color:#b388ff;">d4</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td style="color:#b388ff;">d5</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="zero">0</td><td style="color:#b388ff;">d6</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="one">1</td><td style="color:#b388ff;">d7</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.8;">
+        s=000→d0 &nbsp;|&nbsp; s=001→d1 &nbsp;… s=111→d7
+      </div>
+    </div>
+
+    <!-- VHDL Code -->
+    <div class="card">
+      <div class="card-title">▸ VHDL Code — mux_8.vhd (Dipak.xise)</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('mux8-code')">COPY</button>
+        <pre id="mux8-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">mux_8</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">d</span> : <span class="kw">in</span>  STD_LOGIC_VECTOR (7 downto 0);
+    <span class="signal">s</span> : <span class="kw">in</span>  STD_LOGIC_VECTOR (2 downto 0);
+    <span class="signal">x</span> : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> mux_8;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span> mux_8 <span class="kw">is</span>
+
+<span class="kw">component</span> MUX_4 <span class="kw">is</span>
+  <span class="kw">Port</span> (i: <span class="kw">in</span>  STD_LOGIC_VECTOR(3 downto 0);
+        s: <span class="kw">in</span>  STD_LOGIC_VECTOR(1 downto 0);
+        y: <span class="kw">out</span> STD_LOGIC);
+<span class="kw">end component</span>;
+
+<span class="kw">component</span> and_2 <span class="kw">is</span>
+  <span class="kw">Port</span> (a: <span class="kw">in</span> STD_LOGIC;
+        b: <span class="kw">in</span> STD_LOGIC;
+        y: <span class="kw">out</span> STD_LOGIC);
+<span class="kw">end component</span>;
+
+<span class="kw">component</span> or_2 <span class="kw">is</span>
+  <span class="kw">Port</span> (a: <span class="kw">in</span> STD_LOGIC;
+        b: <span class="kw">in</span> STD_LOGIC;
+        y: <span class="kw">out</span> STD_LOGIC);
+<span class="kw">end component</span>;
+
+<span class="kw">component</span> not_g <span class="kw">is</span>
+  <span class="kw">Port</span> (a: <span class="kw">in</span>  STD_LOGIC;
+        y: <span class="kw">out</span> STD_LOGIC);
+<span class="kw">end component</span>;
+
+<span class="kw">signal</span> <span class="signal">y1</span>,<span class="signal">y2</span>,<span class="signal">y3</span>,<span class="signal">y4</span>,<span class="signal">m</span>: std_logic;
+<span class="kw">begin</span>
+  10: mux_4 <span class="kw">port map</span>(d(3 downto 0),s(1 downto 0),y1);
+  11: not_g <span class="kw">port map</span>(s(2),m);
+  12: and_2 <span class="kw">port map</span>(y1,m,y3);
+  13: mux_4 <span class="kw">port map</span>(d(7 downto 4),s(1 downto 0),y2);
+  14: and_2 <span class="kw">port map</span>(y2,s(2),y4);
+  15: or_2  <span class="kw">port map</span>(y3,y4,x);
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <!-- Block Diagram -->
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — mux_8</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="150" viewBox="0 0 380 150" style="filter:drop-shadow(0 0 10px rgba(179,136,255,0.2))">
+          <line x1="10" y1="35" x2="100" y2="35" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="75" x2="100" y2="75" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="115" x2="100" y2="115" stroke="#4a6080" stroke-width="2"/>
+          <text x="2" y="30" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">d[7:0]</text>
+          <text x="2" y="71" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">s[2:0]</text>
+          <text x="16" y="30" fill="none">.</text>
+          <text x="18" y="69" fill="#4a6080" font-size="9" font-family="Courier New">select</text>
+          <text x="18" y="111" fill="#4a6080" font-size="9" font-family="Courier New">STD_LOGIC</text>
+          <text x="2" y="111" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">---</text>
+          <!-- 8-bit bus notation -->
+          <text x="38" y="24" fill="#4a6080" font-size="9" font-family="Courier New">8-bit</text>
+          <text x="38" y="64" fill="#4a6080" font-size="9" font-family="Courier New">3-bit</text>
+          <rect x="100" y="15" width="180" height="120" rx="8" fill="#0f1628" stroke="#b388ff" stroke-width="2"/>
+          <text x="190" y="57" fill="#b388ff" font-size="14" font-family="Courier New" font-weight="bold" text-anchor="middle">mux_8</text>
+          <text x="190" y="75" fill="#7b2fff" font-size="11" font-family="Courier New" text-anchor="middle">8:1 MUX</text>
+          <text x="190" y="92" fill="#4a6080" font-size="9" font-family="Courier New" text-anchor="middle">x = d[s2·s1·s0]</text>
+          <text x="190" y="123" fill="#4a6080" font-size="9" font-family="Courier New" text-anchor="middle">Structural Architecture</text>
+          <line x1="280" y1="75" x2="370" y2="75" stroke="#4a6080" stroke-width="2"/>
+          <text x="354" y="71" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">x</text>
+          <text x="284" y="69" fill="#4a6080" font-size="9" font-family="Courier New">STD_LOGIC</text>
+          <circle cx="100" cy="35" r="3" fill="#b388ff"/>
+          <circle cx="100" cy="75" r="3" fill="#b388ff"/>
+          <circle cx="280" cy="75" r="3" fill="#00ff88"/>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);padding:0 4px;line-height:1.8;">
+        <span style="color:#b388ff;">d[7:0]</span> 8-bit data &nbsp;|&nbsp;
+        <span style="color:#b388ff;">s[2:0]</span> 3-bit select &nbsp;|&nbsp;
+        <span style="color:var(--green);">x</span> output
+      </div>
+    </div>
+
+    <!-- Circuit Diagram -->
+    <div class="card">
+      <div class="card-title">▸ Structural Circuit — Two MUX_4 + NOT + AND + OR</div>
+      <div style="display:flex;justify-content:center;padding:8px 0;">
+        <svg width="440" height="220" viewBox="0 0 440 220" style="filter:drop-shadow(0 0 8px rgba(179,136,255,0.2))">
+          <!-- Labels left side -->
+          <text x="2" y="28" fill="#ffd700" font-size="10" font-family="Courier New">d(3:0)</text>
+          <text x="2" y="68" fill="#4a6080" font-size="9" font-family="Courier New">s(1:0)</text>
+          <text x="2" y="148" fill="#ffd700" font-size="10" font-family="Courier New">d(7:4)</text>
+          <text x="2" y="183" fill="#4a6080" font-size="9" font-family="Courier New">s(1:0)</text>
+          <text x="2" y="110" fill="#00d4ff" font-size="10" font-family="Courier New">s(2)</text>
+
+          <!-- MUX_4 (lower) box -->
+          <line x1="55" y1="25" x2="80" y2="25" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="55" y1="65" x2="80" y2="65" stroke="#4a6080" stroke-width="1.5"/>
+          <rect x="80" y="15" width="70" height="60" rx="6" fill="#0f1628" stroke="#b388ff" stroke-width="1.8"/>
+          <text x="115" y="41" fill="#b388ff" font-size="10" font-family="Courier New" text-anchor="middle">MUX_4</text>
+          <text x="115" y="55" fill="#4a6080" font-size="8" font-family="Courier New" text-anchor="middle">(I0: 10)</text>
+          <line x1="150" y1="45" x2="195" y2="45" stroke="#4a6080" stroke-width="1.5"/>
+          <text x="155" y="41" fill="#4a6080" font-size="9" font-family="Courier New">y1</text>
+
+          <!-- NOT gate (I1: 11) -->
+          <line x1="55" y1="107" x2="175" y2="107" stroke="#00d4ff" stroke-width="1.5"/>
+          <polygon points="175,99 198,107 175,115" fill="#0f1628" stroke="#ff3366" stroke-width="1.8"/>
+          <circle cx="202" cy="107" r="4" fill="#0f1628" stroke="#ff3366" stroke-width="1.8"/>
+          <text x="178" y="96" fill="#4a6080" font-size="8" font-family="Courier New">I1(11)</text>
+          <line x1="206" y1="107" x2="240" y2="107" stroke="#ff3366" stroke-width="1.5"/>
+          <text x="215" y="103" fill="#ff3366" font-size="9" font-family="Courier New">m</text>
+
+          <!-- AND_2 (I2: 12): y1, m → y3 -->
+          <line x1="195" y1="45" x2="195" y2="78" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="195" y1="78" x2="240" y2="78" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="240" y1="107" x2="240" y2="90" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="240" y1="90" x2="260" y2="90" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="240" y1="78" x2="260" y2="78" stroke="#4a6080" stroke-width="1.5"/>
+          <path d="M260,74 L283,74 Q298,74 298,84 Q298,94 283,94 L260,94 Z" fill="#0f1628" stroke="#7b2fff" stroke-width="1.8"/>
+          <text x="264" y="88" fill="#7b2fff" font-size="9" font-family="Courier New">AND</text>
+          <text x="258" y="71" fill="#4a6080" font-size="8" font-family="Courier New">I2(12)</text>
+          <line x1="298" y1="84" x2="358" y2="84" stroke="#4a6080" stroke-width="1.5"/>
+          <text x="305" y="80" fill="#4a6080" font-size="9" font-family="Courier New">y3</text>
+
+          <!-- MUX_4 (upper) box -->
+          <line x1="55" y1="145" x2="80" y2="145" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="55" y1="180" x2="80" y2="180" stroke="#4a6080" stroke-width="1.5"/>
+          <rect x="80" y="135" width="70" height="60" rx="6" fill="#0f1628" stroke="#b388ff" stroke-width="1.8"/>
+          <text x="115" y="161" fill="#b388ff" font-size="10" font-family="Courier New" text-anchor="middle">MUX_4</text>
+          <text x="115" y="175" fill="#4a6080" font-size="8" font-family="Courier New" text-anchor="middle">(I3: 13)</text>
+          <line x1="150" y1="165" x2="215" y2="165" stroke="#4a6080" stroke-width="1.5"/>
+          <text x="155" y="161" fill="#4a6080" font-size="9" font-family="Courier New">y2</text>
+
+          <!-- AND_2 (I4: 14): y2, s(2) → y4 -->
+          <line x1="55" y1="107" x2="55" y2="135" stroke="none"/>
+          <line x1="215" y1="165" x2="260" y2="165" stroke="#4a6080" stroke-width="1.5"/>
+          <!-- s(2) line to I4 -->
+          <line x1="55" y1="107" x2="55" y2="175" stroke="#00d4ff" stroke-width="1" stroke-dasharray="3,3"/>
+          <line x1="55" y1="175" x2="260" y2="175" stroke="#00d4ff" stroke-width="1.5"/>
+          <path d="M260,161 L283,161 Q298,161 298,171 Q298,181 283,181 L260,181 Z" fill="#0f1628" stroke="#7b2fff" stroke-width="1.8"/>
+          <text x="264" y="175" fill="#7b2fff" font-size="9" font-family="Courier New">AND</text>
+          <text x="258" y="158" fill="#4a6080" font-size="8" font-family="Courier New">I4(14)</text>
+          <line x1="298" y1="171" x2="358" y2="171" stroke="#4a6080" stroke-width="1.5"/>
+          <text x="305" y="167" fill="#4a6080" font-size="9" font-family="Courier New">y4</text>
+
+          <!-- OR_2 (I5: 15): y3, y4 → x -->
+          <line x1="358" y1="84" x2="358" y2="118" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="358" y1="171" x2="358" y2="137" stroke="#4a6080" stroke-width="1.5"/>
+          <path d="M358,110 Q368,110 382,110 Q400,110 410,128 Q400,146 382,146 Q368,146 358,146 Q372,137 372,128 Q372,119 358,110 Z" fill="#0f1628" stroke="#b388ff" stroke-width="1.8"/>
+          <text x="374" y="132" fill="#b388ff" font-size="9" font-family="Courier New">OR</text>
+          <text x="356" y="107" fill="#4a6080" font-size="8" font-family="Courier New">I5(15)</text>
+          <line x1="410" y1="128" x2="435" y2="128" stroke="#00ff88" stroke-width="2.5"/>
+          <circle cx="435" cy="128" r="5" fill="#00ff88" opacity="0.7"/>
+          <text x="420" y="122" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">x</text>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.8;padding:0 4px;">
+        10(MUX_4):d(3:0)→y1 &nbsp;|&nbsp; 11(NOT):s(2)→m &nbsp;|&nbsp; 12(AND):y1·m→y3 &nbsp;|&nbsp; 13(MUX_4):d(7:4)→y2 &nbsp;|&nbsp; 14(AND):y2·s(2)→y4 &nbsp;|&nbsp; 15(OR):y3+y4→x
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Testbench — mux8_tb.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('mux8-tb')">COPY</button>
+        <pre id="mux8-tb"><span class="kw">ENTITY</span> <span class="entity-name">mux8_tb</span> <span class="kw">IS END</span> mux8_tb;
+<span class="kw">ARCHITECTURE</span> behavior <span class="kw">OF</span> mux8_tb <span class="kw">IS</span>
+  <span class="kw">COMPONENT</span> mux_8
+    <span class="kw">PORT</span>(d: <span class="kw">IN</span>  std_logic_vector(7 downto 0);
+         s: <span class="kw">IN</span>  std_logic_vector(2 downto 0);
+         x: <span class="kw">OUT</span> std_logic);
+  <span class="kw">END COMPONENT</span>;
+  <span class="kw">signal</span> <span class="signal">d</span>: std_logic_vector(7 downto 0)
+           := <span class="str">"10110100"</span>;
+  <span class="kw">signal</span> <span class="signal">s</span>: std_logic_vector(2 downto 0)
+           := (others=&gt;<span class="str">'0'</span>);
+  <span class="kw">signal</span> <span class="signal">x</span>: std_logic;
+<span class="kw">BEGIN</span>
+  uut: mux_8 <span class="kw">PORT MAP</span>
+    (d=&gt;d, s=&gt;s, x=&gt;x);
+  stim_proc: <span class="kw">process begin</span>
+    s&lt;=<span class="str">"000"</span>; <span class="kw">wait for</span> 100 ns;
+    s&lt;=<span class="str">"001"</span>; <span class="kw">wait for</span> 100 ns;
+    s&lt;=<span class="str">"010"</span>; <span class="kw">wait for</span> 100 ns;
+    s&lt;=<span class="str">"011"</span>; <span class="kw">wait for</span> 100 ns;
+    s&lt;=<span class="str">"100"</span>; <span class="kw">wait for</span> 100 ns;
+    s&lt;=<span class="str">"101"</span>; <span class="kw">wait for</span> 100 ns;
+    s&lt;=<span class="str">"110"</span>; <span class="kw">wait for</span> 100 ns;
+    s&lt;=<span class="str">"111"</span>; <span class="kw">wait for</span> 100 ns;
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+<span class="kw">END</span>;</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Execution Steps — Xilinx ISE (Dipak.xise)</div>
+      <div class="steps-container">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><strong>Create ISE Project</strong><div class="substep">File → New Project → Name: <code>Dipak</code>, save as <code>Dipak.xise</code>, HDL</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><strong>Create Sub-Components</strong><div class="substep">Add 4 VHDL files: <code>MUX_4.vhd</code>, <code>and_2.vhd</code>, <code>or_2.vhd</code>, <code>not_g.vhd</code></div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Implement MUX_4 (4:1 MUX)</strong><div class="substep">Entity with i(3:0), s(1:0), y — behavioral with process/case on s</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Implement and_2, or_2, not_g</strong><div class="substep">Simple behavioral: y &lt;= a and b; / y &lt;= a or b; / y &lt;= not a;</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><strong>Create mux_8.vhd</strong><div class="substep">New Source → VHDL Module → Name: <code>mux_8</code> — declare all 4 components</div></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-content"><strong>Enter Port Maps (labels 10–15)</strong><div class="substep">I0=10:mux_4; I1=11:not_g; I2=12:and_2; I3=13:mux_4; I4=14:and_2; I5=15:or_2</div></div></div>
+        <div class="step"><div class="step-num">7</div><div class="step-content"><strong>Check Syntax</strong><div class="substep">Synthesize-XST → Check Syntax on mux_8 → 0 errors</div></div></div>
+        <div class="step"><div class="step-num">8</div><div class="step-content"><strong>Create Testbench</strong><div class="substep">New Source → VHDL Test Bench → <code>mux8_tb</code>, associate with mux_8</div></div></div>
+        <div class="step"><div class="step-num">9</div><div class="step-content"><strong>Launch ISim</strong><div class="substep">Sim view → Simulate Behavioral Model → ISim opens (seen in Dipak.xise console)</div></div></div>
+        <div class="step"><div class="step-num">10</div><div class="step-content"><strong>Verify All 8 Selections</strong><div class="substep">x traces d0→d7 as s cycles 000→111 each 100 ns</div></div></div>
+      </div>
+      <div class="note-box" style="margin-top:14px;border-color:#b388ff;">
+        <strong style="color:#b388ff;">EXAM NOTE:</strong> 8:1 MUX uses hierarchical structural design. MUX_4 sub-component must be compiled BEFORE mux_8. Instance labels (10–15) are numeric — valid VHDL identifiers as long as they start with a letter, though ISE accepts these as shown in Dipak.xise reference.
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
 <footer>
   <div class="container">
-    <p>VHDL Basic Logic Gates · Xilinx Vivado Behavioral Simulation</p>
-    <p style="margin-top:8px;font-size:11px;"><span>IEEE STD_LOGIC_1164</span> · AND · OR · NOT · NAND · NOR · XOR</p>
-    <p style="margin-top:6px;font-size:10px;color:#2a4060;">All codes sourced from VHDL_Basic_Gates_Codes.pdf</p>
+    <p>VHDL Logic Gates &amp; Combinational Circuits · Xilinx ISE / Vivado</p>
+    <p style="margin-top:8px;font-size:11px;"><span>IEEE STD_LOGIC_1164</span> · AND · OR · NOT · NAND · NOR · XOR · 2:4 DEC · EXP-1 · EXP-2 · HALF SUB · 8:1 MUX</p>
+    <p style="margin-top:6px;font-size:10px;color:#2a4060;">All codes sourced from FIEM lab notebooks</p>
   </div>
 </footer>
 
@@ -2497,11 +3563,103 @@ function copyCode(id) {
   });
 }
 
+// Expression 1: F = AB + BC + CA
+const exp1State = {A:0, B:0, C:0};
+function toggleExp1(inp) { exp1State[inp] ^= 1; updateExp1(); }
+function updateExp1() {
+  const s = exp1State;
+  const F = (s.A&s.B)|(s.B&s.C)|(s.C&s.A);
+  ['A','B','C'].forEach(i => {
+    const t = document.getElementById(`exp1-${i}-toggle`);
+    const b = document.getElementById(`exp1-${i}-bit`);
+    if (t) t.classList.toggle('on', s[i]===1);
+    if (b) { b.textContent=s[i]; b.classList.toggle('high',s[i]===1); }
+  });
+  const o = document.getElementById('exp1-output');
+  if (o) { o.textContent=F; o.classList.toggle('high',F===1); o.classList.toggle('low',F===0); }
+  const tb = document.getElementById('exp1-table');
+  if (tb) { const idx=(s.A<<2)|(s.B<<1)|s.C; tb.querySelectorAll('tr').forEach((r,i)=>r.classList.toggle('highlighted',i===idx)); }
+}
+
+// Expression 2: F = A'BC + AB'C + ABC' + ABC
+const exp2State = {A:0, B:0, C:0};
+function toggleExp2(inp) { exp2State[inp] ^= 1; updateExp2(); }
+function updateExp2() {
+  const s = exp2State;
+  const na=1-s.A, nb=1-s.B, nc=1-s.C;
+  const F = (na&s.B&s.C)|(s.A&nb&s.C)|(s.A&s.B&nc)|(s.A&s.B&s.C);
+  ['A','B','C'].forEach(i => {
+    const t = document.getElementById(`exp2-${i}-toggle`);
+    const b = document.getElementById(`exp2-${i}-bit`);
+    if (t) t.classList.toggle('on', s[i]===1);
+    if (b) { b.textContent=s[i]; b.classList.toggle('high',s[i]===1); }
+  });
+  const o = document.getElementById('exp2-output');
+  if (o) { o.textContent=F; o.classList.toggle('high',F===1); o.classList.toggle('low',F===0); }
+  const tb = document.getElementById('exp2-table');
+  if (tb) { const idx=(s.A<<2)|(s.B<<1)|s.C; tb.querySelectorAll('tr').forEach((r,i)=>r.classList.toggle('highlighted',i===idx)); }
+}
+
+// Half Subtractor: d = a XOR b, b_out = (NOT a) AND b
+const hsState = {a:0, b:0};
+function toggleHS(inp) { hsState[inp] ^= 1; updateHS(); }
+function updateHS() {
+  const s = hsState;
+  const d = s.a ^ s.b;
+  const bout = (1-s.a) & s.b;
+  ['a','b'].forEach(i => {
+    const t = document.getElementById(`hs-${i}-toggle`);
+    const b = document.getElementById(`hs-${i}-bit`);
+    if (t) t.classList.toggle('on', s[i]===1);
+    if (b) { b.textContent=s[i]; b.classList.toggle('high',s[i]===1); }
+  });
+  const od = document.getElementById('hs-d-output');
+  const ob = document.getElementById('hs-bout-output');
+  if (od) { od.textContent=d; od.classList.toggle('high',d===1); od.classList.toggle('low',d===0); }
+  if (ob) { ob.textContent=bout; ob.classList.toggle('high',bout===1); ob.classList.toggle('low',bout===0); }
+  const tb = document.getElementById('hs-table');
+  if (tb) { const idx=(s.a<<1)|s.b; tb.querySelectorAll('tr').forEach((r,i)=>r.classList.toggle('highlighted',i===idx)); }
+}
+
+// 8:1 Multiplexer
+const mux8State = {d:[0,0,0,0,0,0,0,0], s:[0,0,0]};
+function toggleMux8D(i) { mux8State.d[i] ^= 1; updateMux8(); }
+function toggleMux8S(bit) { mux8State.s[bit] ^= 1; updateMux8(); }
+function updateMux8() {
+  const {d, s} = mux8State;
+  const idx = (s[2]<<2)|(s[1]<<1)|s[0];
+  const x = d[idx];
+  [2,1,0].forEach(bit => {
+    const t = document.getElementById(`mux8-s${bit}-toggle`);
+    const b = document.getElementById(`mux8-s${bit}-bit`);
+    if (t) t.classList.toggle('on', s[bit]===1);
+    if (b) { b.textContent=s[bit]; b.classList.toggle('high',s[bit]===1); }
+  });
+  for (let i=0; i<8; i++) {
+    const btn = document.getElementById(`mux8-d${i}-btn`);
+    if (btn) {
+      btn.classList.toggle('on', mux8State.d[i]===1);
+      btn.style.borderColor = (i===idx) ? '#b388ff' : '';
+      btn.style.color = (i===idx) ? '#b388ff' : '';
+    }
+  }
+  const o = document.getElementById('mux8-output');
+  if (o) { o.textContent=x; o.classList.toggle('high',x===1); o.classList.toggle('low',x===0); }
+  const lbl = document.getElementById('mux8-sel-label');
+  if (lbl) lbl.textContent = `→ d${idx} = ${x}`;
+  const tb = document.getElementById('mux8-table');
+  if (tb) tb.querySelectorAll('tr').forEach((r,i) => r.classList.toggle('highlighted',i===idx));
+}
+
 // init gates with inverted defaults
 updateGate('not');
 updateGate('nand');
 updateGate('nor');
 updateDecoder();
+updateExp1();
+updateExp2();
+updateHS();
+updateMux8();
 </script>
 </body>
 </html>
