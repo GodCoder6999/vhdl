@@ -2986,6 +2986,81 @@
     </div>
   </div>
 
+  <!-- Sub-component codes -->
+  <div class="card">
+    <div class="card-title">▸ Sub-Component Files — Must Compile Before hs_ab</div>
+    <div class="three-col">
+      <div>
+        <div style="font-size:10px;color:var(--green);letter-spacing:2px;margin-bottom:8px;">xor_ab.vhd</div>
+        <div class="code-block" style="margin-bottom:0;">
+          <button class="code-copy" onclick="copyCode('hs-xor-code')">COPY</button>
+          <pre id="hs-xor-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">xor_ab</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    a : <span class="kw">in</span>  STD_LOGIC;
+    b : <span class="kw">in</span>  STD_LOGIC;
+    y : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> xor_ab;
+
+<span class="kw">architecture</span> Behavioral
+  <span class="kw">of</span> xor_ab <span class="kw">is</span>
+<span class="kw">begin</span>
+  y <span class="op">&lt;=</span> a <span class="op">xor</span> b;
+<span class="kw">end</span> Behavioral;</pre>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--green);letter-spacing:2px;margin-bottom:8px;">not_ab.vhd</div>
+        <div class="code-block" style="margin-bottom:0;">
+          <button class="code-copy" onclick="copyCode('hs-not-code')">COPY</button>
+          <pre id="hs-not-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">not_ab</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    a : <span class="kw">in</span>  STD_LOGIC;
+    y : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> not_ab;
+
+<span class="kw">architecture</span> Behavioral
+  <span class="kw">of</span> not_ab <span class="kw">is</span>
+<span class="kw">begin</span>
+  y <span class="op">&lt;=</span> <span class="op">not</span> a;
+<span class="kw">end</span> Behavioral;</pre>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:var(--green);letter-spacing:2px;margin-bottom:8px;">and_ab.vhd</div>
+        <div class="code-block" style="margin-bottom:0;">
+          <button class="code-copy" onclick="copyCode('hs-and-code')">COPY</button>
+          <pre id="hs-and-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">and_ab</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    a : <span class="kw">in</span>  STD_LOGIC;
+    b : <span class="kw">in</span>  STD_LOGIC;
+    y : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> and_ab;
+
+<span class="kw">architecture</span> Behavioral
+  <span class="kw">of</span> and_ab <span class="kw">is</span>
+<span class="kw">begin</span>
+  y <span class="op">&lt;=</span> a <span class="op">and</span> b;
+<span class="kw">end</span> Behavioral;</pre>
+        </div>
+      </div>
+    </div>
+    <div class="note-box" style="margin-top:14px;border-color:var(--green);">
+      <strong style="color:var(--green);">COMPILE ORDER:</strong> 1. xor_ab.vhd &nbsp;→&nbsp; 2. not_ab.vhd &nbsp;→&nbsp; 3. and_ab.vhd &nbsp;→&nbsp; 4. hs_ab.vhd (top-level)
+    </div>
+  </div>
+
   <div class="two-col">
     <div class="card">
       <div class="card-title">▸ Block Diagram — Half Subtractor (hs_ab)</div>
@@ -3256,6 +3331,88 @@
   15: or_2  <span class="kw">port map</span>(y3,y4,x);
 <span class="kw">end</span> Behavioral;</pre>
       </div>
+    </div>
+  </div>
+
+  <!-- Sub-component codes for mux_8 -->
+  <div class="card">
+    <div class="card-title">▸ Sub-Component Files — Must Compile Before mux_8</div>
+    <div class="two-col">
+      <div>
+        <div style="font-size:10px;color:#b388ff;letter-spacing:2px;margin-bottom:8px;">MUX_4.vhd — 4:1 Multiplexer (key sub-component)</div>
+        <div class="code-block" style="margin-bottom:0;">
+          <button class="code-copy" onclick="copyCode('mux4-code')">COPY</button>
+          <pre id="mux4-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">MUX_4</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    i : <span class="kw">in</span>  STD_LOGIC_VECTOR(3 downto 0);
+    s : <span class="kw">in</span>  STD_LOGIC_VECTOR(1 downto 0);
+    y : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> MUX_4;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span> MUX_4 <span class="kw">is</span>
+<span class="kw">begin</span>
+  <span class="kw">process</span>(i, s)
+  <span class="kw">begin</span>
+    <span class="kw">case</span> s <span class="kw">is</span>
+      <span class="kw">when</span> <span class="str">"00"</span> =&gt; y &lt;= i(0);
+      <span class="kw">when</span> <span class="str">"01"</span> =&gt; y &lt;= i(1);
+      <span class="kw">when</span> <span class="str">"10"</span> =&gt; y &lt;= i(2);
+      <span class="kw">when</span> <span class="str">"11"</span> =&gt; y &lt;= i(3);
+      <span class="kw">when others</span> =&gt; y &lt;= <span class="str">'0'</span>;
+    <span class="kw">end case</span>;
+  <span class="kw">end process</span>;
+<span class="kw">end</span> Behavioral;</pre>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:#b388ff;letter-spacing:2px;margin-bottom:8px;">Gate primitives — and_2, or_2, not_g</div>
+        <div class="code-block" style="margin-bottom:8px;">
+          <button class="code-copy" onclick="copyCode('mux8-and2-code')">COPY</button>
+          <pre id="mux8-and2-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+<span class="kw">entity</span> <span class="entity-name">and_2</span> <span class="kw">is</span>
+  <span class="kw">Port</span>(a:<span class="kw">in</span> STD_LOGIC; b:<span class="kw">in</span> STD_LOGIC;
+       y:<span class="kw">out</span> STD_LOGIC);
+<span class="kw">end</span> and_2;
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span> and_2 <span class="kw">is</span>
+<span class="kw">begin</span>
+  y <span class="op">&lt;=</span> a <span class="op">and</span> b;
+<span class="kw">end</span> Behavioral;</pre>
+        </div>
+        <div class="code-block" style="margin-bottom:8px;">
+          <button class="code-copy" onclick="copyCode('mux8-or2-code')">COPY</button>
+          <pre id="mux8-or2-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+<span class="kw">entity</span> <span class="entity-name">or_2</span> <span class="kw">is</span>
+  <span class="kw">Port</span>(a:<span class="kw">in</span> STD_LOGIC; b:<span class="kw">in</span> STD_LOGIC;
+       y:<span class="kw">out</span> STD_LOGIC);
+<span class="kw">end</span> or_2;
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span> or_2 <span class="kw">is</span>
+<span class="kw">begin</span>
+  y <span class="op">&lt;=</span> a <span class="op">or</span> b;
+<span class="kw">end</span> Behavioral;</pre>
+        </div>
+        <div class="code-block" style="margin-bottom:0;">
+          <button class="code-copy" onclick="copyCode('mux8-notg-code')">COPY</button>
+          <pre id="mux8-notg-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+<span class="kw">entity</span> <span class="entity-name">not_g</span> <span class="kw">is</span>
+  <span class="kw">Port</span>(a:<span class="kw">in</span>  STD_LOGIC;
+       y:<span class="kw">out</span> STD_LOGIC);
+<span class="kw">end</span> not_g;
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span> not_g <span class="kw">is</span>
+<span class="kw">begin</span>
+  y <span class="op">&lt;=</span> <span class="op">not</span> a;
+<span class="kw">end</span> Behavioral;</pre>
+        </div>
+      </div>
+    </div>
+    <div class="note-box" style="margin-top:14px;border-color:#b388ff;">
+      <strong style="color:#b388ff;">COMPILE ORDER:</strong> 1. and_2.vhd &nbsp;→&nbsp; 2. or_2.vhd &nbsp;→&nbsp; 3. not_g.vhd &nbsp;→&nbsp; 4. MUX_4.vhd &nbsp;→&nbsp; 5. mux_8.vhd (top-level)
     </div>
   </div>
 
