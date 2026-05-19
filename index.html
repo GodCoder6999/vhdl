@@ -1,0 +1,1630 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VHDL Basic Logic Gates — Xilinx Vivado</title>
+<style>
+  :root {
+    --bg: #0a0e1a;
+    --panel: #0f1628;
+    --card: #131d35;
+    --border: #1e3a5f;
+    --accent: #00d4ff;
+    --accent2: #7b2fff;
+    --green: #00ff88;
+    --red: #ff3366;
+    --yellow: #ffd700;
+    --orange: #ff9500;
+    --text: #c8d8f0;
+    --muted: #4a6080;
+    --glow: 0 0 20px rgba(0,212,255,0.3);
+  }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Courier New', monospace;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  body::before {
+    content:'';
+    position:fixed; inset:0;
+    background-image:
+      linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+    background-size:40px 40px;
+    pointer-events:none; z-index:0;
+  }
+  .container { max-width:1200px; margin:0 auto; padding:0 20px; position:relative; z-index:1; }
+
+  /* HERO */
+  header { text-align:center; padding:50px 20px 30px; }
+  .hero-badge {
+    display:inline-block;
+    background:linear-gradient(135deg,rgba(0,212,255,0.15),rgba(123,47,255,0.15));
+    border:1px solid var(--accent);
+    padding:4px 18px; border-radius:20px;
+    font-size:11px; letter-spacing:3px; color:var(--accent);
+    text-transform:uppercase; margin-bottom:18px;
+  }
+  h1 {
+    font-size:clamp(2rem,5vw,3.2rem); font-weight:900; line-height:1.1;
+    background:linear-gradient(135deg,#fff 0%,var(--accent) 50%,var(--accent2) 100%);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    background-clip:text; margin-bottom:10px; letter-spacing:-1px;
+  }
+  .hero-sub { color:var(--muted); font-size:13px; letter-spacing:1px; margin-bottom:6px; }
+  .pulse-dot {
+    display:inline-block; width:8px; height:8px;
+    background:var(--green); border-radius:50%; margin-right:8px;
+    animation:pulse 1.5s infinite; vertical-align:middle;
+  }
+  @keyframes pulse {
+    0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(0,255,136,0.4);}
+    50%{opacity:.7;box-shadow:0 0 0 6px rgba(0,255,136,0);}
+  }
+
+  /* STICKY NAV */
+  .gate-nav {
+    position:sticky; top:0; z-index:100;
+    background:rgba(10,14,26,0.95);
+    backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
+    display:flex; gap:6px; justify-content:center;
+    flex-wrap:wrap; padding:12px 16px;
+  }
+  .gate-tab {
+    padding:7px 18px; border:1px solid var(--border);
+    background:var(--panel); color:var(--muted);
+    border-radius:6px; cursor:pointer;
+    font-family:'Courier New',monospace; font-size:12px;
+    font-weight:bold; transition:all .2s; letter-spacing:1px;
+  }
+  .gate-tab:hover { border-color:var(--accent); color:var(--accent); }
+  .gate-tab.active {
+    background:linear-gradient(135deg,rgba(0,212,255,0.2),rgba(123,47,255,0.2));
+    border-color:var(--accent); color:var(--accent); box-shadow:var(--glow);
+  }
+
+  /* SECTIONS */
+  .gate-section { display:none; padding:32px 0 60px; }
+  .gate-section.active { display:block; }
+
+  /* CARDS */
+  .card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:12px; padding:24px; position:relative;
+    overflow:hidden; transition:border-color .3s;
+    margin-bottom:20px;
+  }
+  .card::before {
+    content:''; position:absolute;
+    top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));
+    opacity:0; transition:opacity .3s;
+  }
+  .card:hover { border-color:var(--accent); }
+  .card:hover::before { opacity:1; }
+  .card-title {
+    font-size:11px; letter-spacing:3px; color:var(--accent);
+    text-transform:uppercase; margin-bottom:18px;
+    padding-bottom:10px; border-bottom:1px solid var(--border);
+  }
+
+  /* INFO BAR */
+  .info-bar { display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-bottom:8px; }
+  .gate-name-big {
+    font-size:clamp(1.8rem,4vw,2.6rem); font-weight:900;
+    background:linear-gradient(135deg,#fff,var(--accent));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+    background-clip:text; letter-spacing:-1px;
+  }
+  .tag {
+    background:rgba(0,212,255,0.1); border:1px solid var(--border);
+    padding:3px 12px; border-radius:20px; font-size:11px;
+    color:var(--muted); letter-spacing:1px;
+  }
+  .tag.universal { border-color:var(--yellow); color:var(--yellow); background:rgba(255,215,0,0.1); }
+  .logic-expr { font-size:18px; color:var(--accent2); letter-spacing:2px; font-weight:bold; padding:6px 0 4px; }
+  .gate-desc { color:var(--muted); font-size:13px; margin-bottom:28px; line-height:1.7; }
+
+  /* TWO-COLUMN LAYOUT */
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:20px; }
+  @media(max-width:900px){ .three-col,.two-col { grid-template-columns:1fr; } }
+
+  /* SIMULATOR */
+  .simulator-card {
+    display:flex; flex-direction:column;
+    align-items:center; gap:20px;
+  }
+  .gate-visual {
+    display:flex; align-items:center; gap:16px;
+    width:100%; justify-content:center; flex-wrap:wrap;
+  }
+  .inputs-col { display:flex; flex-direction:column; gap:18px; align-items:flex-end; }
+  .input-toggle { display:flex; align-items:center; gap:10px; cursor:pointer; }
+  .input-label { font-size:14px; color:var(--muted); letter-spacing:1px; font-weight:bold; }
+  .toggle-btn {
+    width:50px; height:26px; background:var(--panel);
+    border:2px solid var(--border); border-radius:13px;
+    position:relative; cursor:pointer; transition:all .3s;
+  }
+  .toggle-btn::after {
+    content:''; position:absolute;
+    width:18px; height:18px; background:var(--muted);
+    border-radius:50%; top:2px; left:2px; transition:all .3s;
+  }
+  .toggle-btn.on { background:rgba(0,255,136,0.15); border-color:var(--green); }
+  .toggle-btn.on::after { background:var(--green); transform:translateX(24px); box-shadow:0 0 10px var(--green); }
+  .bit-display {
+    width:30px; height:30px; border-radius:6px; border:2px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    font-size:15px; font-weight:bold; transition:all .3s;
+    background:var(--panel); color:var(--muted);
+  }
+  .bit-display.high { background:rgba(0,255,136,0.15); border-color:var(--green); color:var(--green); box-shadow:0 0 12px rgba(0,255,136,0.3); }
+  .gate-svg { filter:drop-shadow(0 0 8px rgba(0,212,255,0.4)); }
+  .wire { stroke:var(--muted); stroke-width:2.5; fill:none; transition:stroke .3s; }
+  .wire.active { stroke:var(--green); filter:drop-shadow(0 0 4px var(--green)); }
+  .output-col { display:flex; align-items:center; gap:10px; }
+  .output-label { font-size:14px; color:var(--muted); letter-spacing:1px; font-weight:bold; }
+  .output-bit {
+    width:46px; height:46px; border-radius:10px; border:2px solid var(--border);
+    display:flex; align-items:center; justify-content:center;
+    font-size:20px; font-weight:bold; transition:all .3s;
+    background:var(--panel); color:var(--muted);
+  }
+  .output-bit.high {
+    background:rgba(0,255,136,0.2); border-color:var(--green);
+    color:var(--green); box-shadow:0 0 25px rgba(0,255,136,0.4);
+    animation:pop .3s ease;
+  }
+  .output-bit.low { background:rgba(255,51,102,0.1); border-color:var(--red); color:var(--red); }
+  @keyframes pop { 0%{transform:scale(1)} 50%{transform:scale(1.15)} 100%{transform:scale(1)} }
+
+  /* TRUTH TABLE */
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th {
+    background:rgba(0,212,255,0.1); color:var(--accent);
+    padding:10px 14px; text-align:center;
+    letter-spacing:2px; font-size:12px; border-bottom:1px solid var(--border);
+  }
+  td { padding:9px 14px; text-align:center; border-bottom:1px solid rgba(30,58,95,0.5); transition:background .2s; }
+  tr:last-child td { border-bottom:none; }
+  tr.highlighted td { background:rgba(0,212,255,0.1); }
+  td.one { color:var(--green); font-weight:bold; }
+  td.zero { color:var(--red); }
+
+  /* CODE BLOCK */
+  .code-block {
+    background:#060b14; border:1px solid var(--border);
+    border-radius:8px; padding:18px 18px 18px 18px;
+    font-size:13px; line-height:1.9; overflow-x:auto;
+    position:relative;
+  }
+  .code-copy {
+    position:absolute; top:10px; right:10px;
+    background:rgba(0,212,255,0.1); border:1px solid var(--border);
+    color:var(--muted); padding:4px 10px; border-radius:4px;
+    font-size:10px; cursor:pointer; font-family:'Courier New',monospace;
+    transition:all .2s; letter-spacing:1px;
+  }
+  .code-copy:hover { border-color:var(--accent); color:var(--accent); }
+  .code-copy.copied { color:var(--green); border-color:var(--green); }
+  .kw { color:#7b2fff; }
+  .entity-name { color:var(--accent); }
+  .signal { color:var(--yellow); }
+  .op { color:var(--green); }
+  .lib { color:var(--orange); }
+
+  /* EXECUTION STEPS */
+  .steps-container { counter-reset:step; }
+  .step {
+    display:flex; gap:16px; align-items:flex-start;
+    padding:16px 0; border-bottom:1px solid rgba(30,58,95,0.4);
+    counter-increment:step;
+  }
+  .step:last-child { border-bottom:none; }
+  .step-num {
+    min-width:34px; height:34px;
+    background:linear-gradient(135deg,rgba(0,212,255,0.2),rgba(123,47,255,0.2));
+    border:1px solid var(--accent); border-radius:8px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:bold; color:var(--accent); flex-shrink:0;
+  }
+  .step-body { flex:1; }
+  .step-title { font-size:14px; font-weight:bold; color:var(--text); margin-bottom:6px; letter-spacing:.5px; }
+  .step-detail { font-size:12px; color:var(--muted); line-height:1.8; }
+  .step-detail code {
+    background:rgba(0,212,255,0.1); border:1px solid rgba(0,212,255,0.2);
+    padding:1px 7px; border-radius:4px; color:var(--accent); font-size:12px;
+  }
+  .step-detail .path { color:var(--yellow); }
+  .step-detail .action { color:var(--green); font-weight:bold; }
+  .step-detail .warn { color:var(--orange); }
+
+  /* SUB-STEPS */
+  .substeps { margin-top:8px; padding-left:4px; display:flex; flex-direction:column; gap:5px; }
+  .substep { display:flex; gap:8px; font-size:12px; color:var(--muted); }
+  .substep::before { content:'→'; color:var(--accent2); flex-shrink:0; }
+
+  /* WAVEFORM DIAGRAM */
+  .waveform-table { width:100%; border-collapse:collapse; font-size:12px; }
+  .waveform-table td { padding:4px 10px; border-bottom:1px solid rgba(30,58,95,0.3); }
+  .waveform-table .sig-name { color:var(--accent); width:50px; }
+  .wave-cell { font-family:'Courier New',monospace; letter-spacing:2px; }
+  .w-high { color:var(--green); }
+  .w-low { color:var(--red); }
+
+  /* NOTE BOX */
+  .note-box {
+    background:rgba(255,215,0,0.07); border:1px solid rgba(255,215,0,0.3);
+    border-radius:8px; padding:14px 18px; font-size:12px;
+    color:var(--yellow); line-height:1.8; margin-top:16px;
+  }
+  .note-box strong { color:var(--yellow); }
+
+  /* OVERVIEW GRID */
+  .overview-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:16px; }
+  @media(max-width:700px){ .overview-grid { grid-template-columns:repeat(2,1fr); } }
+  .mini-card {
+    background:var(--card); border:1px solid var(--border);
+    border-radius:10px; padding:20px; cursor:pointer;
+    transition:all .25s; text-align:center;
+  }
+  .mini-card:hover { border-color:var(--accent); transform:translateY(-3px); box-shadow:var(--glow); }
+  .mini-name { font-size:20px; font-weight:900; color:var(--accent); letter-spacing:2px; margin-bottom:5px; }
+  .mini-expr { font-size:13px; color:var(--accent2); letter-spacing:1px; margin-bottom:8px; }
+  .mini-desc { font-size:11px; color:var(--muted); line-height:1.5; }
+
+  /* SECTION DIVIDER */
+  .divider { height:1px; background:linear-gradient(90deg,transparent,var(--border),transparent); margin:28px 0; }
+
+  /* FOOTER */
+  footer {
+    text-align:center; padding:36px 20px; color:var(--muted);
+    font-size:12px; letter-spacing:1px;
+    border-top:1px solid var(--border); margin-top:40px;
+  }
+  footer span { color:var(--accent); }
+
+  /* SCAN LINE */
+  .scan-line {
+    position:fixed; top:0; left:0; right:0; height:2px;
+    background:linear-gradient(90deg,transparent,var(--accent),transparent);
+    animation:scan 5s linear infinite; opacity:.2; pointer-events:none; z-index:999;
+  }
+  @keyframes scan { 0%{top:0} 100%{top:100vh} }
+
+  ::-webkit-scrollbar { width:6px; height:6px; }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  ::-webkit-scrollbar-thumb { background:var(--border); border-radius:3px; }
+  ::-webkit-scrollbar-thumb:hover { background:var(--accent); }
+</style>
+</head>
+<body>
+<div class="scan-line"></div>
+
+<header>
+  <div class="container">
+    <div class="hero-badge">⚡ Xilinx Vivado · VHDL · Digital Logic</div>
+    <h1>VHDL Basic Logic Gates</h1>
+    <p class="hero-sub"><span class="pulse-dot"></span>Complete Execution Reference · Xilinx Vivado</p>
+    <p style="color:var(--muted);font-size:12px;letter-spacing:1px;margin-top:4px;">AND · OR · NOT · NAND · NOR · XOR</p>
+  </div>
+</header>
+
+<nav class="gate-nav">
+  <button class="gate-tab active" onclick="showGate('overview')">OVERVIEW</button>
+  <button class="gate-tab" onclick="showGate('and')">AND</button>
+  <button class="gate-tab" onclick="showGate('or')">OR</button>
+  <button class="gate-tab" onclick="showGate('not')">NOT</button>
+  <button class="gate-tab" onclick="showGate('nand')">NAND</button>
+  <button class="gate-tab" onclick="showGate('nor')">NOR</button>
+  <button class="gate-tab" onclick="showGate('xor')">XOR</button>
+</nav>
+
+<!-- ═══════════════════════════════════════════ OVERVIEW ═══ -->
+<div id="section-overview" class="gate-section active">
+<div class="container">
+
+  <div class="overview-grid" style="margin-bottom:32px;">
+    <div class="mini-card" onclick="showGate('and')">
+      <div class="mini-name">AND</div>
+      <div class="mini-expr">Y = A · B</div>
+      <div class="mini-desc">HIGH only when ALL inputs HIGH</div>
+    </div>
+    <div class="mini-card" onclick="showGate('or')">
+      <div class="mini-name">OR</div>
+      <div class="mini-expr">Y = A + B</div>
+      <div class="mini-desc">HIGH when ANY input HIGH</div>
+    </div>
+    <div class="mini-card" onclick="showGate('not')">
+      <div class="mini-name">NOT</div>
+      <div class="mini-expr">Y = Ā</div>
+      <div class="mini-desc">Inverts single input</div>
+    </div>
+    <div class="mini-card" onclick="showGate('nand')">
+      <div class="mini-name">NAND</div>
+      <div class="mini-expr">Y = <span style="text-decoration:overline">A·B</span></div>
+      <div class="mini-desc">Universal gate · NOT of AND</div>
+    </div>
+    <div class="mini-card" onclick="showGate('nor')">
+      <div class="mini-name">NOR</div>
+      <div class="mini-expr">Y = <span style="text-decoration:overline">A+B</span></div>
+      <div class="mini-desc">Universal gate · NOT of OR</div>
+    </div>
+    <div class="mini-card" onclick="showGate('xor')">
+      <div class="mini-name">XOR</div>
+      <div class="mini-expr">Y = A ⊕ B</div>
+      <div class="mini-desc">HIGH when inputs DIFFER</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">▸ Xilinx Vivado — Master Execution Procedure (Same for All Gates)</div>
+    <div class="steps-container">
+      <div class="step">
+        <div class="step-num">01</div>
+        <div class="step-body">
+          <div class="step-title">Launch Vivado &amp; Create New Project</div>
+          <div class="step-detail">
+            Open <span class="action">Xilinx Vivado</span> → Click <code>Create Project</code> → Click <span class="action">Next</span>
+            <div class="substeps">
+              <div class="substep">Enter <span class="path">Project Name</span> (e.g. <code>AND_GATE_2</code>)</div>
+              <div class="substep">Choose <span class="path">Project Location</span> — any local folder</div>
+              <div class="substep">Check <span class="action">Create project subdirectory</span> → Click <code>Next</code></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">02</div>
+        <div class="step-body">
+          <div class="step-title">Select Project Type</div>
+          <div class="step-detail">
+            Select <span class="action">RTL Project</span> → Check <code>Do not specify sources at this time</code> → Click <code>Next</code>
+            <div class="substeps">
+              <div class="substep"><span class="warn">Note:</span> RTL = Register Transfer Level — correct for behavioral VHDL</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">03</div>
+        <div class="step-body">
+          <div class="step-title">Select Default Part / Board</div>
+          <div class="step-detail">
+            Choose your FPGA board (e.g. <code>xc7a35tcpg236-1</code> for Basys3) or any available part → Click <code>Next</code> → Click <code>Finish</code>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">04</div>
+        <div class="step-body">
+          <div class="step-title">Add Design Source (VHDL File)</div>
+          <div class="step-detail">
+            In <span class="action">Sources panel</span> → Right-click <code>Design Sources</code> → <code>Add Sources</code>
+            <div class="substeps">
+              <div class="substep">Select <span class="action">Add or create design sources</span> → Click <code>Next</code></div>
+              <div class="substep">Click <code>Create File</code> → File type: <code>VHDL</code> → Name: <code>GATE_NAME</code> (e.g. <code>AND_GATE_2</code>)</div>
+              <div class="substep">Click <code>OK</code> → Click <code>Finish</code> → Click <code>OK</code> on Define Module dialog</div>
+              <div class="substep"><span class="warn">OR:</span> Click <code>Add Files</code> to import existing <code>.vhd</code> file</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">05</div>
+        <div class="step-body">
+          <div class="step-title">Enter VHDL Code in Design Source</div>
+          <div class="step-detail">
+            Double-click the <code>.vhd</code> file in Sources → Editor opens → <span class="action">Delete default content</span> → Type/paste the VHDL code for the gate → Press <code>Ctrl+S</code> to save
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">06</div>
+        <div class="step-body">
+          <div class="step-title">Add Simulation Source (Testbench)</div>
+          <div class="step-detail">
+            Right-click <code>Simulation Sources</code> → <code>Add Sources</code>
+            <div class="substeps">
+              <div class="substep">Select <span class="action">Add or create simulation sources</span> → Click <code>Next</code></div>
+              <div class="substep">Click <code>Create File</code> → VHDL → Name: <code>tb_GATE_NAME</code> (e.g. <code>tb_AND_GATE_2</code>)</div>
+              <div class="substep">Click <code>OK</code> → Click <code>Finish</code></div>
+              <div class="substep">Double-click testbench file → Paste testbench code → <code>Ctrl+S</code></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">07</div>
+        <div class="step-body">
+          <div class="step-title">Set Top Module for Simulation</div>
+          <div class="step-detail">
+            In Sources panel → Expand <code>Simulation Sources → sim_1</code> → Right-click testbench → <span class="action">Set as Top</span>
+            <div class="substeps">
+              <div class="substep">Testbench filename should appear bold/underlined when set as top</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">08</div>
+        <div class="step-body">
+          <div class="step-title">Run Behavioral Simulation</div>
+          <div class="step-detail">
+            Left panel <span class="action">Flow Navigator</span> → <code>SIMULATION</code> → Click <span class="action">Run Simulation</span> → Click <span class="action">Run Behavioral Simulation</span>
+            <div class="substeps">
+              <div class="substep">Vivado compiles VHDL — check <span class="action">Tcl Console</span> for errors</div>
+              <div class="substep">Xsim waveform viewer opens automatically</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">09</div>
+        <div class="step-body">
+          <div class="step-title">Add Signals to Waveform Window</div>
+          <div class="step-detail">
+            In <span class="action">Scope panel</span> (left side of Xsim) → Click on the UUT instance → In <span class="action">Objects panel</span> → Select all signals → Right-click → <code>Add to Wave Window</code>
+            <div class="substeps">
+              <div class="substep">Or drag signals from Objects panel to waveform area</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">10</div>
+        <div class="step-body">
+          <div class="step-title">Run Simulation &amp; View Waveform</div>
+          <div class="step-detail">
+            Click <span class="action">Run All</span> button (▶▶) in Xsim toolbar → Click <span class="action">Zoom Fit</span> (magnifier icon) to see full waveform
+            <div class="substeps">
+              <div class="substep">Waveform shows all 4 input combinations (10 ns each)</div>
+              <div class="substep">Verify output <code>Y</code> matches truth table for the gate</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">11</div>
+        <div class="step-body">
+          <div class="step-title">View RTL Schematic (Optional)</div>
+          <div class="step-detail">
+            Flow Navigator → <code>RTL ANALYSIS</code> → <span class="action">Open Elaborated Design</span> → Click <code>Schematic</code>
+            <div class="substeps">
+              <div class="substep">Shows gate-level representation of your VHDL code</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">12</div>
+        <div class="step-body">
+          <div class="step-title">Synthesis &amp; Bitstream (For FPGA Hardware)</div>
+          <div class="step-detail">
+            Flow Navigator → <code>SYNTHESIS</code> → <span class="action">Run Synthesis</span> → After success → <code>IMPLEMENTATION</code> → <span class="action">Run Implementation</span> → <code>PROGRAM AND DEBUG</code> → <span class="action">Generate Bitstream</span> → Connect FPGA board → <span class="action">Open Hardware Manager</span> → Program Device
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="note-box">
+      <strong>EXAM NOTE:</strong> Each gate must be in its own Vivado project OR each VHDL file must have a unique entity name. Entity name in design source MUST exactly match entity name in testbench component declaration. File name should match entity name.
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ AND GATE ═══ -->
+<div id="section-and" class="gate-section">
+<div class="container">
+
+  <div class="info-bar">
+    <div class="gate-name-big">AND Gate</div>
+    <div class="tag">2-INPUT</div>
+    <div class="tag">entity: AND_GATE_2</div>
+  </div>
+  <div class="logic-expr">Y = A · B</div>
+  <p class="gate-desc">Output is HIGH (1) only when BOTH input A and input B are HIGH. Any LOW input forces output LOW.</p>
+
+  <div class="three-col">
+    <!-- Simulator -->
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Gate Simulator</div>
+      <div class="gate-visual">
+        <div class="inputs-col">
+          <div class="input-toggle">
+            <span class="input-label">A</span>
+            <div class="toggle-btn" id="and-a-toggle" onclick="toggleInput('and','a')"></div>
+            <div class="bit-display" id="and-a-bit">0</div>
+          </div>
+          <div class="input-toggle">
+            <span class="input-label">B</span>
+            <div class="toggle-btn" id="and-b-toggle" onclick="toggleInput('and','b')"></div>
+            <div class="bit-display" id="and-b-bit">0</div>
+          </div>
+        </div>
+        <svg class="gate-svg" width="100" height="80" viewBox="0 0 100 80">
+          <line class="wire" id="and-wire-a" x1="0" y1="25" x2="22" y2="25"/>
+          <line class="wire" id="and-wire-b" x1="0" y1="55" x2="22" y2="55"/>
+          <path d="M22,10 L52,10 Q80,10 80,40 Q80,70 52,70 L22,70 Z" fill="#0f1628" stroke="#00d4ff" stroke-width="2"/>
+          <line class="wire" id="and-wire-out" x1="80" y1="40" x2="100" y2="40"/>
+        </svg>
+        <div class="output-col">
+          <span class="output-label">Y</span>
+          <div class="output-bit" id="and-output">0</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Truth Table -->
+    <div class="card">
+      <div class="card-title">▸ Truth Table</div>
+      <table>
+        <thead><tr><th>A</th><th>B</th><th>Y = A·B</th></tr></thead>
+        <tbody id="and-table">
+          <tr class="highlighted"><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="zero">0</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="one">1</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:14px;font-size:11px;color:var(--muted);line-height:1.8;">
+        <span style="color:var(--green);">■</span> Output HIGH: only when A=1 AND B=1<br>
+        <span style="color:var(--red);">■</span> Output LOW: all other combinations
+      </div>
+    </div>
+
+    <!-- VHDL Code -->
+    <div class="card">
+      <div class="card-title">▸ VHDL Code — AND_GATE_2.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('and-code')">COPY</button>
+        <pre id="and-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">AND_GATE_2</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">a</span> : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">b</span> : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">Y</span> : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> AND_GATE_2;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span>
+              AND_GATE_2 <span class="kw">is</span>
+<span class="kw">begin</span>
+  <span class="signal">Y</span> <span class="op">&lt;=</span> a <span class="op">and</span> b;
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Testbench -->
+  <div class="card">
+    <div class="card-title">▸ Testbench — tb_AND_GATE_2.vhd</div>
+    <div class="code-block">
+      <button class="code-copy" onclick="copyCode('and-tb')">COPY</button>
+      <pre id="and-tb"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">tb_AND_GATE_2</span> <span class="kw">is</span>
+<span class="kw">end</span> tb_AND_GATE_2;
+
+<span class="kw">architecture</span> sim <span class="kw">of</span> tb_AND_GATE_2 <span class="kw">is</span>
+
+  <span class="kw">component</span> AND_GATE_2
+    <span class="kw">Port</span> (
+      <span class="signal">a</span> : <span class="kw">in</span>  STD_LOGIC;
+      <span class="signal">b</span> : <span class="kw">in</span>  STD_LOGIC;
+      <span class="signal">Y</span> : <span class="kw">out</span> STD_LOGIC
+    );
+  <span class="kw">end component</span>;
+
+  <span class="kw">signal</span> <span class="signal">a</span>, <span class="signal">b</span>, <span class="signal">Y</span> : STD_LOGIC <span class="op">:=</span> <span class="op">'0'</span>;
+
+<span class="kw">begin</span>
+
+  UUT: AND_GATE_2 <span class="kw">port map</span> (
+    a <span class="op">=></span> a,
+    b <span class="op">=></span> b,
+    Y <span class="op">=></span> Y
+  );
+
+  <span class="kw">process</span>
+  <span class="kw">begin</span>
+    a<span class="op">&lt;=</span><span class="op">'0'</span>; b<span class="op">&lt;=</span><span class="op">'0'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=0</span>
+    a<span class="op">&lt;=</span><span class="op">'0'</span>; b<span class="op">&lt;=</span><span class="op">'1'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=0</span>
+    a<span class="op">&lt;=</span><span class="op">'1'</span>; b<span class="op">&lt;=</span><span class="op">'0'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=0</span>
+    a<span class="op">&lt;=</span><span class="op">'1'</span>; b<span class="op">&lt;=</span><span class="op">'1'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=1</span>
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+
+<span class="kw">end</span> sim;</pre>
+    </div>
+  </div>
+
+  <!-- Execution Steps -->
+  <div class="card">
+    <div class="card-title">▸ Step-by-Step Execution in Xilinx Vivado — AND Gate</div>
+    <div class="steps-container">
+      <div class="step"><div class="step-num">01</div><div class="step-body">
+        <div class="step-title">Create New Vivado Project</div>
+        <div class="step-detail">
+          Vivado → <code>Create Project</code> → Next → Project Name: <code>AND_GATE_2</code> → Choose location → Next
+          <div class="substeps">
+            <div class="substep">Project Type: <span class="action">RTL Project</span> → check "Do not specify sources at this time" → Next</div>
+            <div class="substep">Default Part: select your FPGA (e.g. <code>xc7a35tcpg236-1</code>) → Next → <span class="action">Finish</span></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">02</div><div class="step-body">
+        <div class="step-title">Create &amp; Enter Design Source</div>
+        <div class="step-detail">
+          Sources panel → right-click <code>Design Sources</code> → <span class="action">Add Sources</span> → Add or create design sources → Next
+          <div class="substeps">
+            <div class="substep">Click <span class="action">Create File</span> → VHDL → Name: <code>AND_GATE_2</code> → OK → Finish → OK</div>
+            <div class="substep">Double-click <code>AND_GATE_2.vhd</code> → delete default → paste the VHDL code above → <code>Ctrl+S</code></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">03</div><div class="step-body">
+        <div class="step-title">Create &amp; Enter Testbench</div>
+        <div class="step-detail">
+          Sources panel → right-click <code>Simulation Sources</code> → <span class="action">Add Sources</span> → Add or create simulation sources → Next
+          <div class="substeps">
+            <div class="substep">Click <span class="action">Create File</span> → VHDL → Name: <code>tb_AND_GATE_2</code> → OK → Finish</div>
+            <div class="substep">Double-click <code>tb_AND_GATE_2.vhd</code> → paste testbench code above → <code>Ctrl+S</code></div>
+            <div class="substep">Right-click <code>tb_AND_GATE_2</code> → <span class="action">Set as Top</span></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">04</div><div class="step-body">
+        <div class="step-title">Run Behavioral Simulation</div>
+        <div class="step-detail">
+          Flow Navigator → <code>SIMULATION</code> → <span class="action">Run Simulation</span> → <span class="action">Run Behavioral Simulation</span>
+          <div class="substeps">
+            <div class="substep">Xsim opens — check Tcl Console shows <span class="action">no errors</span></div>
+            <div class="substep">In Scope panel → click <code>tb_AND_GATE_2 → UUT</code></div>
+            <div class="substep">Objects panel → select <code>a, b, Y</code> → right-click → <span class="action">Add to Wave Window</span></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">05</div><div class="step-body">
+        <div class="step-title">Execute &amp; Verify Waveform</div>
+        <div class="step-detail">
+          Click <span class="action">Run All</span> (▶▶) → Click <span class="action">Zoom Fit</span>
+          <div class="substeps">
+            <div class="substep">0–10 ns: a=0, b=0 → Y=<span class="action">0</span></div>
+            <div class="substep">10–20 ns: a=0, b=1 → Y=<span class="action">0</span></div>
+            <div class="substep">20–30 ns: a=1, b=0 → Y=<span class="action">0</span></div>
+            <div class="substep">30–40 ns: a=1, b=1 → Y=<span class="action">1</span> ← only HIGH here</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">06</div><div class="step-body">
+        <div class="step-title">View RTL Schematic</div>
+        <div class="step-detail">
+          Flow Navigator → <code>RTL ANALYSIS</code> → <span class="action">Open Elaborated Design</span> → Click <code>Schematic</code> tab
+          <div class="substeps">
+            <div class="substep">Confirms AND gate symbol with inputs a, b and output Y</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <div class="note-box">
+      <strong>Expected Waveform:</strong> Signal Y stays LOW for first 3 time slots (00, 01, 10) and goes HIGH only at the 4th slot (11). This is the distinctive AND gate pattern.
+    </div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ OR GATE ═══ -->
+<div id="section-or" class="gate-section">
+<div class="container">
+
+  <div class="info-bar">
+    <div class="gate-name-big">OR Gate</div>
+    <div class="tag">2-INPUT</div>
+    <div class="tag">entity: OR_GATE_2</div>
+  </div>
+  <div class="logic-expr">Y = A + B</div>
+  <p class="gate-desc">Output is HIGH (1) when ANY input is HIGH. Output is LOW only when ALL inputs are LOW.</p>
+
+  <div class="three-col">
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Gate Simulator</div>
+      <div class="gate-visual">
+        <div class="inputs-col">
+          <div class="input-toggle"><span class="input-label">A</span><div class="toggle-btn" id="or-a-toggle" onclick="toggleInput('or','a')"></div><div class="bit-display" id="or-a-bit">0</div></div>
+          <div class="input-toggle"><span class="input-label">B</span><div class="toggle-btn" id="or-b-toggle" onclick="toggleInput('or','b')"></div><div class="bit-display" id="or-b-bit">0</div></div>
+        </div>
+        <svg class="gate-svg" width="100" height="80" viewBox="0 0 100 80">
+          <line class="wire" id="or-wire-a" x1="0" y1="25" x2="22" y2="25"/>
+          <line class="wire" id="or-wire-b" x1="0" y1="55" x2="22" y2="55"/>
+          <path d="M15,10 Q35,40 15,70 L50,70 Q85,70 85,40 Q85,10 50,10 Z" fill="#0f1628" stroke="#00d4ff" stroke-width="2"/>
+          <line class="wire" id="or-wire-out" x1="85" y1="40" x2="100" y2="40"/>
+        </svg>
+        <div class="output-col"><span class="output-label">Y</span><div class="output-bit" id="or-output">0</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Truth Table</div>
+      <table>
+        <thead><tr><th>A</th><th>B</th><th>Y = A+B</th></tr></thead>
+        <tbody id="or-table">
+          <tr class="highlighted"><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="one">1</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:14px;font-size:11px;color:var(--muted);line-height:1.8;">
+        <span style="color:var(--red);">■</span> Output LOW: only when A=0 AND B=0<br>
+        <span style="color:var(--green);">■</span> Output HIGH: all other combinations
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ VHDL Code — OR_GATE_2.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('or-code')">COPY</button>
+        <pre id="or-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">OR_GATE_2</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">a</span> : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">b</span> : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">Y</span> : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> OR_GATE_2;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span>
+              OR_GATE_2 <span class="kw">is</span>
+<span class="kw">begin</span>
+  <span class="signal">Y</span> <span class="op">&lt;=</span> a <span class="op">or</span> b;
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">▸ Testbench — tb_OR_GATE_2.vhd</div>
+    <div class="code-block">
+      <button class="code-copy" onclick="copyCode('or-tb')">COPY</button>
+      <pre id="or-tb"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">tb_OR_GATE_2</span> <span class="kw">is</span>
+<span class="kw">end</span> tb_OR_GATE_2;
+
+<span class="kw">architecture</span> sim <span class="kw">of</span> tb_OR_GATE_2 <span class="kw">is</span>
+
+  <span class="kw">component</span> OR_GATE_2
+    <span class="kw">Port</span> (
+      <span class="signal">a</span> : <span class="kw">in</span>  STD_LOGIC;
+      <span class="signal">b</span> : <span class="kw">in</span>  STD_LOGIC;
+      <span class="signal">Y</span> : <span class="kw">out</span> STD_LOGIC
+    );
+  <span class="kw">end component</span>;
+
+  <span class="kw">signal</span> <span class="signal">a</span>, <span class="signal">b</span>, <span class="signal">Y</span> : STD_LOGIC <span class="op">:=</span> <span class="op">'0'</span>;
+
+<span class="kw">begin</span>
+
+  UUT: OR_GATE_2 <span class="kw">port map</span> (
+    a <span class="op">=></span> a, b <span class="op">=></span> b, Y <span class="op">=></span> Y
+  );
+
+  <span class="kw">process</span>
+  <span class="kw">begin</span>
+    a<span class="op">&lt;=</span><span class="op">'0'</span>; b<span class="op">&lt;=</span><span class="op">'0'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=0</span>
+    a<span class="op">&lt;=</span><span class="op">'0'</span>; b<span class="op">&lt;=</span><span class="op">'1'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=1</span>
+    a<span class="op">&lt;=</span><span class="op">'1'</span>; b<span class="op">&lt;=</span><span class="op">'0'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=1</span>
+    a<span class="op">&lt;=</span><span class="op">'1'</span>; b<span class="op">&lt;=</span><span class="op">'1'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=1</span>
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+
+<span class="kw">end</span> sim;</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">▸ Step-by-Step Execution in Xilinx Vivado — OR Gate</div>
+    <div class="steps-container">
+      <div class="step"><div class="step-num">01</div><div class="step-body">
+        <div class="step-title">Create New Project</div>
+        <div class="step-detail">Vivado → <code>Create Project</code> → Next → Name: <code>OR_GATE_2</code> → RTL Project → select FPGA part → Finish</div>
+      </div></div>
+      <div class="step"><div class="step-num">02</div><div class="step-body">
+        <div class="step-title">Create Design Source</div>
+        <div class="step-detail">
+          Sources → right-click <code>Design Sources</code> → Add Sources → Create File → VHDL → Name: <code>OR_GATE_2</code> → OK → Finish
+          <div class="substeps">
+            <div class="substep">Open file → paste VHDL code → <code>Ctrl+S</code></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">03</div><div class="step-body">
+        <div class="step-title">Create Testbench</div>
+        <div class="step-detail">
+          Sources → right-click <code>Simulation Sources</code> → Add Sources → Create File → VHDL → Name: <code>tb_OR_GATE_2</code> → OK → Finish
+          <div class="substeps">
+            <div class="substep">Open testbench → paste testbench code → <code>Ctrl+S</code></div>
+            <div class="substep">Right-click <code>tb_OR_GATE_2</code> → <span class="action">Set as Top</span></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">04</div><div class="step-body">
+        <div class="step-title">Run Behavioral Simulation</div>
+        <div class="step-detail">
+          Flow Navigator → Simulation → <span class="action">Run Behavioral Simulation</span> → Xsim opens
+          <div class="substeps">
+            <div class="substep">Scope → click UUT → Objects → select a, b, Y → right-click → <span class="action">Add to Wave Window</span></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">05</div><div class="step-body">
+        <div class="step-title">Execute &amp; Verify</div>
+        <div class="step-detail">
+          Click <span class="action">Run All</span> → Click <span class="action">Zoom Fit</span>
+          <div class="substeps">
+            <div class="substep">0–10 ns: a=0, b=0 → Y=<span style="color:var(--red)">0</span> ← only LOW here</div>
+            <div class="substep">10–20 ns: a=0, b=1 → Y=<span class="action">1</span></div>
+            <div class="substep">20–30 ns: a=1, b=0 → Y=<span class="action">1</span></div>
+            <div class="substep">30–40 ns: a=1, b=1 → Y=<span class="action">1</span></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <div class="note-box"><strong>Expected Waveform:</strong> Y is LOW only in the first 10 ns (both inputs 0). Y goes HIGH for the remaining 30 ns. Opposite pattern to AND gate.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ NOT GATE ═══ -->
+<div id="section-not" class="gate-section">
+<div class="container">
+
+  <div class="info-bar">
+    <div class="gate-name-big">NOT Gate</div>
+    <div class="tag">1-INPUT</div>
+    <div class="tag">entity: NOT_GATE</div>
+  </div>
+  <div class="logic-expr">Y = Ā (NOT A)</div>
+  <p class="gate-desc">Inverter. Single input only. Output is always the complement of input. HIGH becomes LOW, LOW becomes HIGH.</p>
+
+  <div class="three-col">
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Gate Simulator</div>
+      <div class="gate-visual">
+        <div class="inputs-col">
+          <div class="input-toggle"><span class="input-label">A</span><div class="toggle-btn" id="not-a-toggle" onclick="toggleInput('not','a')"></div><div class="bit-display" id="not-a-bit">0</div></div>
+        </div>
+        <svg class="gate-svg" width="100" height="60" viewBox="0 0 100 60">
+          <line class="wire" id="not-wire-a" x1="0" y1="30" x2="20" y2="30"/>
+          <polygon points="20,10 20,50 68,30" fill="#0f1628" stroke="#00d4ff" stroke-width="2"/>
+          <circle cx="74" cy="30" r="6" fill="#0f1628" stroke="#00d4ff" stroke-width="2"/>
+          <line class="wire" id="not-wire-out" x1="80" y1="30" x2="100" y2="30"/>
+        </svg>
+        <div class="output-col"><span class="output-label">Y</span><div class="output-bit high" id="not-output">1</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Truth Table</div>
+      <table>
+        <thead><tr><th>A</th><th>Y = Ā</th></tr></thead>
+        <tbody id="not-table">
+          <tr class="highlighted"><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:14px;font-size:11px;color:var(--muted);line-height:1.8;">
+        Only 2 combinations (1 input).<br>
+        Output always opposite of input.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ VHDL Code — NOT_GATE.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('not-code')">COPY</button>
+        <pre id="not-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">NOT_GATE</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">a</span> : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">Y</span> : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> NOT_GATE;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span>
+              NOT_GATE <span class="kw">is</span>
+<span class="kw">begin</span>
+  <span class="signal">Y</span> <span class="op">&lt;=</span> <span class="op">NOT</span> a;
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">▸ Testbench — tb_NOT_GATE.vhd</div>
+    <div class="code-block">
+      <button class="code-copy" onclick="copyCode('not-tb')">COPY</button>
+      <pre id="not-tb"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">tb_NOT_GATE</span> <span class="kw">is</span>
+<span class="kw">end</span> tb_NOT_GATE;
+
+<span class="kw">architecture</span> sim <span class="kw">of</span> tb_NOT_GATE <span class="kw">is</span>
+
+  <span class="kw">component</span> NOT_GATE
+    <span class="kw">Port</span> (
+      <span class="signal">a</span> : <span class="kw">in</span>  STD_LOGIC;
+      <span class="signal">Y</span> : <span class="kw">out</span> STD_LOGIC
+    );
+  <span class="kw">end component</span>;
+
+  <span class="kw">signal</span> <span class="signal">a</span>, <span class="signal">Y</span> : STD_LOGIC <span class="op">:=</span> <span class="op">'0'</span>;
+
+<span class="kw">begin</span>
+
+  UUT: NOT_GATE <span class="kw">port map</span> (
+    a <span class="op">=></span> a, Y <span class="op">=></span> Y
+  );
+
+  <span class="kw">process</span>
+  <span class="kw">begin</span>
+    a<span class="op">&lt;=</span><span class="op">'0'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=1</span>
+    a<span class="op">&lt;=</span><span class="op">'1'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=0</span>
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+
+<span class="kw">end</span> sim;</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">▸ Step-by-Step Execution in Xilinx Vivado — NOT Gate</div>
+    <div class="steps-container">
+      <div class="step"><div class="step-num">01</div><div class="step-body">
+        <div class="step-title">Create New Project</div>
+        <div class="step-detail">Vivado → <code>Create Project</code> → Name: <code>NOT_GATE</code> → RTL Project → select FPGA → Finish</div>
+      </div></div>
+      <div class="step"><div class="step-num">02</div><div class="step-body">
+        <div class="step-title">Create Design Source</div>
+        <div class="step-detail">
+          Sources → right-click Design Sources → Add Sources → Create File → VHDL → Name: <code>NOT_GATE</code> → OK → Finish
+          <div class="substeps">
+            <div class="substep">Paste VHDL code → <code>Ctrl+S</code></div>
+            <div class="substep"><span class="warn">NOTE:</span> Only 1 input port <code>a</code> (no port <code>b</code>)</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">03</div><div class="step-body">
+        <div class="step-title">Create Testbench</div>
+        <div class="step-detail">
+          Sources → right-click Simulation Sources → Add Sources → Create File → VHDL → Name: <code>tb_NOT_GATE</code> → Finish
+          <div class="substeps">
+            <div class="substep">Paste testbench code → <code>Ctrl+S</code> → right-click → <span class="action">Set as Top</span></div>
+            <div class="substep"><span class="warn">NOTE:</span> Only 2 test vectors (a=0 and a=1) — NOT gate has only 1 input</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">04</div><div class="step-body">
+        <div class="step-title">Run Behavioral Simulation</div>
+        <div class="step-detail">
+          Flow Navigator → Simulation → <span class="action">Run Behavioral Simulation</span>
+          <div class="substeps">
+            <div class="substep">Add signals <code>a, Y</code> to waveform window</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">05</div><div class="step-body">
+        <div class="step-title">Execute &amp; Verify</div>
+        <div class="step-detail">
+          Click <span class="action">Run All</span> → Zoom Fit
+          <div class="substeps">
+            <div class="substep">0–10 ns: a=0 → Y=<span class="action">1</span> (inverted)</div>
+            <div class="substep">10–20 ns: a=1 → Y=<span style="color:var(--red)">0</span> (inverted)</div>
+            <div class="substep">Waveform of Y is exact mirror/complement of a</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <div class="note-box"><strong>Expected Waveform:</strong> Signal Y is always opposite to A. When A is LOW (0), Y is HIGH (1). When A goes HIGH (1), Y goes LOW (0). The waveform of Y is the inverted copy of A.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ NAND GATE ═══ -->
+<div id="section-nand" class="gate-section">
+<div class="container">
+
+  <div class="info-bar">
+    <div class="gate-name-big">NAND Gate</div>
+    <div class="tag">2-INPUT</div>
+    <div class="tag universal">UNIVERSAL GATE</div>
+    <div class="tag">entity: NAND_GATE_2</div>
+  </div>
+  <div class="logic-expr">Y = <span style="text-decoration:overline">A·B</span> = NOT(A AND B)</div>
+  <p class="gate-desc">Complement of AND. Output is LOW only when ALL inputs are HIGH. Called Universal Gate because any logic function can be built using only NAND gates.</p>
+
+  <div class="three-col">
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Gate Simulator</div>
+      <div class="gate-visual">
+        <div class="inputs-col">
+          <div class="input-toggle"><span class="input-label">A</span><div class="toggle-btn" id="nand-a-toggle" onclick="toggleInput('nand','a')"></div><div class="bit-display" id="nand-a-bit">0</div></div>
+          <div class="input-toggle"><span class="input-label">B</span><div class="toggle-btn" id="nand-b-toggle" onclick="toggleInput('nand','b')"></div><div class="bit-display" id="nand-b-bit">0</div></div>
+        </div>
+        <svg class="gate-svg" width="110" height="80" viewBox="0 0 110 80">
+          <line class="wire" id="nand-wire-a" x1="0" y1="25" x2="22" y2="25"/>
+          <line class="wire" id="nand-wire-b" x1="0" y1="55" x2="22" y2="55"/>
+          <path d="M22,10 L52,10 Q80,10 80,40 Q80,70 52,70 L22,70 Z" fill="#0f1628" stroke="#00d4ff" stroke-width="2"/>
+          <circle cx="86" cy="40" r="6" fill="#0f1628" stroke="#00d4ff" stroke-width="2"/>
+          <line class="wire" id="nand-wire-out" x1="92" y1="40" x2="110" y2="40"/>
+        </svg>
+        <div class="output-col"><span class="output-label">Y</span><div class="output-bit high" id="nand-output">1</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Truth Table</div>
+      <table>
+        <thead><tr><th>A</th><th>B</th><th>Y = <span style="text-decoration:overline">A·B</span></th></tr></thead>
+        <tbody id="nand-table">
+          <tr class="highlighted"><td class="zero">0</td><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="zero">0</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:14px;font-size:11px;color:var(--muted);line-height:1.8;">
+        <span style="color:var(--red);">■</span> Output LOW: only when A=1 AND B=1<br>
+        <span style="color:var(--green);">■</span> Output HIGH: all other combinations<br>
+        <span style="color:var(--yellow);">★</span> Inverse of AND gate
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ VHDL Code — NAND_GATE_2.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('nand-code')">COPY</button>
+        <pre id="nand-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">NAND_GATE_2</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">a</span> : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">b</span> : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">Y</span> : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> NAND_GATE_2;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span>
+              NAND_GATE_2 <span class="kw">is</span>
+<span class="kw">begin</span>
+  <span class="signal">Y</span> <span class="op">&lt;=</span> <span class="op">NOT</span> (a <span class="op">AND</span> b);
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">▸ Testbench — tb_NAND_GATE_2.vhd</div>
+    <div class="code-block">
+      <button class="code-copy" onclick="copyCode('nand-tb')">COPY</button>
+      <pre id="nand-tb"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">tb_NAND_GATE_2</span> <span class="kw">is</span>
+<span class="kw">end</span> tb_NAND_GATE_2;
+
+<span class="kw">architecture</span> sim <span class="kw">of</span> tb_NAND_GATE_2 <span class="kw">is</span>
+
+  <span class="kw">component</span> NAND_GATE_2
+    <span class="kw">Port</span> (
+      <span class="signal">a</span> : <span class="kw">in</span>  STD_LOGIC;
+      <span class="signal">b</span> : <span class="kw">in</span>  STD_LOGIC;
+      <span class="signal">Y</span> : <span class="kw">out</span> STD_LOGIC
+    );
+  <span class="kw">end component</span>;
+
+  <span class="kw">signal</span> <span class="signal">a</span>, <span class="signal">b</span>, <span class="signal">Y</span> : STD_LOGIC <span class="op">:=</span> <span class="op">'0'</span>;
+
+<span class="kw">begin</span>
+
+  UUT: NAND_GATE_2 <span class="kw">port map</span> (
+    a <span class="op">=></span> a, b <span class="op">=></span> b, Y <span class="op">=></span> Y
+  );
+
+  <span class="kw">process</span>
+  <span class="kw">begin</span>
+    a<span class="op">&lt;=</span><span class="op">'0'</span>; b<span class="op">&lt;=</span><span class="op">'0'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=1</span>
+    a<span class="op">&lt;=</span><span class="op">'0'</span>; b<span class="op">&lt;=</span><span class="op">'1'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=1</span>
+    a<span class="op">&lt;=</span><span class="op">'1'</span>; b<span class="op">&lt;=</span><span class="op">'0'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=1</span>
+    a<span class="op">&lt;=</span><span class="op">'1'</span>; b<span class="op">&lt;=</span><span class="op">'1'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=0</span>
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+
+<span class="kw">end</span> sim;</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">▸ Step-by-Step Execution in Xilinx Vivado — NAND Gate</div>
+    <div class="steps-container">
+      <div class="step"><div class="step-num">01</div><div class="step-body">
+        <div class="step-title">Create New Project</div>
+        <div class="step-detail">Vivado → Create Project → Name: <code>NAND_GATE_2</code> → RTL Project → select FPGA → Finish</div>
+      </div></div>
+      <div class="step"><div class="step-num">02</div><div class="step-body">
+        <div class="step-title">Create Design Source</div>
+        <div class="step-detail">
+          Sources → Design Sources → Add Sources → Create File → VHDL → Name: <code>NAND_GATE_2</code> → OK → Finish
+          <div class="substeps">
+            <div class="substep">Paste VHDL code → <code>Ctrl+S</code></div>
+            <div class="substep"><span class="warn">KEY LINE:</span> <code>Y &lt;= NOT (a AND b);</code> — parentheses required</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">03</div><div class="step-body">
+        <div class="step-title">Create Testbench</div>
+        <div class="step-detail">
+          Simulation Sources → Add Sources → Create File → VHDL → Name: <code>tb_NAND_GATE_2</code> → Finish
+          <div class="substeps">
+            <div class="substep">Paste testbench → <code>Ctrl+S</code> → Set as Top</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">04</div><div class="step-body">
+        <div class="step-title">Run Behavioral Simulation</div>
+        <div class="step-detail">
+          Flow Navigator → Simulation → <span class="action">Run Behavioral Simulation</span>
+          <div class="substeps">
+            <div class="substep">Add a, b, Y to waveform → Run All → Zoom Fit</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">05</div><div class="step-body">
+        <div class="step-title">Verify Waveform</div>
+        <div class="step-detail">
+          <div class="substeps">
+            <div class="substep">0–10 ns: a=0, b=0 → Y=<span class="action">1</span></div>
+            <div class="substep">10–20 ns: a=0, b=1 → Y=<span class="action">1</span></div>
+            <div class="substep">20–30 ns: a=1, b=0 → Y=<span class="action">1</span></div>
+            <div class="substep">30–40 ns: a=1, b=1 → Y=<span style="color:var(--red)">0</span> ← only LOW here</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <div class="note-box"><strong>Expected Waveform:</strong> Y stays HIGH for first 3 time slots and goes LOW only in the 4th slot (both inputs HIGH). This is the exact inverse of AND gate. NAND = NOT AND.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ NOR GATE ═══ -->
+<div id="section-nor" class="gate-section">
+<div class="container">
+
+  <div class="info-bar">
+    <div class="gate-name-big">NOR Gate</div>
+    <div class="tag">2-INPUT</div>
+    <div class="tag universal">UNIVERSAL GATE</div>
+    <div class="tag">entity: NOR_GATE_2</div>
+  </div>
+  <div class="logic-expr">Y = <span style="text-decoration:overline">A+B</span> = NOT(A OR B)</div>
+  <p class="gate-desc">Complement of OR. Output HIGH only when ALL inputs LOW. Second Universal Gate — any logic function can be built using only NOR gates.</p>
+
+  <div class="three-col">
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Gate Simulator</div>
+      <div class="gate-visual">
+        <div class="inputs-col">
+          <div class="input-toggle"><span class="input-label">A</span><div class="toggle-btn" id="nor-a-toggle" onclick="toggleInput('nor','a')"></div><div class="bit-display" id="nor-a-bit">0</div></div>
+          <div class="input-toggle"><span class="input-label">B</span><div class="toggle-btn" id="nor-b-toggle" onclick="toggleInput('nor','b')"></div><div class="bit-display" id="nor-b-bit">0</div></div>
+        </div>
+        <svg class="gate-svg" width="110" height="80" viewBox="0 0 110 80">
+          <line class="wire" id="nor-wire-a" x1="0" y1="25" x2="18" y2="25"/>
+          <line class="wire" id="nor-wire-b" x1="0" y1="55" x2="18" y2="55"/>
+          <path d="M15,10 Q35,40 15,70 L50,70 Q85,70 85,40 Q85,10 50,10 Z" fill="#0f1628" stroke="#00d4ff" stroke-width="2"/>
+          <circle cx="91" cy="40" r="6" fill="#0f1628" stroke="#00d4ff" stroke-width="2"/>
+          <line class="wire" id="nor-wire-out" x1="97" y1="40" x2="110" y2="40"/>
+        </svg>
+        <div class="output-col"><span class="output-label">Y</span><div class="output-bit high" id="nor-output">1</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Truth Table</div>
+      <table>
+        <thead><tr><th>A</th><th>B</th><th>Y = <span style="text-decoration:overline">A+B</span></th></tr></thead>
+        <tbody id="nor-table">
+          <tr class="highlighted"><td class="zero">0</td><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="zero">0</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="zero">0</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:14px;font-size:11px;color:var(--muted);line-height:1.8;">
+        <span style="color:var(--green);">■</span> Output HIGH: only when A=0 AND B=0<br>
+        <span style="color:var(--red);">■</span> Output LOW: all other combinations<br>
+        <span style="color:var(--yellow);">★</span> Inverse of OR gate
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ VHDL Code — NOR_GATE_2.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('nor-code')">COPY</button>
+        <pre id="nor-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">NOR_GATE_2</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">a</span> : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">b</span> : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">Y</span> : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> NOR_GATE_2;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span>
+              NOR_GATE_2 <span class="kw">is</span>
+<span class="kw">begin</span>
+  <span class="signal">Y</span> <span class="op">&lt;=</span> <span class="op">NOT</span> (a <span class="op">OR</span> b);
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">▸ Testbench — tb_NOR_GATE_2.vhd</div>
+    <div class="code-block">
+      <button class="code-copy" onclick="copyCode('nor-tb')">COPY</button>
+      <pre id="nor-tb"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">tb_NOR_GATE_2</span> <span class="kw">is</span>
+<span class="kw">end</span> tb_NOR_GATE_2;
+
+<span class="kw">architecture</span> sim <span class="kw">of</span> tb_NOR_GATE_2 <span class="kw">is</span>
+
+  <span class="kw">component</span> NOR_GATE_2
+    <span class="kw">Port</span> (
+      <span class="signal">a</span> : <span class="kw">in</span>  STD_LOGIC;
+      <span class="signal">b</span> : <span class="kw">in</span>  STD_LOGIC;
+      <span class="signal">Y</span> : <span class="kw">out</span> STD_LOGIC
+    );
+  <span class="kw">end component</span>;
+
+  <span class="kw">signal</span> <span class="signal">a</span>, <span class="signal">b</span>, <span class="signal">Y</span> : STD_LOGIC <span class="op">:=</span> <span class="op">'0'</span>;
+
+<span class="kw">begin</span>
+
+  UUT: NOR_GATE_2 <span class="kw">port map</span> (
+    a <span class="op">=></span> a, b <span class="op">=></span> b, Y <span class="op">=></span> Y
+  );
+
+  <span class="kw">process</span>
+  <span class="kw">begin</span>
+    a<span class="op">&lt;=</span><span class="op">'0'</span>; b<span class="op">&lt;=</span><span class="op">'0'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=1</span>
+    a<span class="op">&lt;=</span><span class="op">'0'</span>; b<span class="op">&lt;=</span><span class="op">'1'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=0</span>
+    a<span class="op">&lt;=</span><span class="op">'1'</span>; b<span class="op">&lt;=</span><span class="op">'0'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=0</span>
+    a<span class="op">&lt;=</span><span class="op">'1'</span>; b<span class="op">&lt;=</span><span class="op">'1'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=0</span>
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+
+<span class="kw">end</span> sim;</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">▸ Step-by-Step Execution in Xilinx Vivado — NOR Gate</div>
+    <div class="steps-container">
+      <div class="step"><div class="step-num">01</div><div class="step-body">
+        <div class="step-title">Create New Project</div>
+        <div class="step-detail">Vivado → Create Project → Name: <code>NOR_GATE_2</code> → RTL Project → select FPGA → Finish</div>
+      </div></div>
+      <div class="step"><div class="step-num">02</div><div class="step-body">
+        <div class="step-title">Create Design Source</div>
+        <div class="step-detail">
+          Design Sources → Add Sources → Create File → VHDL → Name: <code>NOR_GATE_2</code> → Finish
+          <div class="substeps">
+            <div class="substep">Paste VHDL code → <code>Ctrl+S</code></div>
+            <div class="substep"><span class="warn">KEY LINE:</span> <code>Y &lt;= NOT (a OR b);</code> — parentheses required</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">03</div><div class="step-body">
+        <div class="step-title">Create Testbench</div>
+        <div class="step-detail">
+          Simulation Sources → Add Sources → Create File → VHDL → Name: <code>tb_NOR_GATE_2</code> → Finish
+          <div class="substeps">
+            <div class="substep">Paste testbench → <code>Ctrl+S</code> → Set as Top</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">04</div><div class="step-body">
+        <div class="step-title">Run Behavioral Simulation</div>
+        <div class="step-detail">
+          Flow Navigator → Simulation → <span class="action">Run Behavioral Simulation</span>
+          <div class="substeps"><div class="substep">Add a, b, Y → Run All → Zoom Fit</div></div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">05</div><div class="step-body">
+        <div class="step-title">Verify Waveform</div>
+        <div class="step-detail">
+          <div class="substeps">
+            <div class="substep">0–10 ns: a=0, b=0 → Y=<span class="action">1</span> ← only HIGH here</div>
+            <div class="substep">10–20 ns: a=0, b=1 → Y=<span style="color:var(--red)">0</span></div>
+            <div class="substep">20–30 ns: a=1, b=0 → Y=<span style="color:var(--red)">0</span></div>
+            <div class="substep">30–40 ns: a=1, b=1 → Y=<span style="color:var(--red)">0</span></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <div class="note-box"><strong>Expected Waveform:</strong> Y is HIGH only in first 10 ns (both inputs 0). Y goes LOW for remaining 30 ns. Exact inverse of OR gate. NOR = NOT OR.</div>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════ XOR GATE ═══ -->
+<div id="section-xor" class="gate-section">
+<div class="container">
+
+  <div class="info-bar">
+    <div class="gate-name-big">XOR Gate</div>
+    <div class="tag">2-INPUT</div>
+    <div class="tag">entity: XOR_GATE_2</div>
+  </div>
+  <div class="logic-expr">Y = A ⊕ B</div>
+  <p class="gate-desc">Exclusive OR. Output HIGH when inputs are DIFFERENT. Output LOW when inputs are SAME. Used in adders, comparators, parity generators.</p>
+
+  <div class="three-col">
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Gate Simulator</div>
+      <div class="gate-visual">
+        <div class="inputs-col">
+          <div class="input-toggle"><span class="input-label">A</span><div class="toggle-btn" id="xor-a-toggle" onclick="toggleInput('xor','a')"></div><div class="bit-display" id="xor-a-bit">0</div></div>
+          <div class="input-toggle"><span class="input-label">B</span><div class="toggle-btn" id="xor-b-toggle" onclick="toggleInput('xor','b')"></div><div class="bit-display" id="xor-b-bit">0</div></div>
+        </div>
+        <svg class="gate-svg" width="100" height="80" viewBox="0 0 100 80">
+          <line class="wire" id="xor-wire-a" x1="0" y1="25" x2="22" y2="25"/>
+          <line class="wire" id="xor-wire-b" x1="0" y1="55" x2="22" y2="55"/>
+          <path d="M10,10 Q30,40 10,70" fill="none" stroke="#00d4ff" stroke-width="2"/>
+          <path d="M15,10 Q35,40 15,70 L50,70 Q85,70 85,40 Q85,10 50,10 Z" fill="#0f1628" stroke="#00d4ff" stroke-width="2"/>
+          <line class="wire" id="xor-wire-out" x1="85" y1="40" x2="100" y2="40"/>
+        </svg>
+        <div class="output-col"><span class="output-label">Y</span><div class="output-bit" id="xor-output">0</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Truth Table</div>
+      <table>
+        <thead><tr><th>A</th><th>B</th><th>Y = A⊕B</th></tr></thead>
+        <tbody id="xor-table">
+          <tr class="highlighted"><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="zero">0</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:14px;font-size:11px;color:var(--muted);line-height:1.8;">
+        <span style="color:var(--green);">■</span> Output HIGH: inputs are DIFFERENT (01, 10)<br>
+        <span style="color:var(--red);">■</span> Output LOW: inputs are SAME (00, 11)
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ VHDL Code — XOR_GATE_2.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('xor-code')">COPY</button>
+        <pre id="xor-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">XOR_GATE_2</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">a</span> : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">b</span> : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">Y</span> : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> XOR_GATE_2;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span>
+              XOR_GATE_2 <span class="kw">is</span>
+<span class="kw">begin</span>
+  <span class="signal">Y</span> <span class="op">&lt;=</span> a <span class="op">XOR</span> b;
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">▸ Testbench — tb_XOR_GATE_2.vhd</div>
+    <div class="code-block">
+      <button class="code-copy" onclick="copyCode('xor-tb')">COPY</button>
+      <pre id="xor-tb"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">tb_XOR_GATE_2</span> <span class="kw">is</span>
+<span class="kw">end</span> tb_XOR_GATE_2;
+
+<span class="kw">architecture</span> sim <span class="kw">of</span> tb_XOR_GATE_2 <span class="kw">is</span>
+
+  <span class="kw">component</span> XOR_GATE_2
+    <span class="kw">Port</span> (
+      <span class="signal">a</span> : <span class="kw">in</span>  STD_LOGIC;
+      <span class="signal">b</span> : <span class="kw">in</span>  STD_LOGIC;
+      <span class="signal">Y</span> : <span class="kw">out</span> STD_LOGIC
+    );
+  <span class="kw">end component</span>;
+
+  <span class="kw">signal</span> <span class="signal">a</span>, <span class="signal">b</span>, <span class="signal">Y</span> : STD_LOGIC <span class="op">:=</span> <span class="op">'0'</span>;
+
+<span class="kw">begin</span>
+
+  UUT: XOR_GATE_2 <span class="kw">port map</span> (
+    a <span class="op">=></span> a, b <span class="op">=></span> b, Y <span class="op">=></span> Y
+  );
+
+  <span class="kw">process</span>
+  <span class="kw">begin</span>
+    a<span class="op">&lt;=</span><span class="op">'0'</span>; b<span class="op">&lt;=</span><span class="op">'0'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=0 (same)</span>
+    a<span class="op">&lt;=</span><span class="op">'0'</span>; b<span class="op">&lt;=</span><span class="op">'1'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=1 (diff)</span>
+    a<span class="op">&lt;=</span><span class="op">'1'</span>; b<span class="op">&lt;=</span><span class="op">'0'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=1 (diff)</span>
+    a<span class="op">&lt;=</span><span class="op">'1'</span>; b<span class="op">&lt;=</span><span class="op">'1'</span>; <span class="kw">wait for</span> 10 ns; <span class="op">-- Y=0 (same)</span>
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+
+<span class="kw">end</span> sim;</pre>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">▸ Step-by-Step Execution in Xilinx Vivado — XOR Gate</div>
+    <div class="steps-container">
+      <div class="step"><div class="step-num">01</div><div class="step-body">
+        <div class="step-title">Create New Project</div>
+        <div class="step-detail">Vivado → Create Project → Name: <code>XOR_GATE_2</code> → RTL Project → select FPGA → Finish</div>
+      </div></div>
+      <div class="step"><div class="step-num">02</div><div class="step-body">
+        <div class="step-title">Create Design Source</div>
+        <div class="step-detail">
+          Design Sources → Add Sources → Create File → VHDL → Name: <code>XOR_GATE_2</code> → Finish
+          <div class="substeps">
+            <div class="substep">Paste VHDL code → <code>Ctrl+S</code></div>
+            <div class="substep"><span class="warn">KEY LINE:</span> <code>Y &lt;= a XOR b;</code> — XOR is built-in VHDL operator</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">03</div><div class="step-body">
+        <div class="step-title">Create Testbench</div>
+        <div class="step-detail">
+          Simulation Sources → Add Sources → Create File → VHDL → Name: <code>tb_XOR_GATE_2</code> → Finish
+          <div class="substeps">
+            <div class="substep">Paste testbench → <code>Ctrl+S</code> → Set as Top</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">04</div><div class="step-body">
+        <div class="step-title">Run Behavioral Simulation</div>
+        <div class="step-detail">
+          Flow Navigator → Simulation → <span class="action">Run Behavioral Simulation</span>
+          <div class="substeps"><div class="substep">Add a, b, Y to waveform → Run All → Zoom Fit</div></div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">05</div><div class="step-body">
+        <div class="step-title">Verify Waveform</div>
+        <div class="step-detail">
+          <div class="substeps">
+            <div class="substep">0–10 ns: a=0, b=0 → Y=<span style="color:var(--red)">0</span> (same inputs)</div>
+            <div class="substep">10–20 ns: a=0, b=1 → Y=<span class="action">1</span> (different inputs)</div>
+            <div class="substep">20–30 ns: a=1, b=0 → Y=<span class="action">1</span> (different inputs)</div>
+            <div class="substep">30–40 ns: a=1, b=1 → Y=<span style="color:var(--red)">0</span> (same inputs)</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <div class="note-box"><strong>Expected Waveform:</strong> Y is LOW when inputs match (00 and 11) and HIGH when inputs differ (01 and 10). Pattern: LOW → HIGH → HIGH → LOW. XOR detects inequality between two bits.</div>
+  </div>
+
+</div>
+</div>
+
+<footer>
+  <div class="container">
+    <p>VHDL Basic Logic Gates · Xilinx Vivado Behavioral Simulation</p>
+    <p style="margin-top:8px;font-size:11px;"><span>IEEE STD_LOGIC_1164</span> · AND · OR · NOT · NAND · NOR · XOR</p>
+    <p style="margin-top:6px;font-size:10px;color:#2a4060;">All codes sourced from VHDL_Basic_Gates_Codes.pdf</p>
+  </div>
+</footer>
+
+<script>
+const state = {
+  and:  {a:0, b:0},
+  or:   {a:0, b:0},
+  not:  {a:0},
+  nand: {a:0, b:0},
+  nor:  {a:0, b:0},
+  xor:  {a:0, b:0}
+};
+
+const logic = {
+  and:  s => s.a & s.b,
+  or:   s => s.a | s.b,
+  not:  s => s.a ? 0 : 1,
+  nand: s => (s.a & s.b) ? 0 : 1,
+  nor:  s => (s.a | s.b) ? 0 : 1,
+  xor:  s => s.a ^ s.b
+};
+
+function toggleInput(gate, inp) {
+  state[gate][inp] ^= 1;
+  updateGate(gate);
+}
+
+function updateGate(gate) {
+  const s = state[gate];
+  const out = logic[gate](s);
+
+  ['a','b'].forEach(inp => {
+    if (!(inp in s)) return;
+    const val = s[inp];
+    const t = document.getElementById(`${gate}-${inp}-toggle`);
+    const b = document.getElementById(`${gate}-${inp}-bit`);
+    const w = document.getElementById(`${gate}-wire-${inp}`);
+    if (t) t.classList.toggle('on', val===1);
+    if (b) { b.textContent=val; b.classList.toggle('high',val===1); }
+    if (w) w.classList.toggle('active',val===1);
+  });
+
+  const outEl = document.getElementById(`${gate}-output`);
+  const outW  = document.getElementById(`${gate}-wire-out`);
+  if (outEl) {
+    outEl.textContent = out;
+    outEl.classList.toggle('high', out===1);
+    outEl.classList.toggle('low',  out===0);
+  }
+  if (outW) outW.classList.toggle('active', out===1);
+
+  // highlight truth table row
+  const tbody = document.getElementById(`${gate}-table`);
+  if (tbody) {
+    const rows = tbody.querySelectorAll('tr');
+    let row = gate==='not' ? s.a : (s.a<<1)|s.b;
+    rows.forEach((r,i) => r.classList.toggle('highlighted', i===row));
+  }
+}
+
+function showGate(name) {
+  document.querySelectorAll('.gate-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.gate-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(`section-${name}`).classList.add('active');
+  event.currentTarget.classList.add('active');
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+function copyCode(id) {
+  const pre = document.getElementById(id);
+  navigator.clipboard.writeText(pre.innerText).then(() => {
+    const btn = pre.parentElement.querySelector('.code-copy');
+    btn.textContent='COPIED!'; btn.classList.add('copied');
+    setTimeout(()=>{ btn.textContent='COPY'; btn.classList.remove('copied'); }, 1500);
+  });
+}
+
+// init gates with inverted defaults
+updateGate('not');
+updateGate('nand');
+updateGate('nor');
+</script>
+</body>
+</html>
