@@ -310,10 +310,10 @@
 
 <header>
   <div class="container">
-    <div class="hero-badge">⚡ Xilinx Vivado · VHDL · Digital Logic</div>
-    <h1>VHDL Basic Logic Gates</h1>
-    <p class="hero-sub"><span class="pulse-dot"></span>Complete Execution Reference · Xilinx Vivado</p>
-    <p style="color:var(--muted);font-size:12px;letter-spacing:1px;margin-top:4px;">AND · OR · NOT · NAND · NOR · XOR</p>
+    <div class="hero-badge">⚡ Xilinx ISE / Vivado · VHDL · Digital Logic</div>
+    <h1>VHDL Logic Gates &amp; Decoder</h1>
+    <p class="hero-sub"><span class="pulse-dot"></span>Complete Execution Reference · Xilinx ISE / Vivado</p>
+    <p style="color:var(--muted);font-size:12px;letter-spacing:1px;margin-top:4px;">AND · OR · NOT · NAND · NOR · XOR · 2:4 Decoder</p>
   </div>
 </header>
 
@@ -325,6 +325,7 @@
   <button class="gate-tab" onclick="showGate('nand')">NAND</button>
   <button class="gate-tab" onclick="showGate('nor')">NOR</button>
   <button class="gate-tab" onclick="showGate('xor')">XOR</button>
+  <button class="gate-tab" onclick="showGate('dec24')" style="border-color:var(--yellow);color:var(--yellow);">2:4 DEC</button>
 </nav>
 
 <!-- ═══════════════════════════════════════════ OVERVIEW ═══ -->
@@ -1919,6 +1920,453 @@
 </div>
 </div>
 
+<!-- ═══════════════════════════════════════════ 2:4 DECODER ═══ -->
+<div id="section-dec24" class="gate-section">
+<div class="container">
+
+  <div class="info-bar">
+    <div class="gate-name-big">2:4 Decoder</div>
+    <div class="tag">2-BIT INPUT</div>
+    <div class="tag">4-BIT OUTPUT</div>
+    <div class="tag" style="border-color:var(--yellow);color:var(--yellow);">entity: decode2_4</div>
+  </div>
+  <div class="logic-expr">e[1:0] → d[3:0] &nbsp;|&nbsp; One-hot output</div>
+  <p class="gate-desc">2-to-4 line decoder. Takes 2-bit binary input <code style="color:var(--yellow);">e</code> and activates exactly one of 4 output lines <code style="color:var(--yellow);">d</code>. Used in memory addressing, multiplexing, and data routing. Tool: Xilinx ISE (ISim) as shown in reference images.</p>
+
+  <!-- Simulator + Truth Table + Code -->
+  <div class="three-col">
+
+    <!-- Live Simulator -->
+    <div class="card simulator-card" style="gap:16px;">
+      <div class="card-title">▸ Live Simulator</div>
+      <div style="width:100%;">
+        <div style="font-size:11px;color:var(--muted);letter-spacing:2px;margin-bottom:12px;">INPUT — e[1:0]</div>
+        <div style="display:flex;gap:20px;justify-content:center;margin-bottom:20px;">
+          <div class="input-toggle" style="flex-direction:column;align-items:center;gap:8px;">
+            <span class="input-label">e[1]</span>
+            <div class="toggle-btn" id="dec-e1-toggle" onclick="toggleDecoder(1)"></div>
+            <div class="bit-display" id="dec-e1-bit">0</div>
+          </div>
+          <div class="input-toggle" style="flex-direction:column;align-items:center;gap:8px;">
+            <span class="input-label">e[0]</span>
+            <div class="toggle-btn" id="dec-e0-toggle" onclick="toggleDecoder(0)"></div>
+            <div class="bit-display" id="dec-e0-bit">0</div>
+          </div>
+        </div>
+        <div style="font-size:11px;color:var(--muted);letter-spacing:2px;margin-bottom:12px;">OUTPUT — d[3:0]</div>
+        <div style="display:flex;gap:12px;justify-content:center;">
+          <div style="text-align:center;">
+            <div class="output-bit" id="dec-d3" style="width:38px;height:38px;font-size:16px;">0</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:4px;">d[3]</div>
+          </div>
+          <div style="text-align:center;">
+            <div class="output-bit" id="dec-d2" style="width:38px;height:38px;font-size:16px;">0</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:4px;">d[2]</div>
+          </div>
+          <div style="text-align:center;">
+            <div class="output-bit" id="dec-d1" style="width:38px;height:38px;font-size:16px;">0</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:4px;">d[1]</div>
+          </div>
+          <div style="text-align:center;">
+            <div class="output-bit high" id="dec-d0" style="width:38px;height:38px;font-size:16px;">1</div>
+            <div style="font-size:10px;color:var(--muted);margin-top:4px;">d[0]</div>
+          </div>
+        </div>
+        <div id="dec-active-label" style="text-align:center;margin-top:16px;font-size:12px;color:var(--green);letter-spacing:1px;">Active line: d[0] → "0001"</div>
+      </div>
+    </div>
+
+    <!-- Truth Table -->
+    <div class="card">
+      <div class="card-title">▸ Truth Table</div>
+      <table>
+        <thead>
+          <tr><th>e[1]</th><th>e[0]</th><th>d[3]</th><th>d[2]</th><th>d[1]</th><th>d[0]</th></tr>
+        </thead>
+        <tbody id="dec-table">
+          <tr class="highlighted">
+            <td class="zero">0</td><td class="zero">0</td>
+            <td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="one">1</td>
+          </tr>
+          <tr>
+            <td class="zero">0</td><td class="one">1</td>
+            <td class="zero">0</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td>
+          </tr>
+          <tr>
+            <td class="one">1</td><td class="zero">0</td>
+            <td class="zero">0</td><td class="one">1</td><td class="zero">0</td><td class="zero">0</td>
+          </tr>
+          <tr>
+            <td class="one">1</td><td class="one">1</td>
+            <td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:12px;font-size:11px;color:var(--muted);line-height:1.9;">
+        <span style="color:var(--green);">One-hot encoding:</span> exactly 1 output HIGH at a time<br>
+        e="00" → d=0001 &nbsp;|&nbsp; e="01" → d=0010<br>
+        e="10" → d=0100 &nbsp;|&nbsp; e="11" → d=1000
+      </div>
+    </div>
+
+    <!-- VHDL Code -->
+    <div class="card">
+      <div class="card-title">▸ VHDL Code — decod2_4.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('dec-code')">COPY</button>
+        <pre id="dec-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">decode2_4</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">e</span> : <span class="kw">in</span>  STD_LOGIC_VECTOR(1 <span class="kw">downto</span> 0);
+    <span class="signal">d</span> : <span class="kw">out</span> STD_LOGIC_VECTOR(3 <span class="kw">downto</span> 0)
+  );
+<span class="kw">end</span> decode2_4;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span>
+              decode2_4 <span class="kw">is</span>
+<span class="kw">begin</span>
+  <span class="kw">process</span>(e)
+  <span class="kw">begin</span>
+    <span class="kw">if</span> (e<span class="op">="00"</span>) <span class="kw">then</span>
+      d<span class="op">&lt;="0001"</span>;
+    <span class="kw">else if</span> (e<span class="op">="01"</span>) <span class="kw">then</span>
+      d<span class="op">&lt;="0010"</span>;
+    <span class="kw">else if</span> (e<span class="op">="10"</span>) <span class="kw">then</span>
+      d<span class="op">&lt;="0100"</span>;
+    <span class="kw">else</span>
+      d<span class="op">&lt;="1000"</span>;
+    <span class="kw">end if</span>;
+    <span class="kw">end if</span>;
+    <span class="kw">end if</span>;
+  <span class="kw">end process</span>;
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Diagrams -->
+  <div class="two-col">
+    <!-- Block Diagram -->
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — 2:4 Decoder</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="400" height="160" viewBox="0 0 400 160" style="filter:drop-shadow(0 0 10px rgba(0,212,255,0.2))">
+          <!-- Input wire e -->
+          <line x1="10" y1="80" x2="100" y2="80" stroke="#4a6080" stroke-width="2.5"/>
+          <text x="4" y="76" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">e</text>
+          <text x="18" y="72" fill="#4a6080" font-size="9" font-family="Courier New">STD_LOGIC_VECTOR</text>
+          <text x="18" y="84" fill="#4a6080" font-size="9" font-family="Courier New">(1 downto 0)</text>
+          <!-- Block -->
+          <rect x="100" y="20" width="180" height="120" rx="8" fill="#0f1628" stroke="#00d4ff" stroke-width="2"/>
+          <text x="190" y="50" fill="#00d4ff" font-size="13" font-family="Courier New" font-weight="bold" text-anchor="middle">decode2_4</text>
+          <text x="190" y="68" fill="#7b2fff" font-size="11" font-family="Courier New" text-anchor="middle">2-to-4 Decoder</text>
+          <text x="190" y="86" fill="#4a6080" font-size="10" font-family="Courier New" text-anchor="middle">e[1:0] → d[3:0]</text>
+          <text x="190" y="104" fill="#00ff88" font-size="10" font-family="Courier New" text-anchor="middle">One-Hot Output</text>
+          <text x="190" y="128" fill="#4a6080" font-size="9" font-family="Courier New" text-anchor="middle">process(e) behavioral</text>
+          <!-- Output wires d[0]-d[3] -->
+          <line x1="280" y1="42" x2="390" y2="42" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="280" y1="68" x2="390" y2="68" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="280" y1="94" x2="390" y2="94" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="280" y1="120" x2="390" y2="120" stroke="#4a6080" stroke-width="1.5"/>
+          <text x="355" y="38" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">d[3]</text>
+          <text x="355" y="64" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">d[2]</text>
+          <text x="355" y="90" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">d[1]</text>
+          <text x="355" y="116" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">d[0]</text>
+          <text x="285" y="36" fill="#4a6080" font-size="8" font-family="Courier New">STD_LOGIC_VECTOR(3 downto 0)</text>
+          <!-- Dots -->
+          <circle cx="100" cy="80" r="3" fill="#00d4ff"/>
+          <circle cx="280" cy="42" r="3" fill="#00ff88"/>
+          <circle cx="280" cy="68" r="3" fill="#00ff88"/>
+          <circle cx="280" cy="94" r="3" fill="#00ff88"/>
+          <circle cx="280" cy="120" r="3" fill="#00ff88"/>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.9;padding:0 4px;">
+        <span style="color:var(--accent);">Input:</span> e — STD_LOGIC_VECTOR(1 downto 0) &nbsp;|&nbsp;
+        <span style="color:var(--green);">Output:</span> d — STD_LOGIC_VECTOR(3 downto 0)<br>
+        <span style="color:var(--yellow);">Architecture:</span> Behavioral with process(e) sensitivity list
+      </div>
+    </div>
+
+    <!-- Circuit Diagram -->
+    <div class="card">
+      <div class="card-title">▸ Circuit / Logic Diagram — 2:4 Decoder</div>
+      <div style="display:flex;justify-content:center;padding:10px 0;">
+        <svg width="380" height="200" viewBox="0 0 380 200" style="filter:drop-shadow(0 0 10px rgba(0,212,255,0.2))">
+          <!-- Input lines -->
+          <line x1="30" y1="40" x2="30" y2="175" stroke="#00d4ff" stroke-width="2"/>
+          <line x1="60" y1="40" x2="60" y2="175" stroke="#00d4ff" stroke-width="2"/>
+          <!-- Labels -->
+          <text x="22" y="30" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">e[1]</text>
+          <text x="52" y="30" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">e[0]</text>
+
+          <!-- NOT circles for complements -->
+          <circle cx="30" cy="50" r="5" fill="#0f1628" stroke="#ff3366" stroke-width="1.5"/>
+          <circle cx="60" cy="70" r="5" fill="#0f1628" stroke="#ff3366" stroke-width="1.5"/>
+          <!-- NOT labels -->
+          <text x="36" y="46" fill="#ff3366" font-size="9" font-family="Courier New">ē[1]</text>
+          <text x="66" y="66" fill="#ff3366" font-size="9" font-family="Courier New">ē[0]</text>
+
+          <!-- AND gate boxes for each output -->
+          <!-- d[0] = e̅[1]·e̅[0] -->
+          <rect x="120" y="52" width="60" height="22" rx="4" fill="#0f1628" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="150" y="67" fill="#00d4ff" font-size="10" font-family="Courier New" text-anchor="middle">&amp;</text>
+          <line x1="30" y1="58" x2="120" y2="63" stroke="#ff3366" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <line x1="60" y1="76" x2="120" y2="67" stroke="#ff3366" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <line x1="180" y1="63" x2="290" y2="63" stroke="#00ff88" stroke-width="1.5"/>
+          <text x="293" y="67" fill="#00ff88" font-size="11" font-family="Courier New" font-weight="bold">d[0]</text>
+          <text x="225" y="58" fill="#4a6080" font-size="9" font-family="Courier New">"0001"</text>
+
+          <!-- d[1] = e̅[1]·e[0] -->
+          <rect x="120" y="84" width="60" height="22" rx="4" fill="#0f1628" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="150" y="99" fill="#00d4ff" font-size="10" font-family="Courier New" text-anchor="middle">&amp;</text>
+          <line x1="30" y1="90" x2="120" y2="95" stroke="#ff3366" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <line x1="60" y1="90" x2="120" y2="99" stroke="#00d4ff" stroke-width="1.5"/>
+          <line x1="180" y1="95" x2="290" y2="95" stroke="#00ff88" stroke-width="1.5"/>
+          <text x="293" y="99" fill="#00ff88" font-size="11" font-family="Courier New" font-weight="bold">d[1]</text>
+          <text x="225" y="90" fill="#4a6080" font-size="9" font-family="Courier New">"0010"</text>
+
+          <!-- d[2] = e[1]·e̅[0] -->
+          <rect x="120" y="116" width="60" height="22" rx="4" fill="#0f1628" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="150" y="131" fill="#00d4ff" font-size="10" font-family="Courier New" text-anchor="middle">&amp;</text>
+          <line x1="30" y1="122" x2="120" y2="127" stroke="#00d4ff" stroke-width="1.5"/>
+          <line x1="60" y1="122" x2="120" y2="131" stroke="#ff3366" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <line x1="180" y1="127" x2="290" y2="127" stroke="#00ff88" stroke-width="1.5"/>
+          <text x="293" y="131" fill="#00ff88" font-size="11" font-family="Courier New" font-weight="bold">d[2]</text>
+          <text x="225" y="122" fill="#4a6080" font-size="9" font-family="Courier New">"0100"</text>
+
+          <!-- d[3] = e[1]·e[0] -->
+          <rect x="120" y="148" width="60" height="22" rx="4" fill="#0f1628" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="150" y="163" fill="#00d4ff" font-size="10" font-family="Courier New" text-anchor="middle">&amp;</text>
+          <line x1="30" y1="154" x2="120" y2="159" stroke="#00d4ff" stroke-width="1.5"/>
+          <line x1="60" y1="154" x2="120" y2="163" stroke="#00d4ff" stroke-width="1.5"/>
+          <line x1="180" y1="159" x2="290" y2="159" stroke="#00ff88" stroke-width="1.5"/>
+          <text x="293" y="163" fill="#00ff88" font-size="11" font-family="Courier New" font-weight="bold">d[3]</text>
+          <text x="225" y="154" fill="#4a6080" font-size="9" font-family="Courier New">"1000"</text>
+
+          <!-- Legend -->
+          <line x1="30" y1="190" x2="50" y2="190" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="52" y="194" fill="#00d4ff" font-size="9" font-family="Courier New">direct</text>
+          <line x1="90" y1="190" x2="110" y2="190" stroke="#ff3366" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <text x="112" y="194" fill="#ff3366" font-size="9" font-family="Courier New">inverted</text>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.9;padding:0 4px;">
+        <span style="color:var(--accent);">Structure:</span> 2 inverters + 4 AND gates &nbsp;|&nbsp;
+        <span style="color:var(--red);">Dashed</span> = inverted input &nbsp;|&nbsp; <span style="color:var(--accent);">Solid</span> = direct input
+      </div>
+    </div>
+  </div>
+
+  <!-- Testbench -->
+  <div class="card">
+    <div class="card-title">▸ Testbench — decode_t.vhd (as shown in reference images)</div>
+    <div class="code-block">
+      <button class="code-copy" onclick="copyCode('dec-tb')">COPY</button>
+      <pre id="dec-tb"><span class="lib">LIBRARY</span> ieee;
+<span class="lib">USE</span> ieee.std_logic_1164.ALL;
+
+<span class="kw">ENTITY</span> <span class="entity-name">decode_t</span> <span class="kw">IS</span>
+<span class="kw">END</span> decode_t;
+
+<span class="kw">ARCHITECTURE</span> behavior <span class="kw">OF</span> decode_t <span class="kw">IS</span>
+
+  <span class="kw">COMPONENT</span> decode2_4
+    <span class="kw">PORT</span>(
+      <span class="signal">e</span> : <span class="kw">IN</span>  std_logic_vector(1 <span class="kw">downto</span> 0);
+      <span class="signal">d</span> : <span class="kw">OUT</span> std_logic_vector(3 <span class="kw">downto</span> 0)
+    );
+  <span class="kw">END COMPONENT</span>;
+
+  <span class="op">--Inputs</span>
+  <span class="kw">signal</span> <span class="signal">e</span> : std_logic_vector(1 <span class="kw">downto</span> 0)
+                        <span class="op">:=</span> (others <span class="op">=></span> <span class="op">'0'</span>);
+  <span class="op">--Outputs</span>
+  <span class="kw">signal</span> <span class="signal">d</span> : std_logic_vector(3 <span class="kw">downto</span> 0);
+
+<span class="kw">BEGIN</span>
+
+  uut: decode2_4 <span class="kw">PORT MAP</span> (
+    e <span class="op">=></span> e,
+    d <span class="op">=></span> d
+  );
+
+  <span class="op">-- Stimulus process</span>
+  stim_proc: <span class="kw">process</span>
+  <span class="kw">begin</span>
+    e(1 <span class="kw">downto</span> 0)<span class="op">&lt;="00"</span>; <span class="kw">wait for</span> 100 ns; <span class="op">-- d=0001</span>
+    e(1 <span class="kw">downto</span> 0)<span class="op">&lt;="01"</span>; <span class="kw">wait for</span> 100 ns; <span class="op">-- d=0010</span>
+    e(1 <span class="kw">downto</span> 0)<span class="op">&lt;="10"</span>; <span class="kw">wait for</span> 100 ns; <span class="op">-- d=0100</span>
+    e(1 <span class="kw">downto</span> 0)<span class="op">&lt;="11"</span>; <span class="kw">wait for</span> 100 ns; <span class="op">-- d=1000</span>
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+
+<span class="kw">END</span>;</pre>
+    </div>
+  </div>
+
+  <!-- Execution Steps -->
+  <div class="card">
+    <div class="card-title">▸ Step-by-Step Execution — Xilinx ISE (as shown in reference images)</div>
+    <div class="steps-container">
+      <div class="step"><div class="step-num">01</div><div class="step-body">
+        <div class="step-title">Open Xilinx ISE &amp; Create New Project</div>
+        <div class="step-detail">
+          ISE → <span class="action">File → New Project</span> → Name: <code>decod2_4</code> → Location: choose folder → Next
+          <div class="substeps">
+            <div class="substep">Device: select your FPGA (e.g. <code>xc3s50-5pq208</code> as in reference) → Next → Finish</div>
+            <div class="substep">Project file creates as <code>decod2_4.xise</code></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">02</div><div class="step-body">
+        <div class="step-title">Add New VHDL Source File</div>
+        <div class="step-detail">
+          Project panel → right-click → <span class="action">New Source</span> → VHDL Module → File name: <code>decod2_4</code> → Next
+          <div class="substeps">
+            <div class="substep">Entity name: <code>decode2_4</code></div>
+            <div class="substep">Add port: <code>e</code> — IN — STD_LOGIC_VECTOR — Bus MSB: 1, LSB: 0</div>
+            <div class="substep">Add port: <code>d</code> — OUT — STD_LOGIC_VECTOR — Bus MSB: 3, LSB: 0</div>
+            <div class="substep">Click Next → Finish → File opens in editor</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">03</div><div class="step-body">
+        <div class="step-title">Enter VHDL Design Code</div>
+        <div class="step-detail">
+          In editor → replace auto-generated code with <code>decod2_4.vhd</code> code above → <code>Ctrl+S</code>
+          <div class="substeps">
+            <div class="substep">Key: <code>process(e)</code> — sensitivity list triggers on any change to e</div>
+            <div class="substep">Uses nested <code>else if / end if</code> (3 end if needed for 3 levels)</div>
+            <div class="substep">e="11" handled by final <code>else</code> — no 4th if needed</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">04</div><div class="step-body">
+        <div class="step-title">Check Syntax</div>
+        <div class="step-detail">
+          Processes panel (left) → expand <code>ISim Simulator</code> → double-click <span class="action">Behavioral Check Syntax</span>
+          <div class="substeps">
+            <div class="substep">Green tick = no errors. Fix any red errors before proceeding</div>
+            <div class="substep">Common error: missing <code>end if;</code> — need exactly 3 for 3 nested ifs</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">05</div><div class="step-body">
+        <div class="step-title">Add Testbench Source File</div>
+        <div class="step-detail">
+          Project panel → right-click → <span class="action">New Source</span> → VHDL Test Bench → File name: <code>decode_t</code> → Next
+          <div class="substeps">
+            <div class="substep">Associate with: select <code>decode2_4</code> → Next → Finish</div>
+            <div class="substep">ISE auto-generates testbench skeleton — replace with <code>decode_t.vhd</code> code above</div>
+            <div class="substep"><code>Ctrl+S</code> to save</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">06</div><div class="step-body">
+        <div class="step-title">Switch to Simulation View</div>
+        <div class="step-detail">
+          Top-left toggle → switch from <span class="action">Implementation</span> to <span class="action">Simulation</span>
+          <div class="substeps">
+            <div class="substep">Design hierarchy changes — testbench <code>decode_t</code> appears as top</div>
+            <div class="substep">Hierarchy shows: <code>decode_t → behavior → uut: decode2_4</code></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">07</div><div class="step-body">
+        <div class="step-title">Run Simulate Behavioral Model</div>
+        <div class="step-detail">
+          Processes panel → <code>ISim Simulator</code> → double-click <span class="action">Simulate Behavioral Model</span>
+          <div class="substeps">
+            <div class="substep">Console shows: <code>decode_t_isim_beh.exe -intstyle ise -gui -tclbatch isim.cmd</code></div>
+            <div class="substep">Console shows: <code>Behavioral Model completed successfully</code></div>
+            <div class="substep">ISim waveform GUI launches automatically</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">08</div><div class="step-body">
+        <div class="step-title">View Waveform in ISim</div>
+        <div class="step-detail">
+          ISim opens → signals <code>e</code> and <code>d</code> visible in waveform panel
+          <div class="substeps">
+            <div class="substep">Click <span class="action">Zoom to Full View</span> (magnifier) to see all 4 time slots</div>
+            <div class="substep">Each slot = 100 ns (set in testbench <code>wait for 100 ns</code>)</div>
+            <div class="substep">Right-click signal → <span class="action">Radix → Binary</span> to see binary values</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">09</div><div class="step-body">
+        <div class="step-title">Verify Waveform Output</div>
+        <div class="step-detail">
+          <div class="substeps">
+            <div class="substep">0–100 ns: e="00" → d=<span class="action">0001</span> (d[0] HIGH)</div>
+            <div class="substep">100–200 ns: e="01" → d=<span class="action">0010</span> (d[1] HIGH)</div>
+            <div class="substep">200–300 ns: e="10" → d=<span class="action">0100</span> (d[2] HIGH)</div>
+            <div class="substep">300–400 ns: e="11" → d=<span class="action">1000</span> (d[3] HIGH)</div>
+            <div class="substep">Each time slot: exactly ONE output line is HIGH — one-hot verified</div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">10</div><div class="step-body">
+        <div class="step-title">Synthesize Design (Implementation)</div>
+        <div class="step-detail">
+          Switch back to <span class="action">Implementation</span> view → Processes → double-click <span class="action">Synthesize - XST</span>
+          <div class="substeps">
+            <div class="substep">After synthesis → double-click <span class="action">View RTL Schematic</span> to see logic diagram</div>
+            <div class="substep">RTL shows 4 AND gates with inverters on inputs</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <div class="note-box">
+      <strong>EXAM NOTE — ISE vs Vivado:</strong> Reference images use Xilinx ISE (project file = .xise, simulator = ISim). Vivado uses .xpr project files and Xsim. Code is identical for both tools. In ISE: "Simulate Behavioral Model" = equivalent to Vivado's "Run Behavioral Simulation". Wait time is 100 ns per vector (not 10 ns as in basic gates) to clearly separate output transitions in waveform.
+    </div>
+  </div>
+
+  <!-- Vivado Steps too -->
+  <div class="card">
+    <div class="card-title">▸ Step-by-Step Execution — Xilinx Vivado (Alternative)</div>
+    <div class="steps-container">
+      <div class="step"><div class="step-num">01</div><div class="step-body">
+        <div class="step-title">Create New Vivado Project</div>
+        <div class="step-detail">Vivado → Create Project → Name: <code>decode2_4</code> → RTL Project → select FPGA part → Finish</div>
+      </div></div>
+      <div class="step"><div class="step-num">02</div><div class="step-body">
+        <div class="step-title">Add Design Source</div>
+        <div class="step-detail">
+          Sources → Design Sources → Add Sources → Create File → VHDL → Name: <code>decod2_4</code> → Finish
+          <div class="substeps">
+            <div class="substep">Paste <code>decod2_4.vhd</code> code → <code>Ctrl+S</code></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">03</div><div class="step-body">
+        <div class="step-title">Add Simulation Source</div>
+        <div class="step-detail">
+          Sources → Simulation Sources → Add Sources → Create File → VHDL → Name: <code>decode_t</code> → Finish
+          <div class="substeps">
+            <div class="substep">Paste testbench code → <code>Ctrl+S</code> → right-click → <span class="action">Set as Top</span></div>
+          </div>
+        </div>
+      </div></div>
+      <div class="step"><div class="step-num">04</div><div class="step-body">
+        <div class="step-title">Run Behavioral Simulation</div>
+        <div class="step-detail">
+          Flow Navigator → Simulation → <span class="action">Run Behavioral Simulation</span> → Xsim opens
+          <div class="substeps">
+            <div class="substep">Add signals e, d to waveform → Run All → Zoom Fit</div>
+            <div class="substep">Verify: d shifts from 0001→0010→0100→1000 every 100 ns</div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+  </div>
+
+</div>
+</div>
+
 <footer>
   <div class="container">
     <p>VHDL Basic Logic Gates · Xilinx Vivado Behavioral Simulation</p>
@@ -1936,6 +2384,54 @@ const state = {
   nor:  {a:0, b:0},
   xor:  {a:0, b:0}
 };
+
+// 2:4 Decoder state: e1, e0 bits
+const decState = {e1:0, e0:0};
+const decOutputs = ['0001','0010','0100','1000'];
+const decLabels  = ['d[0]→"0001"','d[1]→"0010"','d[2]→"0100"','d[3]→"1000"'];
+
+function toggleDecoder(bit) {
+  if (bit===1) decState.e1 ^= 1;
+  else         decState.e0 ^= 1;
+  updateDecoder();
+}
+
+function updateDecoder() {
+  const idx = (decState.e1 << 1) | decState.e0;
+  const out = decOutputs[idx];
+
+  // toggle buttons + bit displays
+  const t1 = document.getElementById('dec-e1-toggle');
+  const t0 = document.getElementById('dec-e0-toggle');
+  const b1 = document.getElementById('dec-e1-bit');
+  const b0 = document.getElementById('dec-e0-bit');
+  if (t1) { t1.classList.toggle('on', decState.e1===1); }
+  if (t0) { t0.classList.toggle('on', decState.e0===1); }
+  if (b1) { b1.textContent=decState.e1; b1.classList.toggle('high',decState.e1===1); }
+  if (b0) { b0.textContent=decState.e0; b0.classList.toggle('high',decState.e0===1); }
+
+  // output bits
+  [3,2,1,0].forEach((bit,i) => {
+    const el = document.getElementById(`dec-d${bit}`);
+    const val = parseInt(out[3-bit]);
+    if (el) {
+      el.textContent = val;
+      el.classList.toggle('high', val===1);
+      el.classList.toggle('low',  val===0);
+    }
+  });
+
+  // active label
+  const lbl = document.getElementById('dec-active-label');
+  if (lbl) lbl.textContent = 'Active line: ' + decLabels[idx];
+
+  // highlight truth table row
+  const tbody = document.getElementById('dec-table');
+  if (tbody) {
+    const rows = tbody.querySelectorAll('tr');
+    rows.forEach((r,i) => r.classList.toggle('highlighted', i===idx));
+  }
+}
 
 const logic = {
   and:  s => s.a & s.b,
@@ -2005,6 +2501,7 @@ function copyCode(id) {
 updateGate('not');
 updateGate('nand');
 updateGate('nor');
+updateDecoder();
 </script>
 </body>
 </html>
