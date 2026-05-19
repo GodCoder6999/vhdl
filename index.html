@@ -606,6 +606,86 @@
     </div>
   </div>
 
+  <!-- AND Diagrams -->
+  <div class="two-col">
+    <!-- Block Diagram -->
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — AND Gate</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="130" viewBox="0 0 380 130" style="filter:drop-shadow(0 0 10px rgba(0,212,255,0.2))">
+          <!-- Input wires -->
+          <line x1="10" y1="45" x2="100" y2="45" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="85" x2="100" y2="85" stroke="#4a6080" stroke-width="2"/>
+          <!-- Input labels -->
+          <text x="6" y="41" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">A</text>
+          <text x="6" y="81" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">B</text>
+          <text x="18" y="39" fill="#4a6080" font-size="10" font-family="Courier New">STD_LOGIC</text>
+          <text x="18" y="79" fill="#4a6080" font-size="10" font-family="Courier New">STD_LOGIC</text>
+          <!-- Block -->
+          <rect x="100" y="20" width="180" height="90" rx="8" fill="#0f1628" stroke="#00d4ff" stroke-width="2"/>
+          <!-- Gate name -->
+          <text x="190" y="52" fill="#00d4ff" font-size="15" font-family="Courier New" font-weight="bold" text-anchor="middle">AND_GATE_2</text>
+          <!-- Expression -->
+          <text x="190" y="72" fill="#7b2fff" font-size="13" font-family="Courier New" text-anchor="middle">Y = A · B</text>
+          <!-- Entity label -->
+          <text x="190" y="100" fill="#4a6080" font-size="10" font-family="Courier New" text-anchor="middle">entity: AND_GATE_2</text>
+          <!-- Output wire -->
+          <line x1="280" y1="65" x2="370" y2="65" stroke="#4a6080" stroke-width="2"/>
+          <!-- Output label -->
+          <text x="354" y="61" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">Y</text>
+          <text x="292" y="59" fill="#4a6080" font-size="10" font-family="Courier New">STD_LOGIC</text>
+          <!-- Input pin dots -->
+          <circle cx="100" cy="45" r="3" fill="#00d4ff"/>
+          <circle cx="100" cy="85" r="3" fill="#00d4ff"/>
+          <circle cx="280" cy="65" r="3" fill="#00ff88"/>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.9;padding:0 4px;">
+        <span style="color:var(--accent);">Inputs:</span> A, B — STD_LOGIC &nbsp;|&nbsp;
+        <span style="color:var(--green);">Output:</span> Y — STD_LOGIC<br>
+        <span style="color:var(--accent);">Architecture:</span> Behavioral &nbsp;|&nbsp;
+        <span style="color:var(--accent);">Library:</span> IEEE.STD_LOGIC_1164
+      </div>
+    </div>
+    <!-- Circuit Diagram -->
+    <div class="card">
+      <div class="card-title">▸ Circuit / Logic Diagram — AND Gate</div>
+      <div style="display:flex;justify-content:center;align-items:center;padding:16px 0;">
+        <svg width="320" height="160" viewBox="0 0 320 160" style="filter:drop-shadow(0 0 10px rgba(0,212,255,0.2))">
+          <!-- Input A wire -->
+          <line x1="20" y1="58" x2="90" y2="58" stroke="#00d4ff" stroke-width="2.5"/>
+          <!-- Input B wire -->
+          <line x1="20" y1="102" x2="90" y2="102" stroke="#00d4ff" stroke-width="2.5"/>
+          <!-- AND gate body -->
+          <path d="M90,35 L90,125 L128,125 Q175,125 175,80 Q175,35 128,35 Z" fill="#0f1628" stroke="#00d4ff" stroke-width="2.5"/>
+          <!-- Output wire -->
+          <line x1="175" y1="80" x2="300" y2="80" stroke="#00ff88" stroke-width="2.5"/>
+          <!-- Labels -->
+          <text x="6" y="54" fill="#ffd700" font-size="14" font-family="Courier New" font-weight="bold">A</text>
+          <text x="6" y="98" fill="#ffd700" font-size="14" font-family="Courier New" font-weight="bold">B</text>
+          <text x="285" y="76" fill="#ffd700" font-size="14" font-family="Courier New" font-weight="bold">Y</text>
+          <!-- Gate label inside -->
+          <text x="108" y="84" fill="#00d4ff" font-size="13" font-family="Courier New" font-weight="bold" text-anchor="middle">&amp;</text>
+          <!-- Pin dots -->
+          <circle cx="20" cy="58" r="4" fill="#ffd700"/>
+          <circle cx="20" cy="102" r="4" fill="#ffd700"/>
+          <circle cx="300" cy="80" r="4" fill="#00ff88"/>
+          <!-- Logic expression below -->
+          <text x="160" y="148" fill="#7b2fff" font-size="12" font-family="Courier New" text-anchor="middle">Y &lt;= a and b;</text>
+          <!-- Wire labels -->
+          <text x="30" y="50" fill="#4a6080" font-size="9" font-family="Courier New">in</text>
+          <text x="30" y="94" fill="#4a6080" font-size="9" font-family="Courier New">in</text>
+          <text x="200" y="72" fill="#4a6080" font-size="9" font-family="Courier New">out</text>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.9;padding:0 4px;">
+        <span style="color:var(--yellow);">Symbol:</span> D-shaped body — IEEE standard AND gate &nbsp;|&nbsp;
+        <span style="color:var(--yellow);">Operator:</span> &amp; (ampersand)<br>
+        <span style="color:var(--green);">HIGH output</span> only when A=1 AND B=1 simultaneously
+      </div>
+    </div>
+  </div>
+
   <!-- Testbench -->
   <div class="card">
     <div class="card-title">▸ Testbench — tb_AND_GATE_2.vhd</div>
@@ -795,6 +875,66 @@
     </div>
   </div>
 
+  <!-- OR Diagrams -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — OR Gate</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="130" viewBox="0 0 380 130" style="filter:drop-shadow(0 0 10px rgba(0,212,255,0.2))">
+          <line x1="10" y1="45" x2="100" y2="45" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="85" x2="100" y2="85" stroke="#4a6080" stroke-width="2"/>
+          <text x="6" y="41" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">A</text>
+          <text x="6" y="81" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">B</text>
+          <text x="18" y="39" fill="#4a6080" font-size="10" font-family="Courier New">STD_LOGIC</text>
+          <text x="18" y="79" fill="#4a6080" font-size="10" font-family="Courier New">STD_LOGIC</text>
+          <rect x="100" y="20" width="180" height="90" rx="8" fill="#0f1628" stroke="#00d4ff" stroke-width="2"/>
+          <text x="190" y="52" fill="#00d4ff" font-size="15" font-family="Courier New" font-weight="bold" text-anchor="middle">OR_GATE_2</text>
+          <text x="190" y="72" fill="#7b2fff" font-size="13" font-family="Courier New" text-anchor="middle">Y = A + B</text>
+          <text x="190" y="100" fill="#4a6080" font-size="10" font-family="Courier New" text-anchor="middle">entity: OR_GATE_2</text>
+          <line x1="280" y1="65" x2="370" y2="65" stroke="#4a6080" stroke-width="2"/>
+          <text x="354" y="61" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">Y</text>
+          <text x="292" y="59" fill="#4a6080" font-size="10" font-family="Courier New">STD_LOGIC</text>
+          <circle cx="100" cy="45" r="3" fill="#00d4ff"/>
+          <circle cx="100" cy="85" r="3" fill="#00d4ff"/>
+          <circle cx="280" cy="65" r="3" fill="#00ff88"/>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.9;padding:0 4px;">
+        <span style="color:var(--accent);">Inputs:</span> A, B — STD_LOGIC &nbsp;|&nbsp;
+        <span style="color:var(--green);">Output:</span> Y — STD_LOGIC<br>
+        <span style="color:var(--accent);">Architecture:</span> Behavioral &nbsp;|&nbsp;
+        <span style="color:var(--accent);">Library:</span> IEEE.STD_LOGIC_1164
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Circuit / Logic Diagram — OR Gate</div>
+      <div style="display:flex;justify-content:center;align-items:center;padding:16px 0;">
+        <svg width="320" height="160" viewBox="0 0 320 160" style="filter:drop-shadow(0 0 10px rgba(0,212,255,0.2))">
+          <line x1="20" y1="58" x2="85" y2="58" stroke="#00d4ff" stroke-width="2.5"/>
+          <line x1="20" y1="102" x2="85" y2="102" stroke="#00d4ff" stroke-width="2.5"/>
+          <!-- OR gate curved body -->
+          <path d="M78,35 Q100,80 78,125 L118,125 Q165,125 175,80 Q165,35 118,35 Z" fill="#0f1628" stroke="#00d4ff" stroke-width="2.5"/>
+          <line x1="175" y1="80" x2="300" y2="80" stroke="#00ff88" stroke-width="2.5"/>
+          <text x="6" y="54" fill="#ffd700" font-size="14" font-family="Courier New" font-weight="bold">A</text>
+          <text x="6" y="98" fill="#ffd700" font-size="14" font-family="Courier New" font-weight="bold">B</text>
+          <text x="285" y="76" fill="#ffd700" font-size="14" font-family="Courier New" font-weight="bold">Y</text>
+          <text x="122" y="85" fill="#00d4ff" font-size="13" font-family="Courier New" font-weight="bold" text-anchor="middle">≥1</text>
+          <circle cx="20" cy="58" r="4" fill="#ffd700"/>
+          <circle cx="20" cy="102" r="4" fill="#ffd700"/>
+          <circle cx="300" cy="80" r="4" fill="#00ff88"/>
+          <text x="160" y="148" fill="#7b2fff" font-size="12" font-family="Courier New" text-anchor="middle">Y &lt;= a or b;</text>
+          <text x="30" y="50" fill="#4a6080" font-size="9" font-family="Courier New">in</text>
+          <text x="30" y="94" fill="#4a6080" font-size="9" font-family="Courier New">in</text>
+          <text x="200" y="72" fill="#4a6080" font-size="9" font-family="Courier New">out</text>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.9;padding:0 4px;">
+        <span style="color:var(--yellow);">Symbol:</span> Curved body with concave back — IEEE standard OR gate<br>
+        <span style="color:var(--green);">HIGH output</span> when ANY input is HIGH (≥1 input HIGH)
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-title">▸ Testbench — tb_OR_GATE_2.vhd</div>
     <div class="code-block">
@@ -951,6 +1091,60 @@
 <span class="kw">begin</span>
   <span class="signal">Y</span> <span class="op">&lt;=</span> <span class="op">NOT</span> a;
 <span class="kw">end</span> Behavioral;</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- NOT Diagrams -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — NOT Gate</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="110" viewBox="0 0 380 110" style="filter:drop-shadow(0 0 10px rgba(0,212,255,0.2))">
+          <line x1="10" y1="55" x2="100" y2="55" stroke="#4a6080" stroke-width="2"/>
+          <text x="6" y="51" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">A</text>
+          <text x="18" y="49" fill="#4a6080" font-size="10" font-family="Courier New">STD_LOGIC</text>
+          <rect x="100" y="15" width="180" height="80" rx="8" fill="#0f1628" stroke="#00d4ff" stroke-width="2"/>
+          <text x="190" y="44" fill="#00d4ff" font-size="15" font-family="Courier New" font-weight="bold" text-anchor="middle">NOT_GATE</text>
+          <text x="190" y="64" fill="#7b2fff" font-size="13" font-family="Courier New" text-anchor="middle">Y = Ā</text>
+          <text x="190" y="84" fill="#4a6080" font-size="10" font-family="Courier New" text-anchor="middle">entity: NOT_GATE</text>
+          <line x1="280" y1="55" x2="370" y2="55" stroke="#4a6080" stroke-width="2"/>
+          <text x="354" y="51" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">Y</text>
+          <text x="292" y="49" fill="#4a6080" font-size="10" font-family="Courier New">STD_LOGIC</text>
+          <circle cx="100" cy="55" r="3" fill="#00d4ff"/>
+          <circle cx="280" cy="55" r="3" fill="#00ff88"/>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.9;padding:0 4px;">
+        <span style="color:var(--accent);">Input:</span> A only — STD_LOGIC &nbsp;|&nbsp;
+        <span style="color:var(--green);">Output:</span> Y — STD_LOGIC<br>
+        <span style="color:var(--yellow);">Single input only</span> — no port B
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Circuit / Logic Diagram — NOT Gate</div>
+      <div style="display:flex;justify-content:center;align-items:center;padding:16px 0;">
+        <svg width="320" height="140" viewBox="0 0 320 140" style="filter:drop-shadow(0 0 10px rgba(0,212,255,0.2))">
+          <line x1="20" y1="70" x2="80" y2="70" stroke="#00d4ff" stroke-width="2.5"/>
+          <!-- NOT gate triangle -->
+          <polygon points="80,35 80,105 155,70" fill="#0f1628" stroke="#00d4ff" stroke-width="2.5"/>
+          <!-- Bubble (inversion circle) -->
+          <circle cx="165" cy="70" r="10" fill="#0f1628" stroke="#00d4ff" stroke-width="2.5"/>
+          <line x1="175" y1="70" x2="300" y2="70" stroke="#00ff88" stroke-width="2.5"/>
+          <text x="6" y="66" fill="#ffd700" font-size="14" font-family="Courier New" font-weight="bold">A</text>
+          <text x="284" y="66" fill="#ffd700" font-size="14" font-family="Courier New" font-weight="bold">Y</text>
+          <!-- 1 inside triangle -->
+          <text x="108" y="75" fill="#00d4ff" font-size="14" font-family="Courier New" font-weight="bold" text-anchor="middle">1</text>
+          <circle cx="20" cy="70" r="4" fill="#ffd700"/>
+          <circle cx="300" cy="70" r="4" fill="#00ff88"/>
+          <text x="160" y="128" fill="#7b2fff" font-size="12" font-family="Courier New" text-anchor="middle">Y &lt;= NOT a;</text>
+          <text x="30" y="62" fill="#4a6080" font-size="9" font-family="Courier New">in</text>
+          <text x="200" y="62" fill="#4a6080" font-size="9" font-family="Courier New">out</text>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.9;padding:0 4px;">
+        <span style="color:var(--yellow);">Symbol:</span> Triangle (buffer) + bubble circle at output — inverter<br>
+        <span style="color:var(--green);">Bubble = inversion.</span> Output always opposite of input.
       </div>
     </div>
   </div>
@@ -1115,6 +1309,69 @@
 <span class="kw">begin</span>
   <span class="signal">Y</span> <span class="op">&lt;=</span> <span class="op">NOT</span> (a <span class="op">AND</span> b);
 <span class="kw">end</span> Behavioral;</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- NAND Diagrams -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — NAND Gate</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="130" viewBox="0 0 380 130" style="filter:drop-shadow(0 0 10px rgba(0,212,255,0.2))">
+          <line x1="10" y1="45" x2="100" y2="45" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="85" x2="100" y2="85" stroke="#4a6080" stroke-width="2"/>
+          <text x="6" y="41" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">A</text>
+          <text x="6" y="81" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">B</text>
+          <text x="18" y="39" fill="#4a6080" font-size="10" font-family="Courier New">STD_LOGIC</text>
+          <text x="18" y="79" fill="#4a6080" font-size="10" font-family="Courier New">STD_LOGIC</text>
+          <rect x="100" y="20" width="180" height="90" rx="8" fill="#0f1628" stroke="#ffd700" stroke-width="2"/>
+          <!-- Gold border for universal -->
+          <rect x="100" y="20" width="180" height="8" rx="4" fill="rgba(255,215,0,0.15)"/>
+          <text x="190" y="48" fill="#00d4ff" font-size="13" font-family="Courier New" font-weight="bold" text-anchor="middle">NAND_GATE_2</text>
+          <text x="190" y="66" fill="#7b2fff" font-size="11" font-family="Courier New" text-anchor="middle">Y = NOT(A AND B)</text>
+          <text x="190" y="84" fill="#ffd700" font-size="10" font-family="Courier New" text-anchor="middle">★ UNIVERSAL GATE</text>
+          <text x="190" y="100" fill="#4a6080" font-size="10" font-family="Courier New" text-anchor="middle">entity: NAND_GATE_2</text>
+          <line x1="280" y1="65" x2="370" y2="65" stroke="#4a6080" stroke-width="2"/>
+          <text x="354" y="61" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">Y</text>
+          <text x="292" y="59" fill="#4a6080" font-size="10" font-family="Courier New">STD_LOGIC</text>
+          <circle cx="100" cy="45" r="3" fill="#00d4ff"/>
+          <circle cx="100" cy="85" r="3" fill="#00d4ff"/>
+          <circle cx="280" cy="65" r="3" fill="#00ff88"/>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.9;padding:0 4px;">
+        <span style="color:var(--yellow);">★ Universal Gate</span> — can implement ANY logic function using only NAND gates<br>
+        <span style="color:var(--accent);">Inputs:</span> A, B — STD_LOGIC &nbsp;|&nbsp; <span style="color:var(--green);">Output:</span> Y — STD_LOGIC
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Circuit / Logic Diagram — NAND Gate</div>
+      <div style="display:flex;justify-content:center;align-items:center;padding:16px 0;">
+        <svg width="320" height="160" viewBox="0 0 320 160" style="filter:drop-shadow(0 0 10px rgba(0,212,255,0.2))">
+          <line x1="20" y1="58" x2="90" y2="58" stroke="#00d4ff" stroke-width="2.5"/>
+          <line x1="20" y1="102" x2="90" y2="102" stroke="#00d4ff" stroke-width="2.5"/>
+          <!-- AND body -->
+          <path d="M90,35 L90,125 L128,125 Q175,125 175,80 Q175,35 128,35 Z" fill="#0f1628" stroke="#00d4ff" stroke-width="2.5"/>
+          <!-- Bubble -->
+          <circle cx="185" cy="80" r="10" fill="#0f1628" stroke="#00d4ff" stroke-width="2.5"/>
+          <line x1="195" y1="80" x2="300" y2="80" stroke="#00ff88" stroke-width="2.5"/>
+          <text x="6" y="54" fill="#ffd700" font-size="14" font-family="Courier New" font-weight="bold">A</text>
+          <text x="6" y="98" fill="#ffd700" font-size="14" font-family="Courier New" font-weight="bold">B</text>
+          <text x="285" y="76" fill="#ffd700" font-size="14" font-family="Courier New" font-weight="bold">Y</text>
+          <text x="108" y="84" fill="#00d4ff" font-size="13" font-family="Courier New" font-weight="bold" text-anchor="middle">&amp;</text>
+          <circle cx="20" cy="58" r="4" fill="#ffd700"/>
+          <circle cx="20" cy="102" r="4" fill="#ffd700"/>
+          <circle cx="300" cy="80" r="4" fill="#00ff88"/>
+          <text x="160" y="148" fill="#7b2fff" font-size="11" font-family="Courier New" text-anchor="middle">Y &lt;= NOT (a AND b);</text>
+          <text x="30" y="50" fill="#4a6080" font-size="9" font-family="Courier New">in</text>
+          <text x="30" y="94" fill="#4a6080" font-size="9" font-family="Courier New">in</text>
+          <text x="210" y="72" fill="#4a6080" font-size="9" font-family="Courier New">out</text>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.9;padding:0 4px;">
+        <span style="color:var(--yellow);">Symbol:</span> AND gate body + bubble circle at output<br>
+        <span style="color:var(--green);">Bubble = NOT.</span> NAND = AND followed by inverter.
       </div>
     </div>
   </div>
@@ -1285,6 +1542,67 @@
     </div>
   </div>
 
+  <!-- NOR Diagrams -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — NOR Gate</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="130" viewBox="0 0 380 130" style="filter:drop-shadow(0 0 10px rgba(0,212,255,0.2))">
+          <line x1="10" y1="45" x2="100" y2="45" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="85" x2="100" y2="85" stroke="#4a6080" stroke-width="2"/>
+          <text x="6" y="41" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">A</text>
+          <text x="6" y="81" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">B</text>
+          <text x="18" y="39" fill="#4a6080" font-size="10" font-family="Courier New">STD_LOGIC</text>
+          <text x="18" y="79" fill="#4a6080" font-size="10" font-family="Courier New">STD_LOGIC</text>
+          <rect x="100" y="20" width="180" height="90" rx="8" fill="#0f1628" stroke="#ffd700" stroke-width="2"/>
+          <text x="190" y="48" fill="#00d4ff" font-size="13" font-family="Courier New" font-weight="bold" text-anchor="middle">NOR_GATE_2</text>
+          <text x="190" y="66" fill="#7b2fff" font-size="11" font-family="Courier New" text-anchor="middle">Y = NOT(A OR B)</text>
+          <text x="190" y="84" fill="#ffd700" font-size="10" font-family="Courier New" text-anchor="middle">★ UNIVERSAL GATE</text>
+          <text x="190" y="100" fill="#4a6080" font-size="10" font-family="Courier New" text-anchor="middle">entity: NOR_GATE_2</text>
+          <line x1="280" y1="65" x2="370" y2="65" stroke="#4a6080" stroke-width="2"/>
+          <text x="354" y="61" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">Y</text>
+          <text x="292" y="59" fill="#4a6080" font-size="10" font-family="Courier New">STD_LOGIC</text>
+          <circle cx="100" cy="45" r="3" fill="#00d4ff"/>
+          <circle cx="100" cy="85" r="3" fill="#00d4ff"/>
+          <circle cx="280" cy="65" r="3" fill="#00ff88"/>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.9;padding:0 4px;">
+        <span style="color:var(--yellow);">★ Universal Gate</span> — can implement ANY logic function using only NOR gates<br>
+        <span style="color:var(--accent);">Inputs:</span> A, B — STD_LOGIC &nbsp;|&nbsp; <span style="color:var(--green);">Output:</span> Y — STD_LOGIC
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Circuit / Logic Diagram — NOR Gate</div>
+      <div style="display:flex;justify-content:center;align-items:center;padding:16px 0;">
+        <svg width="320" height="160" viewBox="0 0 320 160" style="filter:drop-shadow(0 0 10px rgba(0,212,255,0.2))">
+          <line x1="20" y1="58" x2="85" y2="58" stroke="#00d4ff" stroke-width="2.5"/>
+          <line x1="20" y1="102" x2="85" y2="102" stroke="#00d4ff" stroke-width="2.5"/>
+          <!-- OR curved body -->
+          <path d="M78,35 Q100,80 78,125 L118,125 Q165,125 175,80 Q165,35 118,35 Z" fill="#0f1628" stroke="#00d4ff" stroke-width="2.5"/>
+          <!-- Bubble -->
+          <circle cx="185" cy="80" r="10" fill="#0f1628" stroke="#00d4ff" stroke-width="2.5"/>
+          <line x1="195" y1="80" x2="300" y2="80" stroke="#00ff88" stroke-width="2.5"/>
+          <text x="6" y="54" fill="#ffd700" font-size="14" font-family="Courier New" font-weight="bold">A</text>
+          <text x="6" y="98" fill="#ffd700" font-size="14" font-family="Courier New" font-weight="bold">B</text>
+          <text x="285" y="76" fill="#ffd700" font-size="14" font-family="Courier New" font-weight="bold">Y</text>
+          <text x="122" y="85" fill="#00d4ff" font-size="13" font-family="Courier New" font-weight="bold" text-anchor="middle">≥1</text>
+          <circle cx="20" cy="58" r="4" fill="#ffd700"/>
+          <circle cx="20" cy="102" r="4" fill="#ffd700"/>
+          <circle cx="300" cy="80" r="4" fill="#00ff88"/>
+          <text x="160" y="148" fill="#7b2fff" font-size="11" font-family="Courier New" text-anchor="middle">Y &lt;= NOT (a OR b);</text>
+          <text x="30" y="50" fill="#4a6080" font-size="9" font-family="Courier New">in</text>
+          <text x="30" y="94" fill="#4a6080" font-size="9" font-family="Courier New">in</text>
+          <text x="210" y="72" fill="#4a6080" font-size="9" font-family="Courier New">out</text>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.9;padding:0 4px;">
+        <span style="color:var(--yellow);">Symbol:</span> OR gate body + bubble circle at output<br>
+        <span style="color:var(--green);">Bubble = NOT.</span> NOR = OR followed by inverter.
+      </div>
+    </div>
+  </div>
+
   <div class="card">
     <div class="card-title">▸ Testbench — tb_NOR_GATE_2.vhd</div>
     <div class="code-block">
@@ -1443,6 +1761,68 @@
 <span class="kw">begin</span>
   <span class="signal">Y</span> <span class="op">&lt;=</span> a <span class="op">XOR</span> b;
 <span class="kw">end</span> Behavioral;</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- XOR Diagrams -->
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — XOR Gate</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="130" viewBox="0 0 380 130" style="filter:drop-shadow(0 0 10px rgba(0,212,255,0.2))">
+          <line x1="10" y1="45" x2="100" y2="45" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="85" x2="100" y2="85" stroke="#4a6080" stroke-width="2"/>
+          <text x="6" y="41" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">A</text>
+          <text x="6" y="81" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">B</text>
+          <text x="18" y="39" fill="#4a6080" font-size="10" font-family="Courier New">STD_LOGIC</text>
+          <text x="18" y="79" fill="#4a6080" font-size="10" font-family="Courier New">STD_LOGIC</text>
+          <rect x="100" y="20" width="180" height="90" rx="8" fill="#0f1628" stroke="#00d4ff" stroke-width="2"/>
+          <text x="190" y="48" fill="#00d4ff" font-size="13" font-family="Courier New" font-weight="bold" text-anchor="middle">XOR_GATE_2</text>
+          <text x="190" y="66" fill="#7b2fff" font-size="13" font-family="Courier New" text-anchor="middle">Y = A ⊕ B</text>
+          <text x="190" y="84" fill="#4a6080" font-size="10" font-family="Courier New" text-anchor="middle">Exclusive OR</text>
+          <text x="190" y="100" fill="#4a6080" font-size="10" font-family="Courier New" text-anchor="middle">entity: XOR_GATE_2</text>
+          <line x1="280" y1="65" x2="370" y2="65" stroke="#4a6080" stroke-width="2"/>
+          <text x="354" y="61" fill="#ffd700" font-size="13" font-family="Courier New" font-weight="bold">Y</text>
+          <text x="292" y="59" fill="#4a6080" font-size="10" font-family="Courier New">STD_LOGIC</text>
+          <circle cx="100" cy="45" r="3" fill="#00d4ff"/>
+          <circle cx="100" cy="85" r="3" fill="#00d4ff"/>
+          <circle cx="280" cy="65" r="3" fill="#00ff88"/>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.9;padding:0 4px;">
+        <span style="color:var(--accent);">Inputs:</span> A, B — STD_LOGIC &nbsp;|&nbsp;
+        <span style="color:var(--green);">Output:</span> Y — STD_LOGIC<br>
+        <span style="color:var(--yellow);">Application:</span> Half adder sum bit, parity generator, comparator
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Circuit / Logic Diagram — XOR Gate</div>
+      <div style="display:flex;justify-content:center;align-items:center;padding:16px 0;">
+        <svg width="320" height="160" viewBox="0 0 320 160" style="filter:drop-shadow(0 0 10px rgba(0,212,255,0.2))">
+          <line x1="20" y1="58" x2="82" y2="58" stroke="#00d4ff" stroke-width="2.5"/>
+          <line x1="20" y1="102" x2="82" y2="102" stroke="#00d4ff" stroke-width="2.5"/>
+          <!-- Extra XOR curve (double line at input) -->
+          <path d="M68,35 Q88,80 68,125" fill="none" stroke="#00d4ff" stroke-width="2.5"/>
+          <!-- OR curved body -->
+          <path d="M78,35 Q100,80 78,125 L118,125 Q165,125 175,80 Q165,35 118,35 Z" fill="#0f1628" stroke="#00d4ff" stroke-width="2.5"/>
+          <line x1="175" y1="80" x2="300" y2="80" stroke="#00ff88" stroke-width="2.5"/>
+          <text x="6" y="54" fill="#ffd700" font-size="14" font-family="Courier New" font-weight="bold">A</text>
+          <text x="6" y="98" fill="#ffd700" font-size="14" font-family="Courier New" font-weight="bold">B</text>
+          <text x="285" y="76" fill="#ffd700" font-size="14" font-family="Courier New" font-weight="bold">Y</text>
+          <text x="122" y="85" fill="#00d4ff" font-size="13" font-family="Courier New" font-weight="bold" text-anchor="middle">=1</text>
+          <circle cx="20" cy="58" r="4" fill="#ffd700"/>
+          <circle cx="20" cy="102" r="4" fill="#ffd700"/>
+          <circle cx="300" cy="80" r="4" fill="#00ff88"/>
+          <text x="160" y="148" fill="#7b2fff" font-size="12" font-family="Courier New" text-anchor="middle">Y &lt;= a XOR b;</text>
+          <text x="30" y="50" fill="#4a6080" font-size="9" font-family="Courier New">in</text>
+          <text x="30" y="94" fill="#4a6080" font-size="9" font-family="Courier New">in</text>
+          <text x="198" y="72" fill="#4a6080" font-size="9" font-family="Courier New">out</text>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.9;padding:0 4px;">
+        <span style="color:var(--yellow);">Symbol:</span> OR gate + extra curved line at input side<br>
+        <span style="color:var(--green);">HIGH</span> when inputs differ &nbsp;|&nbsp; <span style="color:var(--red);">LOW</span> when inputs match
       </div>
     </div>
   </div>
