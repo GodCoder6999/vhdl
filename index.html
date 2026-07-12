@@ -330,6 +330,7 @@
   <button class="gate-tab" onclick="showGate('exp2')" style="border-color:#ff6eb4;color:#ff6eb4;">EXP-2</button>
   <button class="gate-tab" onclick="showGate('halfsub')" style="border-color:var(--green);color:var(--green);">HALF SUB</button>
   <button class="gate-tab" onclick="showGate('mux8')" style="border-color:#b388ff;color:#b388ff;">8:1 MUX</button>
+  <button class="gate-tab" onclick="showGate('fa')" style="border-color:#5c9dff;color:#5c9dff;">FA by HA</button>
 </nav>
 
 <!-- ═══════════════════════════════════════════ OVERVIEW ═══ -->
@@ -3590,10 +3591,311 @@
 </div>
 </div>
 
+<!-- FULL ADDER by HALF ADDER SECTION -->
+<div id="section-fa" class="gate-section">
+<div class="container">
+  <div class="info-bar">
+    <div class="gate-name-big" style="background:linear-gradient(135deg,#fff,#5c9dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Full Adder by Half Adder</div>
+    <div class="tag" style="border-color:#5c9dff;color:#5c9dff;">STRUCTURAL</div>
+    <div class="tag">entity: FA</div>
+  </div>
+  <div class="logic-expr" style="color:#5c9dff;">sf = af ⊕ bf ⊕ c_in &nbsp;|&nbsp; c_out = (af·bf) + (c_in·(af⊕bf))</div>
+  <p class="gate-desc">Adds three 1-bit numbers (af + bf + carry-in). Built from TWO Half Adder components plus one OR gate. HA1 adds af,bf → gives partial sum + carry; HA2 adds that partial sum to c_in → final sum sf; the two HA carries are OR'd for c_out.</p>
+
+  <div class="three-col">
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Full Adder Simulator</div>
+      <div style="display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;">
+        <div class="inputs-col">
+          <div class="input-toggle">
+            <span class="input-label">af</span>
+            <div class="toggle-btn" id="fa-af-toggle" onclick="toggleFA('af')"></div>
+            <div class="bit-display" id="fa-af-bit">0</div>
+          </div>
+          <div class="input-toggle">
+            <span class="input-label">bf</span>
+            <div class="toggle-btn" id="fa-bf-toggle" onclick="toggleFA('bf')"></div>
+            <div class="bit-display" id="fa-bf-bit">0</div>
+          </div>
+          <div class="input-toggle">
+            <span class="input-label">c_in</span>
+            <div class="toggle-btn" id="fa-cin-toggle" onclick="toggleFA('cin')"></div>
+            <div class="bit-display" id="fa-cin-bit">0</div>
+          </div>
+        </div>
+        <div style="font-size:28px;color:var(--accent2);">→</div>
+        <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+          <div class="output-col">
+            <div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:4px;">sf (sum)</div>
+            <div class="output-bit" id="fa-sf-output">0</div>
+          </div>
+          <div class="output-col">
+            <div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:4px;">c_out</div>
+            <div class="output-bit" id="fa-cout-output">0</div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top:14px;text-align:center;font-size:11px;color:var(--muted);padding:8px;background:rgba(92,157,255,0.05);border-radius:6px;border:1px solid rgba(92,157,255,0.2);">
+        sf = af XOR bf XOR c_in &nbsp;|&nbsp; c_out = sig2 OR sig3
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Truth Table</div>
+      <table>
+        <thead><tr><th>af</th><th>bf</th><th>c_in</th><th>sf</th><th>c_out</th></tr></thead>
+        <tbody id="fa-table">
+          <tr class="highlighted"><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="one">1</td><td class="one">1</td><td class="one">1</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.8;">
+        <span style="color:#5c9dff;">■</span> sf = 1 when odd number of inputs are 1<br>
+        <span style="color:var(--orange);">■</span> c_out = 1 when two or more inputs are 1
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ VHDL Code — FA.vhd (Structural)</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('fa-code')">COPY</button>
+        <pre id="fa-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+<span class="lib">use</span> IEEE.STD_LOGIC_ARITH.ALL;
+<span class="lib">use</span> IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">FA</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">af</span>    : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">bf</span>    : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">c_in</span>  : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">sf</span>    : <span class="kw">out</span> STD_LOGIC;
+    <span class="signal">c_out</span> : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> FA;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span> FA <span class="kw">is</span>
+
+<span class="kw">component</span> HA <span class="kw">is</span>
+  <span class="kw">Port</span> (a : <span class="kw">in</span>  STD_LOGIC;
+        b : <span class="kw">in</span>  STD_LOGIC;
+        s : <span class="kw">out</span> STD_LOGIC;
+        c : <span class="kw">out</span> STD_LOGIC);
+<span class="kw">end component</span>;
+
+<span class="kw">signal</span> <span class="signal">sig1</span>,<span class="signal">sig2</span>,<span class="signal">sig3</span> : STD_LOGIC;
+
+<span class="kw">begin</span>
+  HA1: HA <span class="kw">port map</span>(af, bf, sig1, sig2);
+  HA2: HA <span class="kw">port map</span>(sig1, c_in, sf, sig3);
+  c_out <span class="op">&lt;=</span> sig2 <span class="op">or</span> sig3;
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sub-component code -->
+  <div class="card">
+    <div class="card-title">▸ Sub-Component File — Must Compile Before FA</div>
+    <div class="two-col">
+      <div>
+        <div style="font-size:10px;color:#5c9dff;letter-spacing:2px;margin-bottom:8px;">HA.vhd (Half Adder — dataflow)</div>
+        <div class="code-block" style="margin-bottom:0;">
+          <button class="code-copy" onclick="copyCode('fa-ha-code')">COPY</button>
+          <pre id="fa-ha-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+<span class="lib">use</span> IEEE.STD_LOGIC_ARITH.ALL;
+<span class="lib">use</span> IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">HA</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    a : <span class="kw">in</span>  STD_LOGIC;
+    b : <span class="kw">in</span>  STD_LOGIC;
+    s : <span class="kw">out</span> STD_LOGIC;
+    c : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> HA;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span> HA <span class="kw">is</span>
+<span class="kw">begin</span>
+  s <span class="op">&lt;=</span> a <span class="op">xor</span> b;
+  c <span class="op">&lt;=</span> a <span class="op">and</span> b;
+<span class="kw">end</span> Behavioral;</pre>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:10px;color:#5c9dff;letter-spacing:2px;margin-bottom:8px;">How the two HAs build the FA</div>
+        <div style="font-size:12px;color:var(--muted);line-height:2;padding:10px;background:rgba(92,157,255,0.05);border:1px solid rgba(92,157,255,0.2);border-radius:8px;">
+          <strong style="color:#5c9dff;">HA1</strong>: af + bf<br>
+          &nbsp;&nbsp;→ sig1 = af ⊕ bf (partial sum)<br>
+          &nbsp;&nbsp;→ sig2 = af · bf (carry 1)<br><br>
+          <strong style="color:#5c9dff;">HA2</strong>: sig1 + c_in<br>
+          &nbsp;&nbsp;→ sf = sig1 ⊕ c_in (final sum)<br>
+          &nbsp;&nbsp;→ sig3 = sig1 · c_in (carry 2)<br><br>
+          <strong style="color:var(--orange);">OR</strong>: c_out = sig2 + sig3
+        </div>
+      </div>
+    </div>
+    <div class="note-box" style="margin-top:14px;border-color:#5c9dff;">
+      <strong style="color:#5c9dff;">COMPILE ORDER:</strong> 1. HA.vhd &nbsp;→&nbsp; 2. FA.vhd (top-level — instantiates HA twice)
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — Full Adder (FA)</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="150" viewBox="0 0 380 150" style="filter:drop-shadow(0 0 10px rgba(92,157,255,0.2))">
+          <line x1="10" y1="40" x2="100" y2="40" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="70" x2="100" y2="70" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="100" x2="100" y2="100" stroke="#4a6080" stroke-width="2"/>
+          <text x="0" y="36" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">af</text>
+          <text x="0" y="66" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">bf</text>
+          <text x="0" y="96" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">c_in</text>
+          <rect x="100" y="20" width="180" height="100" rx="8" fill="#0f1628" stroke="#5c9dff" stroke-width="2"/>
+          <text x="190" y="58" fill="#5c9dff" font-size="14" font-family="Courier New" font-weight="bold" text-anchor="middle">FA</text>
+          <text x="190" y="76" fill="#7b2fff" font-size="11" font-family="Courier New" text-anchor="middle">Full Adder</text>
+          <text x="190" y="104" fill="#4a6080" font-size="9" font-family="Courier New" text-anchor="middle">2 × HA + OR</text>
+          <line x1="280" y1="50" x2="370" y2="50" stroke="#4a6080" stroke-width="2"/>
+          <line x1="280" y1="90" x2="370" y2="90" stroke="#4a6080" stroke-width="2"/>
+          <text x="340" y="46" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">sf</text>
+          <text x="284" y="44" fill="#4a6080" font-size="9" font-family="Courier New">sum</text>
+          <text x="320" y="86" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">c_out</text>
+          <text x="284" y="86" fill="#4a6080" font-size="9" font-family="Courier New">carry</text>
+          <circle cx="100" cy="40" r="3" fill="#5c9dff"/>
+          <circle cx="100" cy="70" r="3" fill="#5c9dff"/>
+          <circle cx="100" cy="100" r="3" fill="#5c9dff"/>
+          <circle cx="280" cy="50" r="3" fill="#00d4ff"/>
+          <circle cx="280" cy="90" r="3" fill="#ff9500"/>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);padding:0 4px;line-height:1.8;">
+        <span style="color:#5c9dff;">Inputs:</span> af, bf, c_in — STD_LOGIC &nbsp;|&nbsp;
+        <span style="color:var(--accent);">sf</span> = sum &nbsp;|&nbsp; <span style="color:var(--orange);">c_out</span> = carry-out
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Circuit — Structural (HA1, HA2, OR)</div>
+      <div style="display:flex;justify-content:center;padding:8px 0;">
+        <svg width="420" height="200" viewBox="0 0 420 200" style="filter:drop-shadow(0 0 8px rgba(92,157,255,0.2))">
+          <!-- inputs -->
+          <text x="2" y="44" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">af</text>
+          <text x="2" y="74" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">bf</text>
+          <text x="0" y="150" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">c_in</text>
+          <line x1="24" y1="40" x2="60" y2="40" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="24" y1="70" x2="60" y2="70" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="30" y1="146" x2="235" y2="146" stroke="#4a6080" stroke-width="1.5"/>
+          <!-- HA1 -->
+          <rect x="60" y="28" width="70" height="55" rx="6" fill="#0f1628" stroke="#5c9dff" stroke-width="1.8"/>
+          <text x="95" y="52" fill="#5c9dff" font-size="11" font-family="Courier New" font-weight="bold" text-anchor="middle">HA1</text>
+          <text x="95" y="68" fill="#4a6080" font-size="8" font-family="Courier New" text-anchor="middle">af,bf</text>
+          <!-- sig1 to HA2 -->
+          <line x1="130" y1="45" x2="200" y2="45" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="150" y="40" fill="#00d4ff" font-size="9" font-family="Courier New">sig1</text>
+          <!-- sig2 down to OR -->
+          <line x1="130" y1="68" x2="150" y2="68" stroke="#ff9500" stroke-width="1.5"/>
+          <line x1="150" y1="68" x2="150" y2="115" stroke="#ff9500" stroke-width="1.5"/>
+          <line x1="150" y1="115" x2="300" y2="115" stroke="#ff9500" stroke-width="1.5"/>
+          <text x="156" y="82" fill="#ff9500" font-size="9" font-family="Courier New">sig2</text>
+          <!-- HA2 -->
+          <rect x="200" y="35" width="70" height="55" rx="6" fill="#0f1628" stroke="#5c9dff" stroke-width="1.8"/>
+          <text x="235" y="59" fill="#5c9dff" font-size="11" font-family="Courier New" font-weight="bold" text-anchor="middle">HA2</text>
+          <text x="235" y="75" fill="#4a6080" font-size="8" font-family="Courier New" text-anchor="middle">sig1,c_in</text>
+          <line x1="235" y1="90" x2="235" y2="146" stroke="#4a6080" stroke-width="1.5"/>
+          <!-- sf out -->
+          <line x1="270" y1="50" x2="380" y2="50" stroke="#00d4ff" stroke-width="2"/>
+          <circle cx="380" cy="50" r="5" fill="#00d4ff" opacity="0.7"/>
+          <text x="386" y="46" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">sf</text>
+          <!-- sig3 down to OR -->
+          <line x1="255" y1="90" x2="255" y2="105" stroke="#ff9500" stroke-width="1.5"/>
+          <line x1="255" y1="105" x2="300" y2="105" stroke="#ff9500" stroke-width="1.5"/>
+          <text x="262" y="102" fill="#ff9500" font-size="9" font-family="Courier New">sig3</text>
+          <!-- OR gate -->
+          <path d="M300,98 Q315,98 335,110 Q315,122 300,122 Q307,110 300,98 Z" fill="#0f1628" stroke="#ff6eb4" stroke-width="1.8"/>
+          <text x="308" y="114" fill="#ff6eb4" font-size="8" font-family="Courier New">OR</text>
+          <line x1="335" y1="110" x2="380" y2="110" stroke="#ff9500" stroke-width="2"/>
+          <circle cx="380" cy="110" r="5" fill="#ff9500" opacity="0.7"/>
+          <text x="386" y="106" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">c_out</text>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.8;padding:0 4px;">
+        HA1: af,bf→sig1,sig2 &nbsp;|&nbsp; HA2: sig1,c_in→sf,sig3 &nbsp;|&nbsp; c_out = sig2 OR sig3
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Testbench — testing.vhw</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('fa-tb')">COPY</button>
+        <pre id="fa-tb"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+<span class="lib">use</span> IEEE.STD_LOGIC_ARITH.ALL;
+<span class="lib">use</span> IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+<span class="kw">ENTITY</span> <span class="entity-name">testing</span> <span class="kw">IS END</span> testing;
+
+<span class="kw">ARCHITECTURE</span> testbench_arch <span class="kw">OF</span> testing <span class="kw">IS</span>
+  <span class="kw">COMPONENT</span> FA
+    <span class="kw">PORT</span>(af    : <span class="kw">In</span>  std_logic;
+         bf    : <span class="kw">In</span>  std_logic;
+         c_in  : <span class="kw">In</span>  std_logic;
+         sf    : <span class="kw">Out</span> std_logic;
+         c_out : <span class="kw">Out</span> std_logic);
+  <span class="kw">END COMPONENT</span>;
+  <span class="kw">SIGNAL</span> <span class="signal">af</span>, <span class="signal">bf</span>, <span class="signal">c_in</span>  : std_logic := <span class="str">'0'</span>;
+  <span class="kw">SIGNAL</span> <span class="signal">sf</span>, <span class="signal">c_out</span>     : std_logic := <span class="str">'0'</span>;
+<span class="kw">BEGIN</span>
+  UUT: FA <span class="kw">PORT MAP</span>
+    (af=&gt;af, bf=&gt;bf, c_in=&gt;c_in, sf=&gt;sf, c_out=&gt;c_out);
+  <span class="kw">PROCESS BEGIN</span>
+    <span class="kw">WAIT FOR</span> 200 ns; c_in&lt;=<span class="str">'1'</span>;
+    <span class="kw">WAIT FOR</span> 100 ns; bf&lt;=<span class="str">'1'</span>; c_in&lt;=<span class="str">'0'</span>;
+    <span class="kw">WAIT FOR</span> 100 ns; c_in&lt;=<span class="str">'1'</span>;
+    <span class="kw">WAIT FOR</span> 100 ns; af&lt;=<span class="str">'1'</span>; bf&lt;=<span class="str">'0'</span>; c_in&lt;=<span class="str">'0'</span>;
+    <span class="kw">WAIT FOR</span> 100 ns; c_in&lt;=<span class="str">'1'</span>;
+    <span class="kw">WAIT FOR</span> 100 ns; bf&lt;=<span class="str">'1'</span>; c_in&lt;=<span class="str">'0'</span>;
+    <span class="kw">WAIT FOR</span> 100 ns; c_in&lt;=<span class="str">'1'</span>;
+    <span class="kw">WAIT FOR</span> 200 ns;
+  <span class="kw">END PROCESS</span>;
+<span class="kw">END</span> testbench_arch;</pre>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Execution Steps — Xilinx ISE (Structural)</div>
+      <div class="steps-container">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><strong>Create ISE Project</strong><div class="substep">File → New Project → Name: <code>FA_by_HA</code>, HDL type: VHDL</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><strong>Create Half Adder First</strong><div class="substep">New Source → VHDL Module → Name: <code>HA</code> — ports a,b,s,c</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Enter HA Code</strong><div class="substep">Dataflow: <code>s&lt;=a xor b; c&lt;=a and b;</code></div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Create Top-Level FA</strong><div class="substep">New Source → VHDL Module → Name: <code>FA</code> — ports af,bf,c_in,sf,c_out</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><strong>Declare HA + Signals</strong><div class="substep">component HA + <code>signal sig1,sig2,sig3</code></div></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-content"><strong>Enter Port Maps</strong><div class="substep">HA1:HA(af,bf,sig1,sig2); HA2:HA(sig1,c_in,sf,sig3); c_out&lt;=sig2 or sig3</div></div></div>
+        <div class="step"><div class="step-num">7</div><div class="step-content"><strong>Check Syntax</strong><div class="substep">Synthesize-XST → Check Syntax on FA → 0 errors</div></div></div>
+        <div class="step"><div class="step-num">8</div><div class="step-content"><strong>Create Testbench</strong><div class="substep">New Source → VHDL Test Bench → <code>testing</code>, associate with FA</div></div></div>
+        <div class="step"><div class="step-num">9</div><div class="step-content"><strong>Launch ISim</strong><div class="substep">Sim view → Simulate Behavioral Model → Run 1000 ns</div></div></div>
+        <div class="step"><div class="step-num">10</div><div class="step-content"><strong>Verify Sum &amp; Carry</strong><div class="substep">sf = af⊕bf⊕c_in; c_out=1 when ≥2 inputs high</div></div></div>
+      </div>
+      <div class="note-box" style="margin-top:14px;border-color:#5c9dff;">
+        <strong style="color:#5c9dff;">EXAM NOTE:</strong> Full Adder is built STRUCTURALLY from two Half Adder instances (HA1, HA2) plus one OR gate. HA.vhd must be compiled BEFORE FA.vhd. This is hierarchical design — the FA reuses the HA component twice via port map.
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
 <footer>
   <div class="container">
     <p>VHDL Logic Gates &amp; Combinational Circuits · Xilinx ISE / Vivado</p>
-    <p style="margin-top:8px;font-size:11px;"><span>IEEE STD_LOGIC_1164</span> · AND · OR · NOT · NAND · NOR · XOR · 2:4 DEC · EXP-1 · EXP-2 · HALF SUB · 8:1 MUX</p>
+    <p style="margin-top:8px;font-size:11px;"><span>IEEE STD_LOGIC_1164</span> · AND · OR · NOT · NAND · NOR · XOR · 2:4 DEC · EXP-1 · EXP-2 · HALF SUB · 8:1 MUX · FA by HA</p>
     <p style="margin-top:6px;font-size:10px;color:#2a4060;">All codes sourced from FIEM lab notebooks</p>
   </div>
 </footer>
@@ -3808,6 +4110,30 @@ function updateMux8() {
   if (tb) tb.querySelectorAll('tr').forEach((r,i) => r.classList.toggle('highlighted',i===idx));
 }
 
+// Full Adder by Half Adder: sf = af XOR bf XOR c_in, c_out = (af AND bf) OR (c_in AND (af XOR bf))
+const faState = {af:0, bf:0, cin:0};
+function toggleFA(inp) { faState[inp] ^= 1; updateFA(); }
+function updateFA() {
+  const s = faState;
+  const sig1 = s.af ^ s.bf;   // HA1 sum
+  const sig2 = s.af & s.bf;   // HA1 carry
+  const sf   = sig1 ^ s.cin;  // HA2 sum
+  const sig3 = sig1 & s.cin;  // HA2 carry
+  const cout = sig2 | sig3;
+  [['af','af'],['bf','bf'],['cin','cin']].forEach(([id,key]) => {
+    const t = document.getElementById(`fa-${id}-toggle`);
+    const b = document.getElementById(`fa-${id}-bit`);
+    if (t) t.classList.toggle('on', s[key]===1);
+    if (b) { b.textContent=s[key]; b.classList.toggle('high',s[key]===1); }
+  });
+  const os = document.getElementById('fa-sf-output');
+  const oc = document.getElementById('fa-cout-output');
+  if (os) { os.textContent=sf;   os.classList.toggle('high',sf===1);   os.classList.toggle('low',sf===0); }
+  if (oc) { oc.textContent=cout; oc.classList.toggle('high',cout===1); oc.classList.toggle('low',cout===0); }
+  const tb = document.getElementById('fa-table');
+  if (tb) { const idx=(s.af<<2)|(s.bf<<1)|s.cin; tb.querySelectorAll('tr').forEach((r,i)=>r.classList.toggle('highlighted',i===idx)); }
+}
+
 // init gates with inverted defaults
 updateGate('not');
 updateGate('nand');
@@ -3817,6 +4143,7 @@ updateExp1();
 updateExp2();
 updateHS();
 updateMux8();
+updateFA();
 </script>
 </body>
 </html>
