@@ -331,6 +331,10 @@
   <button class="gate-tab" onclick="showGate('halfsub')" style="border-color:var(--green);color:var(--green);">HALF SUB</button>
   <button class="gate-tab" onclick="showGate('mux8')" style="border-color:#b388ff;color:#b388ff;">8:1 MUX</button>
   <button class="gate-tab" onclick="showGate('fa')" style="border-color:#5c9dff;color:#5c9dff;">FA by HA</button>
+  <button class="gate-tab" onclick="showGate('fa2ha')" style="border-color:#00e5a0;color:#00e5a0;">FA · 2 HA</button>
+  <button class="gate-tab" onclick="showGate('faBeh')" style="border-color:#ffb74d;color:#ffb74d;">FA · BEHAV</button>
+  <button class="gate-tab" onclick="showGate('fs2hs')" style="border-color:#4fc3f7;color:#4fc3f7;">FS · 2 HS</button>
+  <button class="gate-tab" onclick="showGate('fsBeh')" style="border-color:#f06292;color:#f06292;">FS · BEHAV</button>
 </nav>
 
 <!-- ═══════════════════════════════════════════ OVERVIEW ═══ -->
@@ -3892,10 +3896,823 @@
 </div>
 </div>
 
+<!-- ═══════════ FULL ADDER using TWO HALF ADDERS (STRUCTURAL) ═══ -->
+<div id="section-fa2ha" class="gate-section">
+<div class="container">
+  <div class="info-bar">
+    <div class="gate-name-big" style="background:linear-gradient(135deg,#fff,#00e5a0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Full Adder using Two Half Adders</div>
+    <div class="tag" style="border-color:#00e5a0;color:#00e5a0;">STRUCTURAL</div>
+    <div class="tag">entity: full_adder</div>
+  </div>
+  <div class="logic-expr" style="color:#00e5a0;">sum = a ⊕ b ⊕ cin &nbsp;|&nbsp; cout = (a·b) + (cin·(a⊕b))</div>
+  <p class="gate-desc">Adds three 1-bit numbers using TWO half_adder components plus one OR gate. HA1 adds a,b → sum1 + carry1. HA2 adds sum1,cin → final sum + carry2. The two carries are OR'd for cout. Pure structural (component instantiation) architecture.</p>
+
+  <div class="three-col">
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Simulator</div>
+      <div style="display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;">
+        <div class="inputs-col">
+          <div class="input-toggle"><span class="input-label">a</span><div class="toggle-btn" id="fa2ha-a-toggle" onclick="toggleFA2HA('a')"></div><div class="bit-display" id="fa2ha-a-bit">0</div></div>
+          <div class="input-toggle"><span class="input-label">b</span><div class="toggle-btn" id="fa2ha-b-toggle" onclick="toggleFA2HA('b')"></div><div class="bit-display" id="fa2ha-b-bit">0</div></div>
+          <div class="input-toggle"><span class="input-label">cin</span><div class="toggle-btn" id="fa2ha-cin-toggle" onclick="toggleFA2HA('cin')"></div><div class="bit-display" id="fa2ha-cin-bit">0</div></div>
+        </div>
+        <div style="font-size:28px;color:var(--accent2);">→</div>
+        <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+          <div class="output-col"><div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:4px;">sum</div><div class="output-bit" id="fa2ha-sum-output">0</div></div>
+          <div class="output-col"><div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:4px;">cout</div><div class="output-bit" id="fa2ha-cout-output">0</div></div>
+        </div>
+      </div>
+      <div style="margin-top:14px;text-align:center;font-size:11px;color:var(--muted);padding:8px;background:rgba(0,229,160,0.05);border-radius:6px;border:1px solid rgba(0,229,160,0.2);">
+        sum = a XOR b XOR cin &nbsp;|&nbsp; cout = c1 OR c2
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Truth Table</div>
+      <table>
+        <thead><tr><th>a</th><th>b</th><th>cin</th><th>sum</th><th>cout</th></tr></thead>
+        <tbody id="fa2ha-table">
+          <tr class="highlighted"><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="one">1</td><td class="one">1</td><td class="one">1</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ VHDL — full_adder.vhd (Structural)</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('fa2ha-code')">COPY</button>
+        <pre id="fa2ha-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">full_adder</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">a</span>    : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">b</span>    : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">cin</span>  : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">sum</span>  : <span class="kw">out</span> STD_LOGIC;
+    <span class="signal">cout</span> : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> full_adder;
+
+<span class="kw">architecture</span> Structural <span class="kw">of</span> full_adder <span class="kw">is</span>
+
+<span class="kw">component</span> half_adder <span class="kw">is</span>
+  <span class="kw">Port</span> (a : <span class="kw">in</span>  STD_LOGIC;
+        b : <span class="kw">in</span>  STD_LOGIC;
+        s : <span class="kw">out</span> STD_LOGIC;
+        c : <span class="kw">out</span> STD_LOGIC);
+<span class="kw">end component</span>;
+
+<span class="kw">signal</span> <span class="signal">s1</span>, <span class="signal">c1</span>, <span class="signal">c2</span> : STD_LOGIC;
+
+<span class="kw">begin</span>
+  HA1: half_adder <span class="kw">port map</span>(a, b, s1, c1);
+  HA2: half_adder <span class="kw">port map</span>(s1, cin, sum, c2);
+  cout <span class="op">&lt;=</span> c1 <span class="op">or</span> c2;
+<span class="kw">end</span> Structural;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">▸ Sub-Component — half_adder.vhd (Must Compile First)</div>
+    <div class="two-col">
+      <div>
+        <div class="code-block" style="margin-bottom:0;">
+          <button class="code-copy" onclick="copyCode('fa2ha-ha')">COPY</button>
+          <pre id="fa2ha-ha"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">half_adder</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    a : <span class="kw">in</span>  STD_LOGIC;
+    b : <span class="kw">in</span>  STD_LOGIC;
+    s : <span class="kw">out</span> STD_LOGIC;
+    c : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> half_adder;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span> half_adder <span class="kw">is</span>
+<span class="kw">begin</span>
+  s <span class="op">&lt;=</span> a <span class="op">xor</span> b;
+  c <span class="op">&lt;=</span> a <span class="op">and</span> b;
+<span class="kw">end</span> Behavioral;</pre>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--muted);line-height:2;padding:10px;background:rgba(0,229,160,0.05);border:1px solid rgba(0,229,160,0.2);border-radius:8px;">
+          <strong style="color:#00e5a0;">HA1</strong>(a,b) → s1 = a⊕b, c1 = a·b<br>
+          <strong style="color:#00e5a0;">HA2</strong>(s1,cin) → sum = s1⊕cin, c2 = s1·cin<br>
+          <strong style="color:var(--orange);">OR</strong> → cout = c1 + c2
+        </div>
+        <div class="note-box" style="margin-top:14px;border-color:#00e5a0;">
+          <strong style="color:#00e5a0;">COMPILE ORDER:</strong> 1. half_adder.vhd → 2. full_adder.vhd
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — full_adder</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="150" viewBox="0 0 380 150" style="filter:drop-shadow(0 0 10px rgba(0,229,160,0.2))">
+          <line x1="10" y1="40" x2="100" y2="40" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="70" x2="100" y2="70" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="100" x2="100" y2="100" stroke="#4a6080" stroke-width="2"/>
+          <text x="0" y="36" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">a</text>
+          <text x="0" y="66" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">b</text>
+          <text x="0" y="96" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">cin</text>
+          <rect x="100" y="20" width="180" height="100" rx="8" fill="#0f1628" stroke="#00e5a0" stroke-width="2"/>
+          <text x="190" y="58" fill="#00e5a0" font-size="14" font-family="Courier New" font-weight="bold" text-anchor="middle">full_adder</text>
+          <text x="190" y="78" fill="#7b2fff" font-size="10" font-family="Courier New" text-anchor="middle">2 × half_adder + OR</text>
+          <text x="190" y="104" fill="#4a6080" font-size="9" font-family="Courier New" text-anchor="middle">Structural</text>
+          <line x1="280" y1="50" x2="370" y2="50" stroke="#4a6080" stroke-width="2"/>
+          <line x1="280" y1="90" x2="370" y2="90" stroke="#4a6080" stroke-width="2"/>
+          <text x="332" y="46" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">sum</text>
+          <text x="330" y="86" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">cout</text>
+          <circle cx="100" cy="40" r="3" fill="#00e5a0"/><circle cx="100" cy="70" r="3" fill="#00e5a0"/><circle cx="100" cy="100" r="3" fill="#00e5a0"/>
+          <circle cx="280" cy="50" r="3" fill="#00d4ff"/><circle cx="280" cy="90" r="3" fill="#ff9500"/>
+        </svg>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Structural Circuit — HA1, HA2, OR</div>
+      <div style="display:flex;justify-content:center;padding:8px 0;">
+        <svg width="420" height="200" viewBox="0 0 420 200" style="filter:drop-shadow(0 0 8px rgba(0,229,160,0.2))">
+          <text x="2" y="44" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">a</text>
+          <text x="2" y="74" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">b</text>
+          <text x="0" y="150" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">cin</text>
+          <line x1="24" y1="40" x2="60" y2="40" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="24" y1="70" x2="60" y2="70" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="26" y1="146" x2="235" y2="146" stroke="#4a6080" stroke-width="1.5"/>
+          <rect x="60" y="28" width="70" height="55" rx="6" fill="#0f1628" stroke="#00e5a0" stroke-width="1.8"/>
+          <text x="95" y="52" fill="#00e5a0" font-size="11" font-family="Courier New" font-weight="bold" text-anchor="middle">HA1</text>
+          <text x="95" y="68" fill="#4a6080" font-size="8" font-family="Courier New" text-anchor="middle">a,b</text>
+          <line x1="130" y1="45" x2="200" y2="45" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="150" y="40" fill="#00d4ff" font-size="9" font-family="Courier New">s1</text>
+          <line x1="130" y1="68" x2="150" y2="68" stroke="#ff9500" stroke-width="1.5"/>
+          <line x1="150" y1="68" x2="150" y2="115" stroke="#ff9500" stroke-width="1.5"/>
+          <line x1="150" y1="115" x2="300" y2="115" stroke="#ff9500" stroke-width="1.5"/>
+          <text x="156" y="82" fill="#ff9500" font-size="9" font-family="Courier New">c1</text>
+          <rect x="200" y="35" width="70" height="55" rx="6" fill="#0f1628" stroke="#00e5a0" stroke-width="1.8"/>
+          <text x="235" y="59" fill="#00e5a0" font-size="11" font-family="Courier New" font-weight="bold" text-anchor="middle">HA2</text>
+          <text x="235" y="75" fill="#4a6080" font-size="8" font-family="Courier New" text-anchor="middle">s1,cin</text>
+          <line x1="235" y1="90" x2="235" y2="146" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="270" y1="50" x2="380" y2="50" stroke="#00d4ff" stroke-width="2"/>
+          <circle cx="380" cy="50" r="5" fill="#00d4ff" opacity="0.7"/>
+          <text x="386" y="46" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">sum</text>
+          <line x1="255" y1="90" x2="255" y2="105" stroke="#ff9500" stroke-width="1.5"/>
+          <line x1="255" y1="105" x2="300" y2="105" stroke="#ff9500" stroke-width="1.5"/>
+          <text x="262" y="102" fill="#ff9500" font-size="9" font-family="Courier New">c2</text>
+          <path d="M300,98 Q315,98 335,110 Q315,122 300,122 Q307,110 300,98 Z" fill="#0f1628" stroke="#ff6eb4" stroke-width="1.8"/>
+          <text x="308" y="114" fill="#ff6eb4" font-size="8" font-family="Courier New">OR</text>
+          <line x1="335" y1="110" x2="380" y2="110" stroke="#ff9500" stroke-width="2"/>
+          <circle cx="380" cy="110" r="5" fill="#ff9500" opacity="0.7"/>
+          <text x="386" y="106" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">cout</text>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.8;padding:0 4px;">HA1:a,b→s1,c1 | HA2:s1,cin→sum,c2 | cout=c1 OR c2</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Testbench — full_adder_tb.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('fa2ha-tb')">COPY</button>
+        <pre id="fa2ha-tb"><span class="kw">ENTITY</span> <span class="entity-name">full_adder_tb</span> <span class="kw">IS END</span> full_adder_tb;
+<span class="kw">ARCHITECTURE</span> behavior <span class="kw">OF</span> full_adder_tb <span class="kw">IS</span>
+  <span class="kw">COMPONENT</span> full_adder
+    <span class="kw">PORT</span>(a,b,cin : <span class="kw">IN</span>  std_logic;
+         sum,cout : <span class="kw">OUT</span> std_logic);
+  <span class="kw">END COMPONENT</span>;
+  <span class="kw">signal</span> <span class="signal">a</span>,<span class="signal">b</span>,<span class="signal">cin</span> : std_logic := <span class="str">'0'</span>;
+  <span class="kw">signal</span> <span class="signal">sum</span>,<span class="signal">cout</span> : std_logic;
+<span class="kw">BEGIN</span>
+  uut: full_adder <span class="kw">PORT MAP</span>(a,b,cin,sum,cout);
+  <span class="kw">process begin</span>
+    a&lt;=<span class="str">'0'</span>;b&lt;=<span class="str">'0'</span>;cin&lt;=<span class="str">'0'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'0'</span>;b&lt;=<span class="str">'0'</span>;cin&lt;=<span class="str">'1'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'0'</span>;b&lt;=<span class="str">'1'</span>;cin&lt;=<span class="str">'0'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'0'</span>;b&lt;=<span class="str">'1'</span>;cin&lt;=<span class="str">'1'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'1'</span>;b&lt;=<span class="str">'0'</span>;cin&lt;=<span class="str">'0'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'1'</span>;b&lt;=<span class="str">'0'</span>;cin&lt;=<span class="str">'1'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'1'</span>;b&lt;=<span class="str">'1'</span>;cin&lt;=<span class="str">'0'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'1'</span>;b&lt;=<span class="str">'1'</span>;cin&lt;=<span class="str">'1'</span>;<span class="kw">wait for</span> 100 ns;
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+<span class="kw">END</span>;</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Execution Steps — Xilinx ISE</div>
+      <div class="steps-container">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><strong>New Project</strong><div class="substep">File → New Project → <code>full_adder_2ha</code>, HDL: VHDL</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><strong>Create half_adder</strong><div class="substep">New Source → VHDL Module → <code>half_adder</code> (a,b,s,c)</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Enter HA code</strong><div class="substep"><code>s&lt;=a xor b; c&lt;=a and b;</code></div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Create full_adder</strong><div class="substep">component half_adder + signals s1,c1,c2</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><strong>Port maps</strong><div class="substep">HA1(a,b,s1,c1); HA2(s1,cin,sum,c2); cout&lt;=c1 or c2</div></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-content"><strong>Check Syntax</strong><div class="substep">Synthesize-XST → 0 errors</div></div></div>
+        <div class="step"><div class="step-num">7</div><div class="step-content"><strong>Testbench</strong><div class="substep">VHDL Test Bench → all 8 input combos</div></div></div>
+        <div class="step"><div class="step-num">8</div><div class="step-content"><strong>Simulate</strong><div class="substep">ISim → Run 800 ns → verify sum/cout</div></div></div>
+      </div>
+      <div class="note-box" style="margin-top:14px;border-color:#00e5a0;">
+        <strong style="color:#00e5a0;">EXAM NOTE:</strong> STRUCTURAL — full adder instantiates half_adder TWICE + OR gate. half_adder.vhd compiled before full_adder.vhd.
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ FULL ADDER using HALF ADDER (BEHAVIORAL) ═══ -->
+<div id="section-faBeh" class="gate-section">
+<div class="container">
+  <div class="info-bar">
+    <div class="gate-name-big" style="background:linear-gradient(135deg,#fff,#ffb74d);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Full Adder using Half Adder</div>
+    <div class="tag" style="border-color:#ffb74d;color:#ffb74d;">BEHAVIORAL</div>
+    <div class="tag">entity: full_adder_bh</div>
+  </div>
+  <div class="logic-expr" style="color:#ffb74d;">sum = a ⊕ b ⊕ cin &nbsp;|&nbsp; cout = ab + bcin + acin</div>
+  <p class="gate-desc">Same full adder logic derived from the half-adder equations, written in a single behavioral/dataflow file — direct concurrent signal assignments, no component instantiation. sum reuses the half-adder XOR; cout is the majority function.</p>
+
+  <div class="three-col">
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Simulator</div>
+      <div style="display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;">
+        <div class="inputs-col">
+          <div class="input-toggle"><span class="input-label">a</span><div class="toggle-btn" id="faBeh-a-toggle" onclick="toggleFABeh('a')"></div><div class="bit-display" id="faBeh-a-bit">0</div></div>
+          <div class="input-toggle"><span class="input-label">b</span><div class="toggle-btn" id="faBeh-b-toggle" onclick="toggleFABeh('b')"></div><div class="bit-display" id="faBeh-b-bit">0</div></div>
+          <div class="input-toggle"><span class="input-label">cin</span><div class="toggle-btn" id="faBeh-cin-toggle" onclick="toggleFABeh('cin')"></div><div class="bit-display" id="faBeh-cin-bit">0</div></div>
+        </div>
+        <div style="font-size:28px;color:var(--accent2);">→</div>
+        <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+          <div class="output-col"><div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:4px;">sum</div><div class="output-bit" id="faBeh-sum-output">0</div></div>
+          <div class="output-col"><div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:4px;">cout</div><div class="output-bit" id="faBeh-cout-output">0</div></div>
+        </div>
+      </div>
+      <div style="margin-top:14px;text-align:center;font-size:11px;color:var(--muted);padding:8px;background:rgba(255,183,77,0.05);border-radius:6px;border:1px solid rgba(255,183,77,0.2);">
+        sum = a XOR b XOR cin &nbsp;|&nbsp; cout = (a AND b) OR (b AND cin) OR (a AND cin)
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Truth Table</div>
+      <table>
+        <thead><tr><th>a</th><th>b</th><th>cin</th><th>sum</th><th>cout</th></tr></thead>
+        <tbody id="faBeh-table">
+          <tr class="highlighted"><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="one">1</td><td class="one">1</td><td class="one">1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ VHDL — full_adder_bh.vhd (Behavioral)</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('faBeh-code')">COPY</button>
+        <pre id="faBeh-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">full_adder_bh</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">a</span>    : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">b</span>    : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">cin</span>  : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">sum</span>  : <span class="kw">out</span> STD_LOGIC;
+    <span class="signal">cout</span> : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> full_adder_bh;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span> full_adder_bh <span class="kw">is</span>
+<span class="kw">begin</span>
+  sum  <span class="op">&lt;=</span> a <span class="op">xor</span> b <span class="op">xor</span> cin;
+  cout <span class="op">&lt;=</span> (a <span class="op">and</span> b) <span class="op">or</span> (b <span class="op">and</span> cin) <span class="op">or</span> (a <span class="op">and</span> cin);
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — full_adder_bh</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="150" viewBox="0 0 380 150" style="filter:drop-shadow(0 0 10px rgba(255,183,77,0.2))">
+          <line x1="10" y1="40" x2="100" y2="40" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="70" x2="100" y2="70" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="100" x2="100" y2="100" stroke="#4a6080" stroke-width="2"/>
+          <text x="0" y="36" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">a</text>
+          <text x="0" y="66" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">b</text>
+          <text x="0" y="96" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">cin</text>
+          <rect x="100" y="20" width="180" height="100" rx="8" fill="#0f1628" stroke="#ffb74d" stroke-width="2"/>
+          <text x="190" y="58" fill="#ffb74d" font-size="13" font-family="Courier New" font-weight="bold" text-anchor="middle">full_adder_bh</text>
+          <text x="190" y="78" fill="#7b2fff" font-size="10" font-family="Courier New" text-anchor="middle">dataflow equations</text>
+          <text x="190" y="104" fill="#4a6080" font-size="9" font-family="Courier New" text-anchor="middle">Behavioral</text>
+          <line x1="280" y1="50" x2="370" y2="50" stroke="#4a6080" stroke-width="2"/>
+          <line x1="280" y1="90" x2="370" y2="90" stroke="#4a6080" stroke-width="2"/>
+          <text x="332" y="46" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">sum</text>
+          <text x="330" y="86" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">cout</text>
+          <circle cx="100" cy="40" r="3" fill="#ffb74d"/><circle cx="100" cy="70" r="3" fill="#ffb74d"/><circle cx="100" cy="100" r="3" fill="#ffb74d"/>
+          <circle cx="280" cy="50" r="3" fill="#00d4ff"/><circle cx="280" cy="90" r="3" fill="#ff9500"/>
+        </svg>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Gate-Level Circuit</div>
+      <div style="display:flex;justify-content:center;padding:8px 0;">
+        <svg width="420" height="200" viewBox="0 0 420 200" style="filter:drop-shadow(0 0 8px rgba(255,183,77,0.2))">
+          <text x="2" y="40" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">a</text>
+          <text x="2" y="70" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">b</text>
+          <text x="0" y="100" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">cin</text>
+          <!-- XOR3 for sum -->
+          <path d="M60,28 Q72,28 92,28 Q116,28 128,50 Q116,72 92,72 Q72,72 60,72 Q74,62 74,50 Q74,38 60,28 Z" fill="#0f1628" stroke="#00d4ff" stroke-width="1.6"/>
+          <text x="86" y="54" fill="#00d4ff" font-size="9" font-family="Courier New">XOR</text>
+          <line x1="128" y1="50" x2="380" y2="50" stroke="#00d4ff" stroke-width="2"/>
+          <circle cx="380" cy="50" r="5" fill="#00d4ff" opacity="0.7"/>
+          <text x="386" y="46" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">sum</text>
+          <text x="60" y="24" fill="#4a6080" font-size="8" font-family="Courier New">a⊕b⊕cin</text>
+          <!-- AND-OR for cout -->
+          <rect x="150" y="110" width="60" height="22" rx="4" fill="#0f1628" stroke="#00ff88" stroke-width="1.4"/>
+          <text x="180" y="125" fill="#00ff88" font-size="8" font-family="Courier New" text-anchor="middle">AND ×3</text>
+          <text x="152" y="106" fill="#4a6080" font-size="8" font-family="Courier New">ab, bcin, acin</text>
+          <line x1="210" y1="121" x2="255" y2="121" stroke="#ff9500" stroke-width="1.5"/>
+          <path d="M255,108 Q272,108 295,124 Q272,140 255,140 Q263,124 255,108 Z" fill="#0f1628" stroke="#ff6eb4" stroke-width="1.6"/>
+          <text x="264" y="127" fill="#ff6eb4" font-size="8" font-family="Courier New">OR</text>
+          <line x1="295" y1="124" x2="380" y2="124" stroke="#ff9500" stroke-width="2"/>
+          <circle cx="380" cy="124" r="5" fill="#ff9500" opacity="0.7"/>
+          <text x="386" y="120" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">cout</text>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.8;padding:0 4px;">sum = 3-input XOR | cout = OR of 3 AND terms (majority)</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Testbench — full_adder_bh_tb.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('faBeh-tb')">COPY</button>
+        <pre id="faBeh-tb"><span class="kw">ENTITY</span> <span class="entity-name">full_adder_bh_tb</span> <span class="kw">IS END</span> full_adder_bh_tb;
+<span class="kw">ARCHITECTURE</span> behavior <span class="kw">OF</span> full_adder_bh_tb <span class="kw">IS</span>
+  <span class="kw">COMPONENT</span> full_adder_bh
+    <span class="kw">PORT</span>(a,b,cin : <span class="kw">IN</span>  std_logic;
+         sum,cout : <span class="kw">OUT</span> std_logic);
+  <span class="kw">END COMPONENT</span>;
+  <span class="kw">signal</span> <span class="signal">a</span>,<span class="signal">b</span>,<span class="signal">cin</span> : std_logic := <span class="str">'0'</span>;
+  <span class="kw">signal</span> <span class="signal">sum</span>,<span class="signal">cout</span> : std_logic;
+<span class="kw">BEGIN</span>
+  uut: full_adder_bh <span class="kw">PORT MAP</span>(a,b,cin,sum,cout);
+  <span class="kw">process begin</span>
+    a&lt;=<span class="str">'0'</span>;b&lt;=<span class="str">'0'</span>;cin&lt;=<span class="str">'0'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'0'</span>;b&lt;=<span class="str">'0'</span>;cin&lt;=<span class="str">'1'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'0'</span>;b&lt;=<span class="str">'1'</span>;cin&lt;=<span class="str">'0'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'0'</span>;b&lt;=<span class="str">'1'</span>;cin&lt;=<span class="str">'1'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'1'</span>;b&lt;=<span class="str">'0'</span>;cin&lt;=<span class="str">'0'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'1'</span>;b&lt;=<span class="str">'0'</span>;cin&lt;=<span class="str">'1'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'1'</span>;b&lt;=<span class="str">'1'</span>;cin&lt;=<span class="str">'0'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'1'</span>;b&lt;=<span class="str">'1'</span>;cin&lt;=<span class="str">'1'</span>;<span class="kw">wait for</span> 100 ns;
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+<span class="kw">END</span>;</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Execution Steps — Xilinx ISE</div>
+      <div class="steps-container">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><strong>New Project</strong><div class="substep">File → New Project → <code>full_adder_bh</code>, HDL: VHDL</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><strong>New Source</strong><div class="substep">VHDL Module → <code>full_adder_bh</code> — ports a,b,cin,sum,cout</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Enter Equations</strong><div class="substep"><code>sum&lt;=a xor b xor cin;</code> and cout majority</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Check Syntax</strong><div class="substep">Synthesize-XST → 0 errors</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><strong>Testbench</strong><div class="substep">VHDL Test Bench → all 8 combos, 100 ns each</div></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-content"><strong>Simulate</strong><div class="substep">ISim → Run 800 ns → verify</div></div></div>
+      </div>
+      <div class="note-box" style="margin-top:14px;border-color:#ffb74d;">
+        <strong style="color:#ffb74d;">EXAM NOTE:</strong> BEHAVIORAL — single file, no components. Concurrent assignments only. Same truth table as the 2-HA structural version.
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ FULL SUBTRACTOR using TWO HALF SUBTRACTORS (STRUCTURAL) ═══ -->
+<div id="section-fs2hs" class="gate-section">
+<div class="container">
+  <div class="info-bar">
+    <div class="gate-name-big" style="background:linear-gradient(135deg,#fff,#4fc3f7);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Full Subtractor using Two Half Subtractors</div>
+    <div class="tag" style="border-color:#4fc3f7;color:#4fc3f7;">STRUCTURAL</div>
+    <div class="tag">entity: full_subtractor</div>
+  </div>
+  <div class="logic-expr" style="color:#4fc3f7;">diff = a ⊕ b ⊕ bin &nbsp;|&nbsp; bout = a'b + a'bin + b·bin</div>
+  <p class="gate-desc">Subtracts with borrow-in (a − b − bin) using TWO half_subtractor components plus one OR gate. HS1: a,b → d1 + bo1. HS2: d1,bin → diff + bo2. The two borrows are OR'd for bout.</p>
+
+  <div class="three-col">
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Simulator</div>
+      <div style="display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;">
+        <div class="inputs-col">
+          <div class="input-toggle"><span class="input-label">a</span><div class="toggle-btn" id="fs2hs-a-toggle" onclick="toggleFS2HS('a')"></div><div class="bit-display" id="fs2hs-a-bit">0</div></div>
+          <div class="input-toggle"><span class="input-label">b</span><div class="toggle-btn" id="fs2hs-b-toggle" onclick="toggleFS2HS('b')"></div><div class="bit-display" id="fs2hs-b-bit">0</div></div>
+          <div class="input-toggle"><span class="input-label">bin</span><div class="toggle-btn" id="fs2hs-bin-toggle" onclick="toggleFS2HS('bin')"></div><div class="bit-display" id="fs2hs-bin-bit">0</div></div>
+        </div>
+        <div style="font-size:28px;color:var(--accent2);">→</div>
+        <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+          <div class="output-col"><div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:4px;">diff</div><div class="output-bit" id="fs2hs-diff-output">0</div></div>
+          <div class="output-col"><div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:4px;">bout</div><div class="output-bit" id="fs2hs-bout-output">0</div></div>
+        </div>
+      </div>
+      <div style="margin-top:14px;text-align:center;font-size:11px;color:var(--muted);padding:8px;background:rgba(79,195,247,0.05);border-radius:6px;border:1px solid rgba(79,195,247,0.2);">
+        diff = a XOR b XOR bin &nbsp;|&nbsp; bout = bo1 OR bo2
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Truth Table</div>
+      <table>
+        <thead><tr><th>a</th><th>b</th><th>bin</th><th>diff</th><th>bout</th></tr></thead>
+        <tbody id="fs2hs-table">
+          <tr class="highlighted"><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td class="one">1</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td class="one">1</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="one">1</td><td class="one">1</td><td class="one">1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ VHDL — full_subtractor.vhd (Structural)</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('fs2hs-code')">COPY</button>
+        <pre id="fs2hs-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">full_subtractor</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">a</span>    : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">b</span>    : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">bin</span>  : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">diff</span> : <span class="kw">out</span> STD_LOGIC;
+    <span class="signal">bout</span> : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> full_subtractor;
+
+<span class="kw">architecture</span> Structural <span class="kw">of</span> full_subtractor <span class="kw">is</span>
+
+<span class="kw">component</span> half_subtractor <span class="kw">is</span>
+  <span class="kw">Port</span> (a : <span class="kw">in</span>  STD_LOGIC;
+        b : <span class="kw">in</span>  STD_LOGIC;
+        d : <span class="kw">out</span> STD_LOGIC;
+        bo : <span class="kw">out</span> STD_LOGIC);
+<span class="kw">end component</span>;
+
+<span class="kw">signal</span> <span class="signal">d1</span>, <span class="signal">bo1</span>, <span class="signal">bo2</span> : STD_LOGIC;
+
+<span class="kw">begin</span>
+  HS1: half_subtractor <span class="kw">port map</span>(a, b, d1, bo1);
+  HS2: half_subtractor <span class="kw">port map</span>(d1, bin, diff, bo2);
+  bout <span class="op">&lt;=</span> bo1 <span class="op">or</span> bo2;
+<span class="kw">end</span> Structural;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">▸ Sub-Component — half_subtractor.vhd (Must Compile First)</div>
+    <div class="two-col">
+      <div>
+        <div class="code-block" style="margin-bottom:0;">
+          <button class="code-copy" onclick="copyCode('fs2hs-hs')">COPY</button>
+          <pre id="fs2hs-hs"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">half_subtractor</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    a  : <span class="kw">in</span>  STD_LOGIC;
+    b  : <span class="kw">in</span>  STD_LOGIC;
+    d  : <span class="kw">out</span> STD_LOGIC;
+    bo : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> half_subtractor;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span> half_subtractor <span class="kw">is</span>
+<span class="kw">begin</span>
+  d  <span class="op">&lt;=</span> a <span class="op">xor</span> b;
+  bo <span class="op">&lt;=</span> (<span class="op">not</span> a) <span class="op">and</span> b;
+<span class="kw">end</span> Behavioral;</pre>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--muted);line-height:2;padding:10px;background:rgba(79,195,247,0.05);border:1px solid rgba(79,195,247,0.2);border-radius:8px;">
+          <strong style="color:#4fc3f7;">HS1</strong>(a,b) → d1 = a⊕b, bo1 = a'·b<br>
+          <strong style="color:#4fc3f7;">HS2</strong>(d1,bin) → diff = d1⊕bin, bo2 = d1'·bin<br>
+          <strong style="color:var(--orange);">OR</strong> → bout = bo1 + bo2
+        </div>
+        <div class="note-box" style="margin-top:14px;border-color:#4fc3f7;">
+          <strong style="color:#4fc3f7;">COMPILE ORDER:</strong> 1. half_subtractor.vhd → 2. full_subtractor.vhd
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — full_subtractor</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="150" viewBox="0 0 380 150" style="filter:drop-shadow(0 0 10px rgba(79,195,247,0.2))">
+          <line x1="10" y1="40" x2="100" y2="40" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="70" x2="100" y2="70" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="100" x2="100" y2="100" stroke="#4a6080" stroke-width="2"/>
+          <text x="0" y="36" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">a</text>
+          <text x="0" y="66" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">b</text>
+          <text x="0" y="96" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">bin</text>
+          <rect x="100" y="20" width="180" height="100" rx="8" fill="#0f1628" stroke="#4fc3f7" stroke-width="2"/>
+          <text x="190" y="56" fill="#4fc3f7" font-size="12" font-family="Courier New" font-weight="bold" text-anchor="middle">full_subtractor</text>
+          <text x="190" y="76" fill="#7b2fff" font-size="10" font-family="Courier New" text-anchor="middle">2 × half_subtractor + OR</text>
+          <text x="190" y="104" fill="#4a6080" font-size="9" font-family="Courier New" text-anchor="middle">Structural</text>
+          <line x1="280" y1="50" x2="370" y2="50" stroke="#4a6080" stroke-width="2"/>
+          <line x1="280" y1="90" x2="370" y2="90" stroke="#4a6080" stroke-width="2"/>
+          <text x="332" y="46" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">diff</text>
+          <text x="330" y="86" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">bout</text>
+          <circle cx="100" cy="40" r="3" fill="#4fc3f7"/><circle cx="100" cy="70" r="3" fill="#4fc3f7"/><circle cx="100" cy="100" r="3" fill="#4fc3f7"/>
+          <circle cx="280" cy="50" r="3" fill="#00d4ff"/><circle cx="280" cy="90" r="3" fill="#ff9500"/>
+        </svg>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Structural Circuit — HS1, HS2, OR</div>
+      <div style="display:flex;justify-content:center;padding:8px 0;">
+        <svg width="420" height="200" viewBox="0 0 420 200" style="filter:drop-shadow(0 0 8px rgba(79,195,247,0.2))">
+          <text x="2" y="44" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">a</text>
+          <text x="2" y="74" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">b</text>
+          <text x="0" y="150" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">bin</text>
+          <line x1="24" y1="40" x2="60" y2="40" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="24" y1="70" x2="60" y2="70" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="26" y1="146" x2="235" y2="146" stroke="#4a6080" stroke-width="1.5"/>
+          <rect x="60" y="28" width="70" height="55" rx="6" fill="#0f1628" stroke="#4fc3f7" stroke-width="1.8"/>
+          <text x="95" y="52" fill="#4fc3f7" font-size="11" font-family="Courier New" font-weight="bold" text-anchor="middle">HS1</text>
+          <text x="95" y="68" fill="#4a6080" font-size="8" font-family="Courier New" text-anchor="middle">a,b</text>
+          <line x1="130" y1="45" x2="200" y2="45" stroke="#00d4ff" stroke-width="1.5"/>
+          <text x="150" y="40" fill="#00d4ff" font-size="9" font-family="Courier New">d1</text>
+          <line x1="130" y1="68" x2="150" y2="68" stroke="#ff9500" stroke-width="1.5"/>
+          <line x1="150" y1="68" x2="150" y2="115" stroke="#ff9500" stroke-width="1.5"/>
+          <line x1="150" y1="115" x2="300" y2="115" stroke="#ff9500" stroke-width="1.5"/>
+          <text x="156" y="82" fill="#ff9500" font-size="9" font-family="Courier New">bo1</text>
+          <rect x="200" y="35" width="70" height="55" rx="6" fill="#0f1628" stroke="#4fc3f7" stroke-width="1.8"/>
+          <text x="235" y="59" fill="#4fc3f7" font-size="11" font-family="Courier New" font-weight="bold" text-anchor="middle">HS2</text>
+          <text x="235" y="75" fill="#4a6080" font-size="8" font-family="Courier New" text-anchor="middle">d1,bin</text>
+          <line x1="235" y1="90" x2="235" y2="146" stroke="#4a6080" stroke-width="1.5"/>
+          <line x1="270" y1="50" x2="380" y2="50" stroke="#00d4ff" stroke-width="2"/>
+          <circle cx="380" cy="50" r="5" fill="#00d4ff" opacity="0.7"/>
+          <text x="386" y="46" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">diff</text>
+          <line x1="255" y1="90" x2="255" y2="105" stroke="#ff9500" stroke-width="1.5"/>
+          <line x1="255" y1="105" x2="300" y2="105" stroke="#ff9500" stroke-width="1.5"/>
+          <text x="262" y="102" fill="#ff9500" font-size="9" font-family="Courier New">bo2</text>
+          <path d="M300,98 Q315,98 335,110 Q315,122 300,122 Q307,110 300,98 Z" fill="#0f1628" stroke="#ff6eb4" stroke-width="1.8"/>
+          <text x="308" y="114" fill="#ff6eb4" font-size="8" font-family="Courier New">OR</text>
+          <line x1="335" y1="110" x2="380" y2="110" stroke="#ff9500" stroke-width="2"/>
+          <circle cx="380" cy="110" r="5" fill="#ff9500" opacity="0.7"/>
+          <text x="386" y="106" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">bout</text>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.8;padding:0 4px;">HS1:a,b→d1,bo1 | HS2:d1,bin→diff,bo2 | bout=bo1 OR bo2</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Testbench — full_subtractor_tb.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('fs2hs-tb')">COPY</button>
+        <pre id="fs2hs-tb"><span class="kw">ENTITY</span> <span class="entity-name">full_subtractor_tb</span> <span class="kw">IS END</span> full_subtractor_tb;
+<span class="kw">ARCHITECTURE</span> behavior <span class="kw">OF</span> full_subtractor_tb <span class="kw">IS</span>
+  <span class="kw">COMPONENT</span> full_subtractor
+    <span class="kw">PORT</span>(a,b,bin : <span class="kw">IN</span>  std_logic;
+         diff,bout : <span class="kw">OUT</span> std_logic);
+  <span class="kw">END COMPONENT</span>;
+  <span class="kw">signal</span> <span class="signal">a</span>,<span class="signal">b</span>,<span class="signal">bin</span> : std_logic := <span class="str">'0'</span>;
+  <span class="kw">signal</span> <span class="signal">diff</span>,<span class="signal">bout</span> : std_logic;
+<span class="kw">BEGIN</span>
+  uut: full_subtractor <span class="kw">PORT MAP</span>(a,b,bin,diff,bout);
+  <span class="kw">process begin</span>
+    a&lt;=<span class="str">'0'</span>;b&lt;=<span class="str">'0'</span>;bin&lt;=<span class="str">'0'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'0'</span>;b&lt;=<span class="str">'0'</span>;bin&lt;=<span class="str">'1'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'0'</span>;b&lt;=<span class="str">'1'</span>;bin&lt;=<span class="str">'0'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'0'</span>;b&lt;=<span class="str">'1'</span>;bin&lt;=<span class="str">'1'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'1'</span>;b&lt;=<span class="str">'0'</span>;bin&lt;=<span class="str">'0'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'1'</span>;b&lt;=<span class="str">'0'</span>;bin&lt;=<span class="str">'1'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'1'</span>;b&lt;=<span class="str">'1'</span>;bin&lt;=<span class="str">'0'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'1'</span>;b&lt;=<span class="str">'1'</span>;bin&lt;=<span class="str">'1'</span>;<span class="kw">wait for</span> 100 ns;
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+<span class="kw">END</span>;</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Execution Steps — Xilinx ISE</div>
+      <div class="steps-container">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><strong>New Project</strong><div class="substep">File → New Project → <code>full_subtractor_2hs</code>, VHDL</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><strong>Create half_subtractor</strong><div class="substep">VHDL Module → <code>half_subtractor</code> (a,b,d,bo)</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Enter HS code</strong><div class="substep"><code>d&lt;=a xor b; bo&lt;=(not a) and b;</code></div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Create full_subtractor</strong><div class="substep">component half_subtractor + signals d1,bo1,bo2</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><strong>Port maps</strong><div class="substep">HS1(a,b,d1,bo1); HS2(d1,bin,diff,bo2); bout&lt;=bo1 or bo2</div></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-content"><strong>Check Syntax</strong><div class="substep">Synthesize-XST → 0 errors</div></div></div>
+        <div class="step"><div class="step-num">7</div><div class="step-content"><strong>Testbench + Simulate</strong><div class="substep">All 8 combos → ISim Run 800 ns</div></div></div>
+      </div>
+      <div class="note-box" style="margin-top:14px;border-color:#4fc3f7;">
+        <strong style="color:#4fc3f7;">EXAM NOTE:</strong> STRUCTURAL — full subtractor instantiates half_subtractor TWICE + OR gate. HS borrow uses (NOT a) so a' feeds the AND. Compile HS before FS.
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ FULL SUBTRACTOR using HALF SUBTRACTOR (BEHAVIORAL) ═══ -->
+<div id="section-fsBeh" class="gate-section">
+<div class="container">
+  <div class="info-bar">
+    <div class="gate-name-big" style="background:linear-gradient(135deg,#fff,#f06292);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Full Subtractor using Half Subtractor</div>
+    <div class="tag" style="border-color:#f06292;color:#f06292;">BEHAVIORAL</div>
+    <div class="tag">entity: full_sub_bh</div>
+  </div>
+  <div class="logic-expr" style="color:#f06292;">diff = a ⊕ b ⊕ bin &nbsp;|&nbsp; bout = a'b + a'bin + b·bin</div>
+  <p class="gate-desc">Same full subtractor logic from the half-subtractor equations, written as a single behavioral/dataflow file — concurrent assignments, no components. diff reuses the half-subtractor XOR; bout is the sum-of-products borrow.</p>
+
+  <div class="three-col">
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Simulator</div>
+      <div style="display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;">
+        <div class="inputs-col">
+          <div class="input-toggle"><span class="input-label">a</span><div class="toggle-btn" id="fsBeh-a-toggle" onclick="toggleFSBeh('a')"></div><div class="bit-display" id="fsBeh-a-bit">0</div></div>
+          <div class="input-toggle"><span class="input-label">b</span><div class="toggle-btn" id="fsBeh-b-toggle" onclick="toggleFSBeh('b')"></div><div class="bit-display" id="fsBeh-b-bit">0</div></div>
+          <div class="input-toggle"><span class="input-label">bin</span><div class="toggle-btn" id="fsBeh-bin-toggle" onclick="toggleFSBeh('bin')"></div><div class="bit-display" id="fsBeh-bin-bit">0</div></div>
+        </div>
+        <div style="font-size:28px;color:var(--accent2);">→</div>
+        <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+          <div class="output-col"><div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:4px;">diff</div><div class="output-bit" id="fsBeh-diff-output">0</div></div>
+          <div class="output-col"><div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:4px;">bout</div><div class="output-bit" id="fsBeh-bout-output">0</div></div>
+        </div>
+      </div>
+      <div style="margin-top:14px;text-align:center;font-size:11px;color:var(--muted);padding:8px;background:rgba(240,98,146,0.05);border-radius:6px;border:1px solid rgba(240,98,146,0.2);">
+        diff = a XOR b XOR bin &nbsp;|&nbsp; bout = (a' AND b) OR (a' AND bin) OR (b AND bin)
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Truth Table</div>
+      <table>
+        <thead><tr><th>a</th><th>b</th><th>bin</th><th>diff</th><th>bout</th></tr></thead>
+        <tbody id="fsBeh-table">
+          <tr class="highlighted"><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="zero">0</td><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td class="one">1</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td class="one">1</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="one">1</td><td class="one">1</td><td class="one">1</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ VHDL — full_sub_bh.vhd (Behavioral)</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('fsBeh-code')">COPY</button>
+        <pre id="fsBeh-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">full_sub_bh</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">a</span>    : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">b</span>    : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">bin</span>  : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">diff</span> : <span class="kw">out</span> STD_LOGIC;
+    <span class="signal">bout</span> : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> full_sub_bh;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span> full_sub_bh <span class="kw">is</span>
+<span class="kw">begin</span>
+  diff <span class="op">&lt;=</span> a <span class="op">xor</span> b <span class="op">xor</span> bin;
+  bout <span class="op">&lt;=</span> ((<span class="op">not</span> a) <span class="op">and</span> b) <span class="op">or</span> ((<span class="op">not</span> a) <span class="op">and</span> bin) <span class="op">or</span> (b <span class="op">and</span> bin);
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — full_sub_bh</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="150" viewBox="0 0 380 150" style="filter:drop-shadow(0 0 10px rgba(240,98,146,0.2))">
+          <line x1="10" y1="40" x2="100" y2="40" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="70" x2="100" y2="70" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="100" x2="100" y2="100" stroke="#4a6080" stroke-width="2"/>
+          <text x="0" y="36" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">a</text>
+          <text x="0" y="66" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">b</text>
+          <text x="0" y="96" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">bin</text>
+          <rect x="100" y="20" width="180" height="100" rx="8" fill="#0f1628" stroke="#f06292" stroke-width="2"/>
+          <text x="190" y="58" fill="#f06292" font-size="13" font-family="Courier New" font-weight="bold" text-anchor="middle">full_sub_bh</text>
+          <text x="190" y="78" fill="#7b2fff" font-size="10" font-family="Courier New" text-anchor="middle">dataflow equations</text>
+          <text x="190" y="104" fill="#4a6080" font-size="9" font-family="Courier New" text-anchor="middle">Behavioral</text>
+          <line x1="280" y1="50" x2="370" y2="50" stroke="#4a6080" stroke-width="2"/>
+          <line x1="280" y1="90" x2="370" y2="90" stroke="#4a6080" stroke-width="2"/>
+          <text x="332" y="46" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">diff</text>
+          <text x="330" y="86" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">bout</text>
+          <circle cx="100" cy="40" r="3" fill="#f06292"/><circle cx="100" cy="70" r="3" fill="#f06292"/><circle cx="100" cy="100" r="3" fill="#f06292"/>
+          <circle cx="280" cy="50" r="3" fill="#00d4ff"/><circle cx="280" cy="90" r="3" fill="#ff9500"/>
+        </svg>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Gate-Level Circuit</div>
+      <div style="display:flex;justify-content:center;padding:8px 0;">
+        <svg width="420" height="200" viewBox="0 0 420 200" style="filter:drop-shadow(0 0 8px rgba(240,98,146,0.2))">
+          <text x="2" y="40" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">a</text>
+          <text x="2" y="70" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">b</text>
+          <text x="0" y="100" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">bin</text>
+          <path d="M60,28 Q72,28 92,28 Q116,28 128,50 Q116,72 92,72 Q72,72 60,72 Q74,62 74,50 Q74,38 60,28 Z" fill="#0f1628" stroke="#00d4ff" stroke-width="1.6"/>
+          <text x="86" y="54" fill="#00d4ff" font-size="9" font-family="Courier New">XOR</text>
+          <line x1="128" y1="50" x2="380" y2="50" stroke="#00d4ff" stroke-width="2"/>
+          <circle cx="380" cy="50" r="5" fill="#00d4ff" opacity="0.7"/>
+          <text x="386" y="46" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">diff</text>
+          <text x="60" y="24" fill="#4a6080" font-size="8" font-family="Courier New">a⊕b⊕bin</text>
+          <rect x="150" y="110" width="70" height="22" rx="4" fill="#0f1628" stroke="#00ff88" stroke-width="1.4"/>
+          <text x="185" y="125" fill="#00ff88" font-size="8" font-family="Courier New" text-anchor="middle">AND ×3</text>
+          <text x="150" y="106" fill="#4a6080" font-size="8" font-family="Courier New">a'b, a'bin, b·bin</text>
+          <line x1="220" y1="121" x2="255" y2="121" stroke="#ff9500" stroke-width="1.5"/>
+          <path d="M255,108 Q272,108 295,124 Q272,140 255,140 Q263,124 255,108 Z" fill="#0f1628" stroke="#ff6eb4" stroke-width="1.6"/>
+          <text x="264" y="127" fill="#ff6eb4" font-size="8" font-family="Courier New">OR</text>
+          <line x1="295" y1="124" x2="380" y2="124" stroke="#ff9500" stroke-width="2"/>
+          <circle cx="380" cy="124" r="5" fill="#ff9500" opacity="0.7"/>
+          <text x="386" y="120" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">bout</text>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.8;padding:0 4px;">diff = 3-input XOR | bout = OR of 3 AND terms (a' inverts a)</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Testbench — full_sub_bh_tb.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('fsBeh-tb')">COPY</button>
+        <pre id="fsBeh-tb"><span class="kw">ENTITY</span> <span class="entity-name">full_sub_bh_tb</span> <span class="kw">IS END</span> full_sub_bh_tb;
+<span class="kw">ARCHITECTURE</span> behavior <span class="kw">OF</span> full_sub_bh_tb <span class="kw">IS</span>
+  <span class="kw">COMPONENT</span> full_sub_bh
+    <span class="kw">PORT</span>(a,b,bin : <span class="kw">IN</span>  std_logic;
+         diff,bout : <span class="kw">OUT</span> std_logic);
+  <span class="kw">END COMPONENT</span>;
+  <span class="kw">signal</span> <span class="signal">a</span>,<span class="signal">b</span>,<span class="signal">bin</span> : std_logic := <span class="str">'0'</span>;
+  <span class="kw">signal</span> <span class="signal">diff</span>,<span class="signal">bout</span> : std_logic;
+<span class="kw">BEGIN</span>
+  uut: full_sub_bh <span class="kw">PORT MAP</span>(a,b,bin,diff,bout);
+  <span class="kw">process begin</span>
+    a&lt;=<span class="str">'0'</span>;b&lt;=<span class="str">'0'</span>;bin&lt;=<span class="str">'0'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'0'</span>;b&lt;=<span class="str">'0'</span>;bin&lt;=<span class="str">'1'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'0'</span>;b&lt;=<span class="str">'1'</span>;bin&lt;=<span class="str">'0'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'0'</span>;b&lt;=<span class="str">'1'</span>;bin&lt;=<span class="str">'1'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'1'</span>;b&lt;=<span class="str">'0'</span>;bin&lt;=<span class="str">'0'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'1'</span>;b&lt;=<span class="str">'0'</span>;bin&lt;=<span class="str">'1'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'1'</span>;b&lt;=<span class="str">'1'</span>;bin&lt;=<span class="str">'0'</span>;<span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">'1'</span>;b&lt;=<span class="str">'1'</span>;bin&lt;=<span class="str">'1'</span>;<span class="kw">wait for</span> 100 ns;
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+<span class="kw">END</span>;</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Execution Steps — Xilinx ISE</div>
+      <div class="steps-container">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><strong>New Project</strong><div class="substep">File → New Project → <code>full_sub_bh</code>, VHDL</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><strong>New Source</strong><div class="substep">VHDL Module → <code>full_sub_bh</code> — ports a,b,bin,diff,bout</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Enter Equations</strong><div class="substep"><code>diff&lt;=a xor b xor bin;</code> and bout SOP</div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Check Syntax</strong><div class="substep">Synthesize-XST → 0 errors</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><strong>Testbench</strong><div class="substep">VHDL Test Bench → all 8 combos</div></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-content"><strong>Simulate</strong><div class="substep">ISim → Run 800 ns → verify diff/bout</div></div></div>
+      </div>
+      <div class="note-box" style="margin-top:14px;border-color:#f06292;">
+        <strong style="color:#f06292;">EXAM NOTE:</strong> BEHAVIORAL — single file, no components. bout = SOP with a' (NOT a). Same truth table as the 2-HS structural version.
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
 <footer>
   <div class="container">
     <p>VHDL Logic Gates &amp; Combinational Circuits · Xilinx ISE / Vivado</p>
-    <p style="margin-top:8px;font-size:11px;"><span>IEEE STD_LOGIC_1164</span> · AND · OR · NOT · NAND · NOR · XOR · 2:4 DEC · EXP-1 · EXP-2 · HALF SUB · 8:1 MUX · FA by HA</p>
+    <p style="margin-top:8px;font-size:11px;"><span>IEEE STD_LOGIC_1164</span> · AND · OR · NOT · NAND · NOR · XOR · 2:4 DEC · EXP-1 · EXP-2 · HALF SUB · 8:1 MUX · FA by HA · FA·2HA · FA·BEH · FS·2HS · FS·BEH</p>
     <p style="margin-top:6px;font-size:10px;color:#2a4060;">All codes sourced from FIEM lab notebooks</p>
   </div>
 </footer>
@@ -4134,6 +4951,85 @@ function updateFA() {
   if (tb) { const idx=(s.af<<2)|(s.bf<<1)|s.cin; tb.querySelectorAll('tr').forEach((r,i)=>r.classList.toggle('highlighted',i===idx)); }
 }
 
+// FA using two half adders (structural)
+const fa2haState = {a:0, b:0, cin:0};
+function toggleFA2HA(inp) { fa2haState[inp] ^= 1; updateFA2HA(); }
+function updateFA2HA() {
+  const s = fa2haState;
+  const s1 = s.a ^ s.b, c1 = s.a & s.b;
+  const sum = s1 ^ s.cin, c2 = s1 & s.cin;
+  const cout = c1 | c2;
+  ['a','b','cin'].forEach(k => {
+    const t=document.getElementById(`fa2ha-${k}-toggle`), b=document.getElementById(`fa2ha-${k}-bit`);
+    if(t) t.classList.toggle('on',s[k]===1);
+    if(b){ b.textContent=s[k]; b.classList.toggle('high',s[k]===1); }
+  });
+  const os=document.getElementById('fa2ha-sum-output'), oc=document.getElementById('fa2ha-cout-output');
+  if(os){ os.textContent=sum; os.classList.toggle('high',sum===1); os.classList.toggle('low',sum===0); }
+  if(oc){ oc.textContent=cout; oc.classList.toggle('high',cout===1); oc.classList.toggle('low',cout===0); }
+  const tb=document.getElementById('fa2ha-table');
+  if(tb){ const i=(s.a<<2)|(s.b<<1)|s.cin; tb.querySelectorAll('tr').forEach((r,x)=>r.classList.toggle('highlighted',x===i)); }
+}
+
+// FA using half adder (behavioral)
+const faBehState = {a:0, b:0, cin:0};
+function toggleFABeh(inp) { faBehState[inp] ^= 1; updateFABeh(); }
+function updateFABeh() {
+  const s = faBehState;
+  const sum = s.a ^ s.b ^ s.cin;
+  const cout = (s.a & s.b) | (s.b & s.cin) | (s.a & s.cin);
+  ['a','b','cin'].forEach(k => {
+    const t=document.getElementById(`faBeh-${k}-toggle`), b=document.getElementById(`faBeh-${k}-bit`);
+    if(t) t.classList.toggle('on',s[k]===1);
+    if(b){ b.textContent=s[k]; b.classList.toggle('high',s[k]===1); }
+  });
+  const os=document.getElementById('faBeh-sum-output'), oc=document.getElementById('faBeh-cout-output');
+  if(os){ os.textContent=sum; os.classList.toggle('high',sum===1); os.classList.toggle('low',sum===0); }
+  if(oc){ oc.textContent=cout; oc.classList.toggle('high',cout===1); oc.classList.toggle('low',cout===0); }
+  const tb=document.getElementById('faBeh-table');
+  if(tb){ const i=(s.a<<2)|(s.b<<1)|s.cin; tb.querySelectorAll('tr').forEach((r,x)=>r.classList.toggle('highlighted',x===i)); }
+}
+
+// FS using two half subtractors (structural)
+const fs2hsState = {a:0, b:0, bin:0};
+function toggleFS2HS(inp) { fs2hsState[inp] ^= 1; updateFS2HS(); }
+function updateFS2HS() {
+  const s = fs2hsState;
+  const d1 = s.a ^ s.b, bo1 = (1-s.a) & s.b;
+  const diff = d1 ^ s.bin, bo2 = (1-d1) & s.bin;
+  const bout = bo1 | bo2;
+  ['a','b','bin'].forEach(k => {
+    const t=document.getElementById(`fs2hs-${k}-toggle`), b=document.getElementById(`fs2hs-${k}-bit`);
+    if(t) t.classList.toggle('on',s[k]===1);
+    if(b){ b.textContent=s[k]; b.classList.toggle('high',s[k]===1); }
+  });
+  const od=document.getElementById('fs2hs-diff-output'), ob=document.getElementById('fs2hs-bout-output');
+  if(od){ od.textContent=diff; od.classList.toggle('high',diff===1); od.classList.toggle('low',diff===0); }
+  if(ob){ ob.textContent=bout; ob.classList.toggle('high',bout===1); ob.classList.toggle('low',bout===0); }
+  const tb=document.getElementById('fs2hs-table');
+  if(tb){ const i=(s.a<<2)|(s.b<<1)|s.bin; tb.querySelectorAll('tr').forEach((r,x)=>r.classList.toggle('highlighted',x===i)); }
+}
+
+// FS using half subtractor (behavioral)
+const fsBehState = {a:0, b:0, bin:0};
+function toggleFSBeh(inp) { fsBehState[inp] ^= 1; updateFSBeh(); }
+function updateFSBeh() {
+  const s = fsBehState;
+  const na = 1 - s.a;
+  const diff = s.a ^ s.b ^ s.bin;
+  const bout = (na & s.b) | (na & s.bin) | (s.b & s.bin);
+  ['a','b','bin'].forEach(k => {
+    const t=document.getElementById(`fsBeh-${k}-toggle`), b=document.getElementById(`fsBeh-${k}-bit`);
+    if(t) t.classList.toggle('on',s[k]===1);
+    if(b){ b.textContent=s[k]; b.classList.toggle('high',s[k]===1); }
+  });
+  const od=document.getElementById('fsBeh-diff-output'), ob=document.getElementById('fsBeh-bout-output');
+  if(od){ od.textContent=diff; od.classList.toggle('high',diff===1); od.classList.toggle('low',diff===0); }
+  if(ob){ ob.textContent=bout; ob.classList.toggle('high',bout===1); ob.classList.toggle('low',bout===0); }
+  const tb=document.getElementById('fsBeh-table');
+  if(tb){ const i=(s.a<<2)|(s.b<<1)|s.bin; tb.querySelectorAll('tr').forEach((r,x)=>r.classList.toggle('highlighted',x===i)); }
+}
+
 // init gates with inverted defaults
 updateGate('not');
 updateGate('nand');
@@ -4144,6 +5040,10 @@ updateExp2();
 updateHS();
 updateMux8();
 updateFA();
+updateFA2HA();
+updateFABeh();
+updateFS2HS();
+updateFSBeh();
 </script>
 </body>
 </html>
