@@ -5955,18 +5955,51 @@ function updateSub8() {
 }
 
 // ISE "New Source Wizard - Define Module" tables per architecture
+const AB_Y = [{n:'a',d:'in'},{n:'b',d:'in'},{n:'Y',d:'out'}];
 const wizardSpecs = [
+  // basic gates
+  { section:'and',  entity:'AND_GATE_2',  arch:'Behavioral', ports:AB_Y },
+  { section:'or',   entity:'OR_GATE_2',   arch:'Behavioral', ports:AB_Y },
+  { section:'not',  entity:'NOT_GATE',    arch:'Behavioral', ports:[{n:'a',d:'in'},{n:'Y',d:'out'}] },
+  { section:'nand', entity:'NAND_GATE_2', arch:'Behavioral', ports:AB_Y },
+  { section:'nor',  entity:'NOR_GATE_2',  arch:'Behavioral', ports:AB_Y },
+  { section:'xor',  entity:'XOR_GATE_2',  arch:'Behavioral', ports:AB_Y },
+  // decoder / expressions
+  { section:'dec24', entity:'decode2_4', arch:'Behavioral',
+    ports:[{n:'e',d:'in',bus:1,msb:1,lsb:0},{n:'d',d:'out',bus:1,msb:3,lsb:0}] },
+  { section:'exp1', entity:'Expression_1', arch:'Behavioral',
+    ports:[{n:'A',d:'in'},{n:'B',d:'in'},{n:'C',d:'in'},{n:'F',d:'out'}] },
+  { section:'exp2', entity:'Expression_2', arch:'Behavioral',
+    ports:[{n:'A',d:'in'},{n:'B',d:'in'},{n:'C',d:'in'},{n:'F',d:'out'}] },
+  // half subtractor (structural, 3 subs)
+  { section:'halfsub', entity:'hs_ab', arch:'Behavioral',
+    ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'d',d:'out'},{n:'b_out',d:'out'}],
+    subs:[
+      { entity:'xor_ab', arch:'Behavioral', ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'y',d:'out'}] },
+      { entity:'not_ab', arch:'Behavioral', ports:[{n:'a',d:'in'},{n:'y',d:'out'}] },
+      { entity:'and_ab', arch:'Behavioral', ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'y',d:'out'}] }
+    ] },
+  // 8:1 mux (structural, 4 subs)
+  { section:'mux8', entity:'mux_8', arch:'Behavioral',
+    ports:[{n:'d',d:'in',bus:1,msb:7,lsb:0},{n:'s',d:'in',bus:1,msb:2,lsb:0},{n:'x',d:'out'}],
+    subs:[
+      { entity:'MUX_4', arch:'Behavioral', ports:[{n:'i',d:'in',bus:1,msb:3,lsb:0},{n:'s',d:'in',bus:1,msb:1,lsb:0},{n:'y',d:'out'}] },
+      { entity:'and_2', arch:'Behavioral', ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'y',d:'out'}] },
+      { entity:'or_2',  arch:'Behavioral', ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'y',d:'out'}] },
+      { entity:'not_g', arch:'Behavioral', ports:[{n:'a',d:'in'},{n:'y',d:'out'}] }
+    ] },
+  // FA by HA (original)
   { section:'fa', entity:'FA', arch:'Behavioral',
     ports:[{n:'af',d:'in'},{n:'bf',d:'in'},{n:'c_in',d:'in'},{n:'sf',d:'out'},{n:'c_out',d:'out'}],
-    sub:{ entity:'HA', arch:'Behavioral', ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'s',d:'out'},{n:'c',d:'out'}] } },
+    subs:[{ entity:'HA', arch:'Behavioral', ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'s',d:'out'},{n:'c',d:'out'}] }] },
   { section:'fa2ha', entity:'full_adder', arch:'Structural',
     ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'cin',d:'in'},{n:'sum',d:'out'},{n:'cout',d:'out'}],
-    sub:{ entity:'half_adder', arch:'Behavioral', ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'s',d:'out'},{n:'c',d:'out'}] } },
+    subs:[{ entity:'half_adder', arch:'Behavioral', ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'s',d:'out'},{n:'c',d:'out'}] }] },
   { section:'faBeh', entity:'full_adder_bh', arch:'Behavioral',
     ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'cin',d:'in'},{n:'sum',d:'out'},{n:'cout',d:'out'}] },
   { section:'fs2hs', entity:'full_subtractor', arch:'Structural',
     ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'bin',d:'in'},{n:'diff',d:'out'},{n:'bout',d:'out'}],
-    sub:{ entity:'half_subtractor', arch:'Behavioral', ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'d',d:'out'},{n:'bo',d:'out'}] } },
+    subs:[{ entity:'half_subtractor', arch:'Behavioral', ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'d',d:'out'},{n:'bo',d:'out'}] }] },
   { section:'fsBeh', entity:'full_sub_bh', arch:'Behavioral',
     ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'bin',d:'in'},{n:'diff',d:'out'},{n:'bout',d:'out'}] },
   { section:'add8', entity:'add_8', arch:'Behavioral',
@@ -6001,7 +6034,7 @@ function renderWizards(){
     let html = '<div class="card-title">▸ ISE New Source Wizard — Define Module</div>'+
                '<p style="font-size:11px;color:var(--muted);margin-bottom:12px;">Fill exactly as shown when you create the VHDL Module (New Source → VHDL Module). Tick <strong>Bus</strong> for vectors and set MSB/LSB.</p>'+
                '<div class="wizard-box">'+ wizTable(spec.entity, spec.arch, spec.ports);
-    if(spec.sub){ html += `<div class="wiz-sub">Sub-component (create this first): ${spec.sub.entity}</div>` + wizTable(spec.sub.entity, spec.sub.arch, spec.sub.ports); }
+    if(spec.subs){ spec.subs.forEach(sub => { html += `<div class="wiz-sub">Sub-component (create this first): ${sub.entity}</div>` + wizTable(sub.entity, sub.arch, sub.ports); }); }
     html += '</div>';
     card.innerHTML = html;
     cont.appendChild(card);
