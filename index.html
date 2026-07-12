@@ -335,6 +335,8 @@
   <button class="gate-tab" onclick="showGate('faBeh')" style="border-color:#ffb74d;color:#ffb74d;">FA · BEHAV</button>
   <button class="gate-tab" onclick="showGate('fs2hs')" style="border-color:#4fc3f7;color:#4fc3f7;">FS · 2 HS</button>
   <button class="gate-tab" onclick="showGate('fsBeh')" style="border-color:#f06292;color:#f06292;">FS · BEHAV</button>
+  <button class="gate-tab" onclick="showGate('add8')" style="border-color:#26c6da;color:#26c6da;">8-BIT ADD</button>
+  <button class="gate-tab" onclick="showGate('dff')" style="border-color:#ab47bc;color:#ab47bc;">D FLIP-FLOP</button>
 </nav>
 
 <!-- ═══════════════════════════════════════════ OVERVIEW ═══ -->
@@ -4709,10 +4711,350 @@
 </div>
 </div>
 
+<!-- ═══════════ 8-BIT ADDER (BEHAVIORAL, VECTOR ARITHMETIC) ═══ -->
+<div id="section-add8" class="gate-section">
+<div class="container">
+  <div class="info-bar">
+    <div class="gate-name-big" style="background:linear-gradient(135deg,#fff,#26c6da);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">8-Bit Adder</div>
+    <div class="tag" style="border-color:#26c6da;color:#26c6da;">BEHAVIORAL</div>
+    <div class="tag">entity: add_8</div>
+  </div>
+  <div class="logic-expr" style="color:#26c6da;">s(7:0) = a(7:0) + b(7:0)</div>
+  <p class="gate-desc">Adds two 8-bit unsigned numbers in a single behavioral line using vector arithmetic (IEEE.STD_LOGIC_UNSIGNED). The + operator on STD_LOGIC_VECTOR does full 8-bit ripple addition. Note: result is 8-bit, so a carry-out beyond bit 7 wraps (mod 256).</p>
+
+  <div class="three-col">
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Simulator</div>
+      <div style="display:flex;flex-direction:column;gap:12px;align-items:center;">
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="input-label" style="width:22px;">a</span>
+          <input type="number" id="add8-a" min="0" max="255" value="0" oninput="updateAdd8()" style="width:80px;background:#0f1628;border:1px solid #26c6da;color:#26c6da;padding:6px;border-radius:6px;font-family:'Courier New';font-size:14px;">
+          <span id="add8-a-bin" style="font-family:'Courier New';font-size:11px;color:var(--muted);">00000000</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="input-label" style="width:22px;">b</span>
+          <input type="number" id="add8-b" min="0" max="255" value="0" oninput="updateAdd8()" style="width:80px;background:#0f1628;border:1px solid #26c6da;color:#26c6da;padding:6px;border-radius:6px;font-family:'Courier New';font-size:14px;">
+          <span id="add8-b-bin" style="font-family:'Courier New';font-size:11px;color:var(--muted);">00000000</span>
+        </div>
+        <div style="font-size:22px;color:var(--accent2);">↓ +</div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="input-label" style="width:22px;color:#26c6da;">s</span>
+          <div class="output-bit" id="add8-s" style="min-width:80px;">0</div>
+          <span id="add8-s-bin" style="font-family:'Courier New';font-size:11px;color:var(--accent);">00000000</span>
+        </div>
+        <div id="add8-carry" style="font-size:11px;color:var(--muted);"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Sample Results</div>
+      <table>
+        <thead><tr><th>a</th><th>b</th><th>s (dec)</th><th>s (bin)</th></tr></thead>
+        <tbody>
+          <tr><td>3</td><td>5</td><td>8</td><td>00001000</td></tr>
+          <tr><td>15</td><td>16</td><td>31</td><td>00011111</td></tr>
+          <tr><td>170</td><td>85</td><td>255</td><td>11111111</td></tr>
+          <tr><td>200</td><td>100</td><td>44*</td><td>00101100</td></tr>
+          <tr><td>255</td><td>1</td><td>0*</td><td>00000000</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.8;">
+        <span style="color:#26c6da;">*</span> carry-out dropped — sum wraps mod 256 (8-bit result)
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ VHDL — add_8.vhd (Behavioral)</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('add8-code')">COPY</button>
+        <pre id="add8-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+<span class="lib">use</span> IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">add_8</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">a</span> : <span class="kw">in</span>  STD_LOGIC_VECTOR(7 <span class="kw">downto</span> 0);
+    <span class="signal">b</span> : <span class="kw">in</span>  STD_LOGIC_VECTOR(7 <span class="kw">downto</span> 0);
+    <span class="signal">s</span> : <span class="kw">out</span> STD_LOGIC_VECTOR(7 <span class="kw">downto</span> 0)
+  );
+<span class="kw">end</span> add_8;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span> add_8 <span class="kw">is</span>
+<span class="kw">begin</span>
+  s <span class="op">&lt;=</span> a <span class="op">+</span> b;
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+      <div class="note-box" style="margin-top:12px;border-color:#26c6da;">
+        <strong style="color:#26c6da;">TIP:</strong> To keep the carry, make <code>s</code> 9 bits and write <code>s &lt;= ('0'&amp;a) + ('0'&amp;b);</code>
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — add_8</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="130" viewBox="0 0 380 130" style="filter:drop-shadow(0 0 10px rgba(38,198,218,0.2))">
+          <line x1="10" y1="45" x2="100" y2="45" stroke="#4a6080" stroke-width="3"/>
+          <line x1="10" y1="85" x2="100" y2="85" stroke="#4a6080" stroke-width="3"/>
+          <text x="0" y="41" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">a</text>
+          <text x="0" y="81" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">b</text>
+          <text x="16" y="38" fill="#4a6080" font-size="8" font-family="Courier New">[7:0]</text>
+          <text x="16" y="78" fill="#4a6080" font-size="8" font-family="Courier New">[7:0]</text>
+          <rect x="100" y="20" width="180" height="90" rx="8" fill="#0f1628" stroke="#26c6da" stroke-width="2"/>
+          <text x="190" y="60" fill="#26c6da" font-size="16" font-family="Courier New" font-weight="bold" text-anchor="middle">add_8</text>
+          <text x="190" y="80" fill="#7b2fff" font-size="11" font-family="Courier New" text-anchor="middle">s = a + b</text>
+          <text x="190" y="100" fill="#4a6080" font-size="9" font-family="Courier New" text-anchor="middle">8-bit vector adder</text>
+          <line x1="280" y1="65" x2="370" y2="65" stroke="#4a6080" stroke-width="3"/>
+          <text x="332" y="61" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">s</text>
+          <text x="316" y="80" fill="#4a6080" font-size="8" font-family="Courier New">[7:0]</text>
+          <circle cx="100" cy="45" r="3" fill="#26c6da"/><circle cx="100" cy="85" r="3" fill="#26c6da"/>
+          <circle cx="280" cy="65" r="3" fill="#00d4ff"/>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);padding:0 4px;line-height:1.8;">Buses a, b, s are 8-bit STD_LOGIC_VECTOR. One <code>+</code> synthesizes an 8-bit ripple-carry adder.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Testbench — add_8_tb.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('add8-tb')">COPY</button>
+        <pre id="add8-tb"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+<span class="lib">use</span> IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+<span class="kw">ENTITY</span> <span class="entity-name">add_8_tb</span> <span class="kw">IS END</span> add_8_tb;
+
+<span class="kw">ARCHITECTURE</span> behavior <span class="kw">OF</span> add_8_tb <span class="kw">IS</span>
+  <span class="kw">COMPONENT</span> add_8
+    <span class="kw">PORT</span>(a,b : <span class="kw">IN</span>  std_logic_vector(7 <span class="kw">downto</span> 0);
+         s   : <span class="kw">OUT</span> std_logic_vector(7 <span class="kw">downto</span> 0));
+  <span class="kw">END COMPONENT</span>;
+  <span class="kw">signal</span> <span class="signal">a</span>,<span class="signal">b</span>,<span class="signal">s</span> : std_logic_vector(7 <span class="kw">downto</span> 0);
+<span class="kw">BEGIN</span>
+  uut: add_8 <span class="kw">PORT MAP</span>(a,b,s);
+  <span class="kw">process begin</span>
+    a&lt;=<span class="str">"00000011"</span>; b&lt;=<span class="str">"00000101"</span>; <span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">"00001111"</span>; b&lt;=<span class="str">"00010000"</span>; <span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">"10101010"</span>; b&lt;=<span class="str">"01010101"</span>; <span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">"11111111"</span>; b&lt;=<span class="str">"00000001"</span>; <span class="kw">wait for</span> 100 ns;
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+<span class="kw">END</span>;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">▸ Execution Steps — Xilinx ISE</div>
+    <div class="steps-container">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><strong>New Project</strong><div class="substep">File → New Project → <code>add_8</code>, HDL: VHDL</div></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><strong>New Source</strong><div class="substep">VHDL Module → <code>add_8</code> — a,b,s as vectors (7 downto 0)</div></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Add UNSIGNED library</strong><div class="substep"><code>use IEEE.STD_LOGIC_UNSIGNED.ALL;</code> enables + on vectors</div></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Enter code</strong><div class="substep"><code>s &lt;= a + b;</code></div></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-content"><strong>Check Syntax</strong><div class="substep">Synthesize-XST → 0 errors</div></div></div>
+      <div class="step"><div class="step-num">6</div><div class="step-content"><strong>Testbench + Simulate</strong><div class="substep">Drive vector values → ISim → verify sum in binary</div></div></div>
+    </div>
+    <div class="note-box" style="margin-top:14px;border-color:#26c6da;">
+      <strong style="color:#26c6da;">EXAM NOTE:</strong> The <code>+</code> on STD_LOGIC_VECTOR needs STD_LOGIC_UNSIGNED (or numeric_std with UNSIGNED type). Result width = operand width, so carry-out is lost unless you widen s.
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ D FLIP-FLOP (BEHAVIORAL, SEQUENTIAL) ═══ -->
+<div id="section-dff" class="gate-section">
+<div class="container">
+  <div class="info-bar">
+    <div class="gate-name-big" style="background:linear-gradient(135deg,#fff,#ab47bc);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">D Flip-Flop</div>
+    <div class="tag" style="border-color:#ab47bc;color:#ab47bc;">SEQUENTIAL</div>
+    <div class="tag">entity: d_ff</div>
+  </div>
+  <div class="logic-expr" style="color:#ab47bc;">on ↑clk: if r='1' → q=0, else q=d</div>
+  <p class="gate-desc">Positive-edge-triggered D flip-flop with synchronous reset. On each rising clock edge q captures d; if reset r is high, q clears to 0 instead. Sequential logic — uses a clocked process, not concurrent assignments.</p>
+
+  <div class="three-col">
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Simulator (click ↑CLK to latch)</div>
+      <div style="display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;">
+        <div class="inputs-col">
+          <div class="input-toggle"><span class="input-label">d</span><div class="toggle-btn" id="dff-d-toggle" onclick="toggleDff('d')"></div><div class="bit-display" id="dff-d-bit">0</div></div>
+          <div class="input-toggle"><span class="input-label">r</span><div class="toggle-btn" id="dff-r-toggle" onclick="toggleDff('r')"></div><div class="bit-display" id="dff-r-bit">0</div></div>
+          <button onclick="clockDff()" style="margin-top:8px;background:#0f1628;border:1px solid #ab47bc;color:#ab47bc;padding:8px 12px;border-radius:6px;cursor:pointer;font-family:'Courier New';font-weight:bold;">↑ CLK</button>
+        </div>
+        <div style="font-size:28px;color:var(--accent2);">→</div>
+        <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+          <div class="output-col"><div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:4px;">q</div><div class="output-bit" id="dff-q-output">0</div></div>
+        </div>
+      </div>
+      <div style="margin-top:14px;text-align:center;font-size:11px;color:var(--muted);padding:8px;background:rgba(171,71,188,0.05);border-radius:6px;border:1px solid rgba(171,71,188,0.2);">
+        q holds its value until the next rising edge of clk
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Characteristic Table</div>
+      <table>
+        <thead><tr><th>clk</th><th>r</th><th>d</th><th>q(next)</th><th>operation</th></tr></thead>
+        <tbody id="dff-table">
+          <tr><td>↑</td><td class="one">1</td><td>x</td><td class="zero">0</td><td>reset</td></tr>
+          <tr><td>↑</td><td class="zero">0</td><td class="zero">0</td><td class="zero">0</td><td>store 0</td></tr>
+          <tr><td>↑</td><td class="zero">0</td><td class="one">1</td><td class="one">1</td><td>store 1</td></tr>
+          <tr><td>0/1/↓</td><td>x</td><td>x</td><td>q</td><td>hold</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.8;">
+        <span style="color:#ab47bc;">↑</span> = rising edge only &nbsp;|&nbsp; x = don't care &nbsp;|&nbsp; hold = no change
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ VHDL — d_ff.vhd (Sequential)</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('dff-code')">COPY</button>
+        <pre id="dff-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">d_ff</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">d</span>   : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">clk</span> : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">r</span>   : <span class="kw">in</span>  STD_LOGIC;
+    <span class="signal">q</span>   : <span class="kw">out</span> STD_LOGIC
+  );
+<span class="kw">end</span> d_ff;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span> d_ff <span class="kw">is</span>
+<span class="kw">begin</span>
+  process(clk)
+  <span class="kw">begin</span>
+    <span class="kw">if</span> (clk'event <span class="op">and</span> clk <span class="op">=</span> <span class="str">'1'</span>) <span class="kw">then</span>
+      <span class="kw">if</span> (r <span class="op">=</span> <span class="str">'1'</span>) <span class="kw">then</span>
+        q <span class="op">&lt;=</span> <span class="str">'0'</span>;
+      <span class="kw">else</span>
+        q <span class="op">&lt;=</span> d;
+      <span class="kw">end if</span>;
+    <span class="kw">end if</span>;
+  <span class="kw">end</span> process;
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+      <div class="note-box" style="margin-top:12px;border-color:#ff9500;">
+        <strong style="color:#ff9500;">FIXED from notebook:</strong> q was <code>inout</code> → now <code>out</code>; reset branch both assigned d (did nothing) → now r='1' clears q to '0'.
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — d_ff</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="150" viewBox="0 0 380 150" style="filter:drop-shadow(0 0 10px rgba(171,71,188,0.2))">
+          <line x1="10" y1="40" x2="100" y2="40" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="75" x2="100" y2="75" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="110" x2="100" y2="110" stroke="#4a6080" stroke-width="2"/>
+          <text x="0" y="36" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">d</text>
+          <text x="0" y="71" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">clk</text>
+          <text x="0" y="106" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">r</text>
+          <rect x="100" y="20" width="180" height="105" rx="8" fill="#0f1628" stroke="#ab47bc" stroke-width="2"/>
+          <text x="190" y="62" fill="#ab47bc" font-size="15" font-family="Courier New" font-weight="bold" text-anchor="middle">d_ff</text>
+          <text x="190" y="82" fill="#7b2fff" font-size="10" font-family="Courier New" text-anchor="middle">D flip-flop</text>
+          <text x="190" y="104" fill="#4a6080" font-size="9" font-family="Courier New" text-anchor="middle">sync reset, ↑edge</text>
+          <!-- clock triangle marker -->
+          <polygon points="100,70 112,75 100,80" fill="none" stroke="#ab47bc" stroke-width="1.5"/>
+          <line x1="280" y1="70" x2="370" y2="70" stroke="#4a6080" stroke-width="2"/>
+          <text x="332" y="66" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">q</text>
+          <circle cx="100" cy="40" r="3" fill="#ab47bc"/><circle cx="100" cy="110" r="3" fill="#ab47bc"/>
+          <circle cx="280" cy="70" r="3" fill="#00d4ff"/>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);padding:0 4px;line-height:1.8;">
+        <span style="color:#ab47bc;">Inputs:</span> d, clk, r &nbsp;|&nbsp; <span style="color:var(--accent);">q</span> = stored bit. Triangle = edge-triggered clk.
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Timing Behavior</div>
+      <div style="display:flex;justify-content:center;padding:8px 0;">
+        <svg width="420" height="180" viewBox="0 0 420 180" style="filter:drop-shadow(0 0 8px rgba(171,71,188,0.2))">
+          <!-- clk -->
+          <text x="4" y="34" fill="#ab47bc" font-size="11" font-family="Courier New" font-weight="bold">clk</text>
+          <polyline points="40,40 60,40 60,20 90,20 90,40 120,40 120,20 150,20 150,40 180,40 180,20 210,20 210,40 240,40 240,20 270,20 270,40" fill="none" stroke="#ab47bc" stroke-width="1.6"/>
+          <!-- rising edge markers -->
+          <line x1="60" y1="15" x2="60" y2="160" stroke="#4a6080" stroke-width="0.6" stroke-dasharray="3,3"/>
+          <line x1="120" y1="15" x2="120" y2="160" stroke="#4a6080" stroke-width="0.6" stroke-dasharray="3,3"/>
+          <line x1="180" y1="15" x2="180" y2="160" stroke="#4a6080" stroke-width="0.6" stroke-dasharray="3,3"/>
+          <line x1="240" y1="15" x2="240" y2="160" stroke="#4a6080" stroke-width="0.6" stroke-dasharray="3,3"/>
+          <!-- d -->
+          <text x="4" y="90" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">d</text>
+          <polyline points="40,100 90,100 90,80 180,80 180,100 240,100 240,80 300,80" fill="none" stroke="#ffd700" stroke-width="1.6"/>
+          <!-- q -->
+          <text x="4" y="145" fill="#00d4ff" font-size="11" font-family="Courier New" font-weight="bold">q</text>
+          <polyline points="40,155 120,155 120,135 180,135 180,155 240,155 240,135 300,135" fill="none" stroke="#00d4ff" stroke-width="1.8"/>
+          <text x="300" y="18" fill="#4a6080" font-size="8" font-family="Courier New">q samples d at each ↑clk</text>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.8;padding:0 4px;">q changes only on rising clk edges, taking d's value at that instant.</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Testbench — d_ff_tb.vhd (with clock gen)</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('dff-tb')">COPY</button>
+        <pre id="dff-tb"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">ENTITY</span> <span class="entity-name">d_ff_tb</span> <span class="kw">IS END</span> d_ff_tb;
+
+<span class="kw">ARCHITECTURE</span> behavior <span class="kw">OF</span> d_ff_tb <span class="kw">IS</span>
+  <span class="kw">COMPONENT</span> d_ff
+    <span class="kw">PORT</span>(d,clk,r : <span class="kw">IN</span>  std_logic;
+         q       : <span class="kw">OUT</span> std_logic);
+  <span class="kw">END COMPONENT</span>;
+  <span class="kw">signal</span> <span class="signal">d</span>,<span class="signal">clk</span>,<span class="signal">r</span> : std_logic := <span class="str">'0'</span>;
+  <span class="kw">signal</span> <span class="signal">q</span> : std_logic;
+  <span class="kw">constant</span> clk_period : time := 100 ns;
+<span class="kw">BEGIN</span>
+  uut: d_ff <span class="kw">PORT MAP</span>(d, clk, r, q);
+
+  clk_proc: <span class="kw">process begin</span>
+    clk &lt;= <span class="str">'0'</span>; <span class="kw">wait for</span> clk_period/2;
+    clk &lt;= <span class="str">'1'</span>; <span class="kw">wait for</span> clk_period/2;
+  <span class="kw">end process</span>;
+
+  stim_proc: <span class="kw">process begin</span>
+    r &lt;= <span class="str">'1'</span>; d &lt;= <span class="str">'0'</span>; <span class="kw">wait for</span> 100 ns;
+    r &lt;= <span class="str">'0'</span>;
+    d &lt;= <span class="str">'1'</span>; <span class="kw">wait for</span> 100 ns;
+    d &lt;= <span class="str">'0'</span>; <span class="kw">wait for</span> 100 ns;
+    d &lt;= <span class="str">'1'</span>; <span class="kw">wait for</span> 100 ns;
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+<span class="kw">END</span>;</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Execution Steps — Xilinx ISE</div>
+      <div class="steps-container">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><strong>New Project</strong><div class="substep">File → New Project → <code>d_ff</code>, HDL: VHDL</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><strong>New Source</strong><div class="substep">VHDL Module → <code>d_ff</code> — ports d, clk, r, q</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Write clocked process</strong><div class="substep">process(clk) → <code>if clk'event and clk='1'</code></div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Add reset + capture</strong><div class="substep">if r='1' q&lt;='0' else q&lt;=d</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><strong>Check Syntax</strong><div class="substep">Synthesize-XST → 0 errors</div></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-content"><strong>Testbench</strong><div class="substep">Add clock-gen process (period 100 ns) + stimulus</div></div></div>
+        <div class="step"><div class="step-num">7</div><div class="step-content"><strong>Simulate</strong><div class="substep">ISim → Run 500 ns → q follows d on rising edges</div></div></div>
+      </div>
+      <div class="note-box" style="margin-top:14px;border-color:#ab47bc;">
+        <strong style="color:#ab47bc;">EXAM NOTE:</strong> SEQUENTIAL — a clocked process with <code>clk'event and clk='1'</code> infers a flip-flop. Output q is <code>out</code> (not inout). Testbench needs a separate clock-generator process.
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
 <footer>
   <div class="container">
     <p>VHDL Logic Gates &amp; Combinational Circuits · Xilinx ISE / Vivado</p>
-    <p style="margin-top:8px;font-size:11px;"><span>IEEE STD_LOGIC_1164</span> · AND · OR · NOT · NAND · NOR · XOR · 2:4 DEC · EXP-1 · EXP-2 · HALF SUB · 8:1 MUX · FA by HA · FA·2HA · FA·BEH · FS·2HS · FS·BEH</p>
+    <p style="margin-top:8px;font-size:11px;"><span>IEEE STD_LOGIC_1164</span> · AND · OR · NOT · NAND · NOR · XOR · 2:4 DEC · EXP-1 · EXP-2 · HALF SUB · 8:1 MUX · FA by HA · FA·2HA · FA·BEH · FS·2HS · FS·BEH · 8-BIT ADD · D-FF</p>
     <p style="margin-top:6px;font-size:10px;color:#2a4060;">All codes sourced from FIEM lab notebooks</p>
   </div>
 </footer>
@@ -5030,6 +5372,42 @@ function updateFSBeh() {
   if(tb){ const i=(s.a<<2)|(s.b<<1)|s.bin; tb.querySelectorAll('tr').forEach((r,x)=>r.classList.toggle('highlighted',x===i)); }
 }
 
+// 8-bit adder (vector arithmetic)
+function toBin8(n){ return (n & 255).toString(2).padStart(8,'0'); }
+function updateAdd8() {
+  const ai = document.getElementById('add8-a'), bi = document.getElementById('add8-b');
+  let a = Math.max(0, Math.min(255, parseInt(ai.value)||0));
+  let b = Math.max(0, Math.min(255, parseInt(bi.value)||0));
+  const full = a + b;
+  const s = full & 255;
+  const carry = full > 255;
+  document.getElementById('add8-a-bin').textContent = toBin8(a);
+  document.getElementById('add8-b-bin').textContent = toBin8(b);
+  const so = document.getElementById('add8-s');
+  so.textContent = s; so.classList.toggle('high', s>0);
+  document.getElementById('add8-s-bin').textContent = toBin8(s);
+  document.getElementById('add8-carry').textContent = carry ? `carry-out = 1 (true sum ${full} wrapped to ${s})` : 'carry-out = 0';
+}
+
+// D flip-flop (sequential, edge-triggered)
+const dffState = {d:0, r:0, q:0};
+function toggleDff(inp) { dffState[inp] ^= 1; renderDff(); }
+function clockDff() {           // simulate one rising edge
+  if (dffState.r === 1) dffState.q = 0;
+  else dffState.q = dffState.d;
+  renderDff();
+}
+function renderDff() {
+  const s = dffState;
+  ['d','r'].forEach(k => {
+    const t=document.getElementById(`dff-${k}-toggle`), b=document.getElementById(`dff-${k}-bit`);
+    if(t) t.classList.toggle('on',s[k]===1);
+    if(b){ b.textContent=s[k]; b.classList.toggle('high',s[k]===1); }
+  });
+  const q=document.getElementById('dff-q-output');
+  if(q){ q.textContent=s.q; q.classList.toggle('high',s.q===1); q.classList.toggle('low',s.q===0); }
+}
+
 // init gates with inverted defaults
 updateGate('not');
 updateGate('nand');
@@ -5044,6 +5422,8 @@ updateFA2HA();
 updateFABeh();
 updateFS2HS();
 updateFSBeh();
+updateAdd8();
+renderDff();
 </script>
 </body>
 </html>
