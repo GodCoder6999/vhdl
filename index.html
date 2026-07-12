@@ -219,6 +219,8 @@
   .signal { color:var(--yellow); }
   .op { color:var(--green); }
   .lib { color:var(--orange); }
+  .cmt { color:#5a7a9a; font-style:italic; }
+  .str { color:#00c896; }
 
   /* EXECUTION STEPS */
   .steps-container { counter-reset:step; }
@@ -337,6 +339,9 @@
   <button class="gate-tab" onclick="showGate('fsBeh')" style="border-color:#f06292;color:#f06292;">FS · BEHAV</button>
   <button class="gate-tab" onclick="showGate('add8')" style="border-color:#26c6da;color:#26c6da;">8-BIT ADD</button>
   <button class="gate-tab" onclick="showGate('dff')" style="border-color:#ab47bc;color:#ab47bc;">D FLIP-FLOP</button>
+  <button class="gate-tab" onclick="showGate('mul8')" style="border-color:#ff7043;color:#ff7043;">8-BIT MUL</button>
+  <button class="gate-tab" onclick="showGate('srlatch')" style="border-color:#5c6bc0;color:#5c6bc0;">SR LATCH</button>
+  <button class="gate-tab" onclick="showGate('sub8')" style="border-color:#26a69a;color:#26a69a;">8-BIT SUB</button>
 </nav>
 
 <!-- ═══════════════════════════════════════════ OVERVIEW ═══ -->
@@ -5051,10 +5056,482 @@
 </div>
 </div>
 
+<!-- ═══════════ 8-BIT MULTIPLIER (BEHAVIORAL, VECTOR ARITHMETIC) ═══ -->
+<div id="section-mul8" class="gate-section">
+<div class="container">
+  <div class="info-bar">
+    <div class="gate-name-big" style="background:linear-gradient(135deg,#fff,#ff7043);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">8-Bit Multiplier</div>
+    <div class="tag" style="border-color:#ff7043;color:#ff7043;">BEHAVIORAL</div>
+    <div class="tag">entity: mul_8</div>
+  </div>
+  <div class="logic-expr" style="color:#ff7043;">r(15:0) = x(7:0) × y(7:0)</div>
+  <p class="gate-desc">Multiplies two 8-bit unsigned numbers. The result needs 16 bits (8+8), so r is STD_LOGIC_VECTOR(15 downto 0). The <code>*</code> operator on STD_LOGIC_VECTOR comes from IEEE.STD_LOGIC_UNSIGNED. No overflow — full product always fits.</p>
+
+  <div class="three-col">
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Simulator</div>
+      <div style="display:flex;flex-direction:column;gap:12px;align-items:center;">
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="input-label" style="width:22px;">x</span>
+          <input type="number" id="mul8-x" min="0" max="255" value="0" oninput="updateMul8b()" style="width:80px;background:#0f1628;border:1px solid #ff7043;color:#ff7043;padding:6px;border-radius:6px;font-family:'Courier New';font-size:14px;">
+          <span id="mul8-x-bin" style="font-family:'Courier New';font-size:11px;color:var(--muted);">00000000</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="input-label" style="width:22px;">y</span>
+          <input type="number" id="mul8-y" min="0" max="255" value="0" oninput="updateMul8b()" style="width:80px;background:#0f1628;border:1px solid #ff7043;color:#ff7043;padding:6px;border-radius:6px;font-family:'Courier New';font-size:14px;">
+          <span id="mul8-y-bin" style="font-family:'Courier New';font-size:11px;color:var(--muted);">00000000</span>
+        </div>
+        <div style="font-size:22px;color:var(--accent2);">↓ ×</div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="input-label" style="width:22px;color:#ff7043;">r</span>
+          <div class="output-bit" id="mul8-r" style="min-width:80px;">0</div>
+        </div>
+        <span id="mul8-r-bin" style="font-family:'Courier New';font-size:11px;color:var(--accent);">0000000000000000</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Sample Results</div>
+      <table>
+        <thead><tr><th>x</th><th>y</th><th>r (dec)</th><th>r (16-bit)</th></tr></thead>
+        <tbody>
+          <tr><td>3</td><td>5</td><td>15</td><td>0000000000001111</td></tr>
+          <tr><td>15</td><td>15</td><td>225</td><td>0000000011100001</td></tr>
+          <tr><td>200</td><td>2</td><td>400</td><td>0000000110010000</td></tr>
+          <tr><td>255</td><td>255</td><td>65025</td><td>1111111000000001</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.8;">
+        <span style="color:#ff7043;">■</span> max = 255×255 = 65025 → fits in 16 bits (no overflow)
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ VHDL — mul_8.vhd (Behavioral)</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('mul8-code')">COPY</button>
+        <pre id="mul8-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+<span class="lib">use</span> IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">mul_8</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">x</span> : <span class="kw">in</span>  STD_LOGIC_VECTOR(7 <span class="kw">downto</span> 0);
+    <span class="signal">y</span> : <span class="kw">in</span>  STD_LOGIC_VECTOR(7 <span class="kw">downto</span> 0);
+    <span class="signal">r</span> : <span class="kw">out</span> STD_LOGIC_VECTOR(15 <span class="kw">downto</span> 0)
+  );
+<span class="kw">end</span> mul_8;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span> mul_8 <span class="kw">is</span>
+<span class="kw">begin</span>
+  r <span class="op">&lt;=</span> x <span class="op">*</span> y;
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+      <div class="note-box" style="margin-top:12px;border-color:#ff7043;">
+        <strong style="color:#ff7043;">KEY:</strong> product width = 8 + 8 = 16 bits. <code>*</code> needs STD_LOGIC_UNSIGNED (or numeric_std with UNSIGNED).
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — mul_8</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="130" viewBox="0 0 380 130" style="filter:drop-shadow(0 0 10px rgba(255,112,67,0.2))">
+          <line x1="10" y1="45" x2="100" y2="45" stroke="#4a6080" stroke-width="3"/>
+          <line x1="10" y1="85" x2="100" y2="85" stroke="#4a6080" stroke-width="3"/>
+          <text x="0" y="41" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">x</text>
+          <text x="0" y="81" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">y</text>
+          <text x="16" y="38" fill="#4a6080" font-size="8" font-family="Courier New">[7:0]</text>
+          <text x="16" y="78" fill="#4a6080" font-size="8" font-family="Courier New">[7:0]</text>
+          <rect x="100" y="20" width="180" height="90" rx="8" fill="#0f1628" stroke="#ff7043" stroke-width="2"/>
+          <text x="190" y="60" fill="#ff7043" font-size="16" font-family="Courier New" font-weight="bold" text-anchor="middle">mul_8</text>
+          <text x="190" y="80" fill="#7b2fff" font-size="11" font-family="Courier New" text-anchor="middle">r = x * y</text>
+          <text x="190" y="100" fill="#4a6080" font-size="9" font-family="Courier New" text-anchor="middle">8×8 → 16-bit product</text>
+          <line x1="280" y1="65" x2="370" y2="65" stroke="#4a6080" stroke-width="3"/>
+          <text x="332" y="61" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">r</text>
+          <text x="312" y="80" fill="#4a6080" font-size="8" font-family="Courier New">[15:0]</text>
+          <circle cx="100" cy="45" r="3" fill="#ff7043"/><circle cx="100" cy="85" r="3" fill="#ff7043"/>
+          <circle cx="280" cy="65" r="3" fill="#00d4ff"/>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);padding:0 4px;line-height:1.8;">x, y are 8-bit; r is 16-bit. One <code>*</code> synthesizes an 8×8 array multiplier.</div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Testbench — mul_8_tb.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('mul8-tb')">COPY</button>
+        <pre id="mul8-tb"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+<span class="lib">use</span> IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+<span class="kw">ENTITY</span> <span class="entity-name">mul_8_tb</span> <span class="kw">IS END</span> mul_8_tb;
+
+<span class="kw">ARCHITECTURE</span> behavior <span class="kw">OF</span> mul_8_tb <span class="kw">IS</span>
+  <span class="kw">COMPONENT</span> mul_8
+    <span class="kw">PORT</span>(x,y : <span class="kw">IN</span>  std_logic_vector(7 <span class="kw">downto</span> 0);
+         r   : <span class="kw">OUT</span> std_logic_vector(15 <span class="kw">downto</span> 0));
+  <span class="kw">END COMPONENT</span>;
+  <span class="kw">signal</span> <span class="signal">x</span>,<span class="signal">y</span> : std_logic_vector(7 <span class="kw">downto</span> 0);
+  <span class="kw">signal</span> <span class="signal">r</span> : std_logic_vector(15 <span class="kw">downto</span> 0);
+<span class="kw">BEGIN</span>
+  uut: mul_8 <span class="kw">PORT MAP</span>(x,y,r);
+  <span class="kw">process begin</span>
+    x&lt;=<span class="str">"00000011"</span>; y&lt;=<span class="str">"00000101"</span>; <span class="kw">wait for</span> 100 ns;
+    x&lt;=<span class="str">"00001111"</span>; y&lt;=<span class="str">"00001111"</span>; <span class="kw">wait for</span> 100 ns;
+    x&lt;=<span class="str">"11111111"</span>; y&lt;=<span class="str">"11111111"</span>; <span class="kw">wait for</span> 100 ns;
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+<span class="kw">END</span>;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">▸ Execution Steps — Xilinx ISE</div>
+    <div class="steps-container">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><strong>New Project</strong><div class="substep">File → New Project → <code>mul_8</code>, VHDL</div></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><strong>New Source</strong><div class="substep">VHDL Module → <code>mul_8</code> — x,y (7:0), r (15:0)</div></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Add UNSIGNED library</strong><div class="substep"><code>use IEEE.STD_LOGIC_UNSIGNED.ALL;</code> enables *</div></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Enter code</strong><div class="substep"><code>r &lt;= x * y;</code></div></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-content"><strong>Check Syntax + Simulate</strong><div class="substep">ISim → verify 16-bit product in binary</div></div></div>
+    </div>
+    <div class="note-box" style="margin-top:14px;border-color:#ff7043;">
+      <strong style="color:#ff7043;">EXAM NOTE:</strong> Output must be 16-bit — an 8-bit r would drop the high byte. Multiplier is bigger hardware than adder (array of AND + adders).
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ SR LATCH (STRUCTURAL / DATAFLOW, NOR CROSS-COUPLED) ═══ -->
+<div id="section-srlatch" class="gate-section">
+<div class="container">
+  <div class="info-bar">
+    <div class="gate-name-big" style="background:linear-gradient(135deg,#fff,#5c6bc0);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">SR Latch (NOR)</div>
+    <div class="tag" style="border-color:#5c6bc0;color:#5c6bc0;">DATAFLOW</div>
+    <div class="tag">entity: Latch</div>
+  </div>
+  <div class="logic-expr" style="color:#5c6bc0;">q = r NOR q_b &nbsp;|&nbsp; q_b = s NOR q</div>
+  <p class="gate-desc">Set-Reset latch from two cross-coupled NOR gates. The outputs feed back into each other, so q and q_b store a bit. s sets q=1, r resets q=0, s=r=0 holds. s=r=1 is invalid (both outputs 0). Level-sensitive — no clock.</p>
+
+  <div class="three-col">
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Simulator (holds state)</div>
+      <div style="display:flex;gap:20px;align-items:center;justify-content:center;flex-wrap:wrap;">
+        <div class="inputs-col">
+          <div class="input-toggle"><span class="input-label">s</span><div class="toggle-btn" id="srl-s-toggle" onclick="toggleSRL('s')"></div><div class="bit-display" id="srl-s-bit">0</div></div>
+          <div class="input-toggle"><span class="input-label">r</span><div class="toggle-btn" id="srl-r-toggle" onclick="toggleSRL('r')"></div><div class="bit-display" id="srl-r-bit">0</div></div>
+        </div>
+        <div style="font-size:28px;color:var(--accent2);">→</div>
+        <div style="display:flex;flex-direction:column;gap:14px;align-items:center;">
+          <div class="output-col"><div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:4px;">q</div><div class="output-bit" id="srl-q-output">0</div></div>
+          <div class="output-col"><div style="font-size:10px;color:var(--muted);letter-spacing:2px;margin-bottom:4px;">q_b</div><div class="output-bit" id="srl-qb-output">0</div></div>
+        </div>
+      </div>
+      <div id="srl-warn" style="margin-top:14px;text-align:center;font-size:11px;color:var(--muted);padding:8px;background:rgba(92,107,192,0.05);border-radius:6px;border:1px solid rgba(92,107,192,0.2);">
+        s=1 → set (q=1) · r=1 → reset (q=0) · 0,0 → hold
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Truth Table</div>
+      <table>
+        <thead><tr><th>s</th><th>r</th><th>q</th><th>q_b</th><th>state</th></tr></thead>
+        <tbody id="srl-table">
+          <tr><td class="zero">0</td><td class="zero">0</td><td>q</td><td>q_b</td><td>hold</td></tr>
+          <tr><td class="zero">0</td><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td>reset</td></tr>
+          <tr><td class="one">1</td><td class="zero">0</td><td class="one">1</td><td class="zero">0</td><td>set</td></tr>
+          <tr><td class="one">1</td><td class="one">1</td><td class="zero">0</td><td class="zero">0</td><td>invalid</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.8;">
+        <span style="color:#5c6bc0;">■</span> hold = no change &nbsp;|&nbsp; <span style="color:#ff3366;">■</span> 1,1 invalid (q=q_b=0)
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ VHDL — Latch.vhd (Dataflow)</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('srl-code')">COPY</button>
+        <pre id="srl-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">Latch</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">r</span>   : <span class="kw">in</span>    STD_LOGIC;
+    <span class="signal">s</span>   : <span class="kw">in</span>    STD_LOGIC;
+    <span class="signal">q</span>   : <span class="kw">inout</span> STD_LOGIC;
+    <span class="signal">q_b</span> : <span class="kw">inout</span> STD_LOGIC
+  );
+<span class="kw">end</span> Latch;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span> Latch <span class="kw">is</span>
+<span class="kw">begin</span>
+  q   <span class="op">&lt;=</span> r <span class="op">nor</span> q_b;
+  q_b <span class="op">&lt;=</span> s <span class="op">nor</span> q;
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+      <div class="note-box" style="margin-top:12px;border-color:#ff9500;">
+        <strong style="color:#ff9500;">FIXED from notebook:</strong> q was <code>in</code> — but it is driven by <code>q &lt;= r nor q_b</code> and read back, so it must be <code>inout</code> (cross-coupled).
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — Latch</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="130" viewBox="0 0 380 130" style="filter:drop-shadow(0 0 10px rgba(92,107,192,0.2))">
+          <line x1="10" y1="45" x2="100" y2="45" stroke="#4a6080" stroke-width="2"/>
+          <line x1="10" y1="85" x2="100" y2="85" stroke="#4a6080" stroke-width="2"/>
+          <text x="0" y="41" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">r</text>
+          <text x="0" y="81" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">s</text>
+          <rect x="100" y="20" width="180" height="90" rx="8" fill="#0f1628" stroke="#5c6bc0" stroke-width="2"/>
+          <text x="190" y="58" fill="#5c6bc0" font-size="15" font-family="Courier New" font-weight="bold" text-anchor="middle">Latch</text>
+          <text x="190" y="78" fill="#7b2fff" font-size="10" font-family="Courier New" text-anchor="middle">SR (NOR-based)</text>
+          <text x="190" y="100" fill="#4a6080" font-size="9" font-family="Courier New" text-anchor="middle">level-sensitive</text>
+          <line x1="280" y1="45" x2="370" y2="45" stroke="#4a6080" stroke-width="2"/>
+          <line x1="280" y1="85" x2="370" y2="85" stroke="#4a6080" stroke-width="2"/>
+          <text x="332" y="41" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">q</text>
+          <text x="322" y="81" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">q_b</text>
+          <circle cx="100" cy="45" r="3" fill="#5c6bc0"/><circle cx="100" cy="85" r="3" fill="#5c6bc0"/>
+          <circle cx="280" cy="45" r="3" fill="#00d4ff"/><circle cx="280" cy="85" r="3" fill="#ff9500"/>
+        </svg>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Gate Circuit — Cross-Coupled NOR</div>
+      <div style="display:flex;justify-content:center;padding:8px 0;">
+        <svg width="420" height="180" viewBox="0 0 420 180" style="filter:drop-shadow(0 0 8px rgba(92,107,192,0.2))">
+          <text x="4" y="45" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">r</text>
+          <text x="4" y="140" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">s</text>
+          <!-- NOR1 (top) -> q -->
+          <line x1="20" y1="40" x2="70" y2="40" stroke="#4a6080" stroke-width="1.5"/>
+          <path d="M70,28 Q88,28 110,45 Q88,62 70,62 Q78,45 70,28 Z" fill="#0f1628" stroke="#5c6bc0" stroke-width="1.8"/>
+          <circle cx="114" cy="45" r="4" fill="#0f1628" stroke="#5c6bc0" stroke-width="1.6"/>
+          <text x="80" y="49" fill="#5c6bc0" font-size="8" font-family="Courier New">NOR</text>
+          <line x1="118" y1="45" x2="300" y2="45" stroke="#00d4ff" stroke-width="1.8"/>
+          <circle cx="300" cy="45" r="5" fill="#00d4ff" opacity="0.7"/>
+          <text x="308" y="41" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">q</text>
+          <!-- NOR2 (bottom) -> q_b -->
+          <line x1="20" y1="135" x2="70" y2="135" stroke="#4a6080" stroke-width="1.5"/>
+          <path d="M70,123 Q88,123 110,140 Q88,157 70,157 Q78,140 70,123 Z" fill="#0f1628" stroke="#5c6bc0" stroke-width="1.8"/>
+          <circle cx="114" cy="140" r="4" fill="#0f1628" stroke="#5c6bc0" stroke-width="1.6"/>
+          <text x="80" y="144" fill="#5c6bc0" font-size="8" font-family="Courier New">NOR</text>
+          <line x1="118" y1="140" x2="300" y2="140" stroke="#ff9500" stroke-width="1.8"/>
+          <circle cx="300" cy="140" r="5" fill="#ff9500" opacity="0.7"/>
+          <text x="308" y="136" fill="#ffd700" font-size="11" font-family="Courier New" font-weight="bold">q_b</text>
+          <!-- cross feedback -->
+          <line x1="160" y1="45" x2="160" y2="128" stroke="#00d4ff" stroke-width="1.2" stroke-dasharray="4,3"/>
+          <line x1="160" y1="128" x2="70" y2="128" stroke="#00d4ff" stroke-width="1.2" stroke-dasharray="4,3"/>
+          <line x1="70" y1="128" x2="70" y2="150" stroke="#00d4ff" stroke-width="1.2" stroke-dasharray="4,3"/>
+          <line x1="200" y1="140" x2="200" y2="57" stroke="#ff9500" stroke-width="1.2" stroke-dasharray="4,3"/>
+          <line x1="200" y1="57" x2="70" y2="57" stroke="#ff9500" stroke-width="1.2" stroke-dasharray="4,3"/>
+          <text x="210" y="95" fill="#4a6080" font-size="8" font-family="Courier New">cross-coupled feedback</text>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);line-height:1.8;padding:0 4px;">q = r NOR q_b · q_b = s NOR q — each output feeds the other gate.</div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Testbench — Latch_tb.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('srl-tb')">COPY</button>
+        <pre id="srl-tb"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+
+<span class="kw">ENTITY</span> <span class="entity-name">Latch_tb</span> <span class="kw">IS END</span> Latch_tb;
+
+<span class="kw">ARCHITECTURE</span> behavior <span class="kw">OF</span> Latch_tb <span class="kw">IS</span>
+  <span class="kw">COMPONENT</span> Latch
+    <span class="kw">PORT</span>(r,s     : <span class="kw">IN</span>    std_logic;
+         q,q_b   : <span class="kw">INOUT</span> std_logic);
+  <span class="kw">END COMPONENT</span>;
+  <span class="kw">signal</span> <span class="signal">r</span>,<span class="signal">s</span>     : std_logic := <span class="str">'0'</span>;
+  <span class="kw">signal</span> <span class="signal">q</span>,<span class="signal">q_b</span> : std_logic;
+<span class="kw">BEGIN</span>
+  uut: Latch <span class="kw">PORT MAP</span>(r, s, q, q_b);
+  <span class="kw">process begin</span>
+    s&lt;=<span class="str">'1'</span>; r&lt;=<span class="str">'0'</span>; <span class="kw">wait for</span> 100 ns;   <span class="cmt">-- set</span>
+    s&lt;=<span class="str">'0'</span>; r&lt;=<span class="str">'0'</span>; <span class="kw">wait for</span> 100 ns;   <span class="cmt">-- hold</span>
+    s&lt;=<span class="str">'0'</span>; r&lt;=<span class="str">'1'</span>; <span class="kw">wait for</span> 100 ns;   <span class="cmt">-- reset</span>
+    s&lt;=<span class="str">'0'</span>; r&lt;=<span class="str">'0'</span>; <span class="kw">wait for</span> 100 ns;   <span class="cmt">-- hold</span>
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+<span class="kw">END</span>;</pre>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Execution Steps — Xilinx ISE</div>
+      <div class="steps-container">
+        <div class="step"><div class="step-num">1</div><div class="step-content"><strong>New Project</strong><div class="substep">File → New Project → <code>Latch</code>, VHDL</div></div></div>
+        <div class="step"><div class="step-num">2</div><div class="step-content"><strong>New Source</strong><div class="substep">VHDL Module → <code>Latch</code> — r,s in; q,q_b inout</div></div></div>
+        <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Enter NOR equations</strong><div class="substep"><code>q&lt;=r nor q_b; q_b&lt;=s nor q;</code></div></div></div>
+        <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Check Syntax</strong><div class="substep">Synthesize-XST → 0 errors</div></div></div>
+        <div class="step"><div class="step-num">5</div><div class="step-content"><strong>Testbench</strong><div class="substep">Drive set → hold → reset → hold</div></div></div>
+        <div class="step"><div class="step-num">6</div><div class="step-content"><strong>Simulate</strong><div class="substep">ISim → Run 500 ns → q holds between changes</div></div></div>
+      </div>
+      <div class="note-box" style="margin-top:14px;border-color:#5c6bc0;">
+        <strong style="color:#5c6bc0;">EXAM NOTE:</strong> Cross-coupled feedback gives memory. q and q_b are <code>inout</code> (driven and read). Avoid s=r=1 — invalid state.
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- ═══════════ 8-BIT SUBTRACTOR (BEHAVIORAL, VECTOR ARITHMETIC) ═══ -->
+<div id="section-sub8" class="gate-section">
+<div class="container">
+  <div class="info-bar">
+    <div class="gate-name-big" style="background:linear-gradient(135deg,#fff,#26a69a);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">8-Bit Subtractor</div>
+    <div class="tag" style="border-color:#26a69a;color:#26a69a;">BEHAVIORAL</div>
+    <div class="tag">entity: sub_8</div>
+  </div>
+  <div class="logic-expr" style="color:#26a69a;">s(7:0) = a(7:0) − b(7:0)</div>
+  <p class="gate-desc">Subtracts two 8-bit unsigned numbers with the vector <code>−</code> operator (IEEE.STD_LOGIC_UNSIGNED). If b &gt; a the result wraps in two's complement (mod 256) — the wrap indicates a borrow.</p>
+
+  <div class="three-col">
+    <div class="card simulator-card">
+      <div class="card-title">▸ Live Simulator</div>
+      <div style="display:flex;flex-direction:column;gap:12px;align-items:center;">
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="input-label" style="width:22px;">a</span>
+          <input type="number" id="sub8-a" min="0" max="255" value="0" oninput="updateSub8()" style="width:80px;background:#0f1628;border:1px solid #26a69a;color:#26a69a;padding:6px;border-radius:6px;font-family:'Courier New';font-size:14px;">
+          <span id="sub8-a-bin" style="font-family:'Courier New';font-size:11px;color:var(--muted);">00000000</span>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="input-label" style="width:22px;">b</span>
+          <input type="number" id="sub8-b" min="0" max="255" value="0" oninput="updateSub8()" style="width:80px;background:#0f1628;border:1px solid #26a69a;color:#26a69a;padding:6px;border-radius:6px;font-family:'Courier New';font-size:14px;">
+          <span id="sub8-b-bin" style="font-family:'Courier New';font-size:11px;color:var(--muted);">00000000</span>
+        </div>
+        <div style="font-size:22px;color:var(--accent2);">↓ −</div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <span class="input-label" style="width:22px;color:#26a69a;">s</span>
+          <div class="output-bit" id="sub8-s" style="min-width:80px;">0</div>
+          <span id="sub8-s-bin" style="font-family:'Courier New';font-size:11px;color:var(--accent);">00000000</span>
+        </div>
+        <div id="sub8-borrow" style="font-size:11px;color:var(--muted);"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ Sample Results</div>
+      <table>
+        <thead><tr><th>a</th><th>b</th><th>s (dec)</th><th>s (bin)</th></tr></thead>
+        <tbody>
+          <tr><td>8</td><td>5</td><td>3</td><td>00000011</td></tr>
+          <tr><td>200</td><td>100</td><td>100</td><td>01100100</td></tr>
+          <tr><td>5</td><td>8</td><td>253*</td><td>11111101</td></tr>
+          <tr><td>0</td><td>1</td><td>255*</td><td>11111111</td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px;font-size:11px;color:var(--muted);line-height:1.8;">
+        <span style="color:#26a69a;">*</span> b &gt; a → borrow, result wraps (two's complement)
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">▸ VHDL — sub_8.vhd (Behavioral)</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('sub8-code')">COPY</button>
+        <pre id="sub8-code"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+<span class="lib">use</span> IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+<span class="kw">entity</span> <span class="entity-name">sub_8</span> <span class="kw">is</span>
+  <span class="kw">Port</span> (
+    <span class="signal">a</span> : <span class="kw">in</span>  STD_LOGIC_VECTOR(7 <span class="kw">downto</span> 0);
+    <span class="signal">b</span> : <span class="kw">in</span>  STD_LOGIC_VECTOR(7 <span class="kw">downto</span> 0);
+    <span class="signal">s</span> : <span class="kw">out</span> STD_LOGIC_VECTOR(7 <span class="kw">downto</span> 0)
+  );
+<span class="kw">end</span> sub_8;
+
+<span class="kw">architecture</span> Behavioral <span class="kw">of</span> sub_8 <span class="kw">is</span>
+<span class="kw">begin</span>
+  s <span class="op">&lt;=</span> a <span class="op">-</span> b;
+<span class="kw">end</span> Behavioral;</pre>
+      </div>
+      <div class="note-box" style="margin-top:12px;border-color:#26a69a;">
+        <strong style="color:#26a69a;">TIP:</strong> a − b when b&gt;a gives the two's-complement result; wrap = borrow-out.
+      </div>
+    </div>
+  </div>
+
+  <div class="two-col">
+    <div class="card">
+      <div class="card-title">▸ Block Diagram — sub_8</div>
+      <div style="display:flex;justify-content:center;padding:16px 0;">
+        <svg width="380" height="130" viewBox="0 0 380 130" style="filter:drop-shadow(0 0 10px rgba(38,166,154,0.2))">
+          <line x1="10" y1="45" x2="100" y2="45" stroke="#4a6080" stroke-width="3"/>
+          <line x1="10" y1="85" x2="100" y2="85" stroke="#4a6080" stroke-width="3"/>
+          <text x="0" y="41" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">a</text>
+          <text x="0" y="81" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">b</text>
+          <text x="16" y="38" fill="#4a6080" font-size="8" font-family="Courier New">[7:0]</text>
+          <text x="16" y="78" fill="#4a6080" font-size="8" font-family="Courier New">[7:0]</text>
+          <rect x="100" y="20" width="180" height="90" rx="8" fill="#0f1628" stroke="#26a69a" stroke-width="2"/>
+          <text x="190" y="60" fill="#26a69a" font-size="16" font-family="Courier New" font-weight="bold" text-anchor="middle">sub_8</text>
+          <text x="190" y="80" fill="#7b2fff" font-size="11" font-family="Courier New" text-anchor="middle">s = a - b</text>
+          <text x="190" y="100" fill="#4a6080" font-size="9" font-family="Courier New" text-anchor="middle">8-bit vector subtractor</text>
+          <line x1="280" y1="65" x2="370" y2="65" stroke="#4a6080" stroke-width="3"/>
+          <text x="332" y="61" fill="#ffd700" font-size="12" font-family="Courier New" font-weight="bold">s</text>
+          <text x="316" y="80" fill="#4a6080" font-size="8" font-family="Courier New">[7:0]</text>
+          <circle cx="100" cy="45" r="3" fill="#26a69a"/><circle cx="100" cy="85" r="3" fill="#26a69a"/>
+          <circle cx="280" cy="65" r="3" fill="#00d4ff"/>
+        </svg>
+      </div>
+      <div style="font-size:11px;color:var(--muted);padding:0 4px;line-height:1.8;">Buses a, b, s are 8-bit. One <code>−</code> synthesizes an 8-bit subtractor (adder + two's complement).</div>
+    </div>
+    <div class="card">
+      <div class="card-title">▸ Testbench — sub_8_tb.vhd</div>
+      <div class="code-block">
+        <button class="code-copy" onclick="copyCode('sub8-tb')">COPY</button>
+        <pre id="sub8-tb"><span class="lib">library</span> IEEE;
+<span class="lib">use</span> IEEE.STD_LOGIC_1164.ALL;
+<span class="lib">use</span> IEEE.STD_LOGIC_UNSIGNED.ALL;
+
+<span class="kw">ENTITY</span> <span class="entity-name">sub_8_tb</span> <span class="kw">IS END</span> sub_8_tb;
+
+<span class="kw">ARCHITECTURE</span> behavior <span class="kw">OF</span> sub_8_tb <span class="kw">IS</span>
+  <span class="kw">COMPONENT</span> sub_8
+    <span class="kw">PORT</span>(a,b : <span class="kw">IN</span>  std_logic_vector(7 <span class="kw">downto</span> 0);
+         s   : <span class="kw">OUT</span> std_logic_vector(7 <span class="kw">downto</span> 0));
+  <span class="kw">END COMPONENT</span>;
+  <span class="kw">signal</span> <span class="signal">a</span>,<span class="signal">b</span>,<span class="signal">s</span> : std_logic_vector(7 <span class="kw">downto</span> 0);
+<span class="kw">BEGIN</span>
+  uut: sub_8 <span class="kw">PORT MAP</span>(a,b,s);
+  <span class="kw">process begin</span>
+    a&lt;=<span class="str">"00001000"</span>; b&lt;=<span class="str">"00000101"</span>; <span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">"11001000"</span>; b&lt;=<span class="str">"01100100"</span>; <span class="kw">wait for</span> 100 ns;
+    a&lt;=<span class="str">"00000101"</span>; b&lt;=<span class="str">"00001000"</span>; <span class="kw">wait for</span> 100 ns;
+    <span class="kw">wait</span>;
+  <span class="kw">end process</span>;
+<span class="kw">END</span>;</pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">▸ Execution Steps — Xilinx ISE</div>
+    <div class="steps-container">
+      <div class="step"><div class="step-num">1</div><div class="step-content"><strong>New Project</strong><div class="substep">File → New Project → <code>sub_8</code>, VHDL</div></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-content"><strong>New Source</strong><div class="substep">VHDL Module → <code>sub_8</code> — a,b,s vectors (7:0)</div></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-content"><strong>Add UNSIGNED library</strong><div class="substep"><code>use IEEE.STD_LOGIC_UNSIGNED.ALL;</code> enables −</div></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-content"><strong>Enter code</strong><div class="substep"><code>s &lt;= a - b;</code></div></div></div>
+      <div class="step"><div class="step-num">5</div><div class="step-content"><strong>Check Syntax + Simulate</strong><div class="substep">ISim → verify difference; watch wrap when b&gt;a</div></div></div>
+    </div>
+    <div class="note-box" style="margin-top:14px;border-color:#26a69a;">
+      <strong style="color:#26a69a;">EXAM NOTE:</strong> Subtractor = adder + two's complement of b. Same 8-bit width, so underflow wraps (mod 256). Pairs naturally with add_8.
+    </div>
+  </div>
+</div>
+</div>
+
 <footer>
   <div class="container">
     <p>VHDL Logic Gates &amp; Combinational Circuits · Xilinx ISE / Vivado</p>
-    <p style="margin-top:8px;font-size:11px;"><span>IEEE STD_LOGIC_1164</span> · AND · OR · NOT · NAND · NOR · XOR · 2:4 DEC · EXP-1 · EXP-2 · HALF SUB · 8:1 MUX · FA by HA · FA·2HA · FA·BEH · FS·2HS · FS·BEH · 8-BIT ADD · D-FF</p>
+    <p style="margin-top:8px;font-size:11px;"><span>IEEE STD_LOGIC_1164</span> · AND · OR · NOT · NAND · NOR · XOR · 2:4 DEC · EXP-1 · EXP-2 · HALF SUB · 8:1 MUX · FA by HA · FA·2HA · FA·BEH · FS·2HS · FS·BEH · 8-BIT ADD · D-FF · 8-BIT MUL · SR LATCH · 8-BIT SUB</p>
     <p style="margin-top:6px;font-size:10px;color:#2a4060;">All codes sourced from FIEM lab notebooks</p>
   </div>
 </footer>
@@ -5408,6 +5885,63 @@ function renderDff() {
   if(q){ q.textContent=s.q; q.classList.toggle('high',s.q===1); q.classList.toggle('low',s.q===0); }
 }
 
+// 8-bit multiplier (vector arithmetic)
+function toBin16(n){ return (n & 0xFFFF).toString(2).padStart(16,'0'); }
+function updateMul8b() {
+  let x = Math.max(0, Math.min(255, parseInt(document.getElementById('mul8-x').value)||0));
+  let y = Math.max(0, Math.min(255, parseInt(document.getElementById('mul8-y').value)||0));
+  const r = x * y;
+  document.getElementById('mul8-x-bin').textContent = toBin8(x);
+  document.getElementById('mul8-y-bin').textContent = toBin8(y);
+  const ro = document.getElementById('mul8-r');
+  ro.textContent = r; ro.classList.toggle('high', r>0);
+  document.getElementById('mul8-r-bin').textContent = toBin16(r);
+}
+
+// SR latch (NOR cross-coupled, holds state)
+const srlState = {s:0, r:0, q:0, qb:1};
+function toggleSRL(inp) { srlState[inp] ^= 1; evalSRL(); }
+function evalSRL() {
+  const st = srlState;
+  if (st.s===0 && st.r===0) { /* hold: q, qb unchanged */ }
+  else if (st.s===0 && st.r===1) { st.q=0; st.qb=1; }
+  else if (st.s===1 && st.r===0) { st.q=1; st.qb=0; }
+  else { st.q=0; st.qb=0; } // invalid
+  ['s','r'].forEach(k => {
+    const t=document.getElementById(`srl-${k}-toggle`), b=document.getElementById(`srl-${k}-bit`);
+    if(t) t.classList.toggle('on',st[k]===1);
+    if(b){ b.textContent=st[k]; b.classList.toggle('high',st[k]===1); }
+  });
+  const q=document.getElementById('srl-q-output'), qb=document.getElementById('srl-qb-output');
+  if(q){ q.textContent=st.q; q.classList.toggle('high',st.q===1); q.classList.toggle('low',st.q===0); }
+  if(qb){ qb.textContent=st.qb; qb.classList.toggle('high',st.qb===1); qb.classList.toggle('low',st.qb===0); }
+  const w=document.getElementById('srl-warn');
+  if(w){
+    const invalid = (st.s===1 && st.r===1);
+    w.innerHTML = invalid ? '⚠ INVALID state (s=r=1): q=q_b=0 — avoid this input'
+                          : 's=1 → set (q=1) · r=1 → reset (q=0) · 0,0 → hold';
+    w.style.borderColor = invalid ? '#ff3366' : 'rgba(92,107,192,0.2)';
+    w.style.color = invalid ? '#ff3366' : 'var(--muted)';
+  }
+  const tb=document.getElementById('srl-table');
+  if(tb){ const i=(st.s<<1)|st.r; tb.querySelectorAll('tr').forEach((row,x)=>row.classList.toggle('highlighted',x===i)); }
+}
+
+// 8-bit subtractor (vector arithmetic)
+function updateSub8() {
+  let a = Math.max(0, Math.min(255, parseInt(document.getElementById('sub8-a').value)||0));
+  let b = Math.max(0, Math.min(255, parseInt(document.getElementById('sub8-b').value)||0));
+  const raw = a - b;
+  const s = ((raw % 256) + 256) % 256;
+  const borrow = raw < 0;
+  document.getElementById('sub8-a-bin').textContent = toBin8(a);
+  document.getElementById('sub8-b-bin').textContent = toBin8(b);
+  const so = document.getElementById('sub8-s');
+  so.textContent = s; so.classList.toggle('high', s>0);
+  document.getElementById('sub8-s-bin').textContent = toBin8(s);
+  document.getElementById('sub8-borrow').textContent = borrow ? `borrow-out = 1 (b>a, true = ${raw}, wraps to ${s})` : 'borrow-out = 0';
+}
+
 // init gates with inverted defaults
 updateGate('not');
 updateGate('nand');
@@ -5424,6 +5958,9 @@ updateFS2HS();
 updateFSBeh();
 updateAdd8();
 renderDff();
+updateMul8b();
+evalSRL();
+updateSub8();
 </script>
 </body>
 </html>
