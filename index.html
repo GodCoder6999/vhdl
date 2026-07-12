@@ -222,6 +222,18 @@
   .cmt { color:#5a7a9a; font-style:italic; }
   .str { color:#00c896; }
 
+  /* ISE DEFINE-MODULE WIZARD (light dialog look) */
+  .wizard-box { background:#e9edf2; border:1px solid #9fb0c3; border-radius:8px; padding:14px; color:#1a2230; font-family:'Segoe UI',Arial,sans-serif; overflow-x:auto; }
+  .wizard-box .wiz-field { display:flex; align-items:center; gap:8px; margin-bottom:8px; font-size:12px; }
+  .wizard-box .wiz-field label { width:130px; color:#333; font-weight:600; }
+  .wizard-box .wiz-field .wiz-val { flex:1; background:#fff; border:1px solid #b8c4d0; border-radius:3px; padding:5px 8px; font-family:'Courier New',monospace; color:#12263a; }
+  .wizard-box table.wiz { width:100%; border-collapse:collapse; font-size:12px; margin-top:6px; background:#fff; min-width:460px; }
+  .wizard-box table.wiz th { background:#d6dee8; color:#243447; border:1px solid #b8c4d0; padding:6px 8px; text-align:left; font-weight:600; }
+  .wizard-box table.wiz td { border:1px solid #cdd7e1; padding:5px 8px; font-family:'Courier New',monospace; color:#1a2230; background:#fff; }
+  .wizard-box .wiz-chk { display:inline-block; width:12px; height:12px; border:1px solid #7a8a9a; border-radius:2px; }
+  .wizard-box .wiz-chk.on { background:#3a6ea5; border-color:#3a6ea5; }
+  .wizard-box .wiz-sub { font-size:11px; color:#3a4a5a; margin:12px 0 2px; font-weight:700; letter-spacing:.3px; }
+
   /* EXECUTION STEPS */
   .steps-container { counter-reset:step; }
   .step {
@@ -5941,6 +5953,61 @@ function updateSub8() {
   document.getElementById('sub8-s-bin').textContent = toBin8(s);
   document.getElementById('sub8-borrow').textContent = borrow ? `borrow-out = 1 (b>a, true = ${raw}, wraps to ${s})` : 'borrow-out = 0';
 }
+
+// ISE "New Source Wizard - Define Module" tables per architecture
+const wizardSpecs = [
+  { section:'fa', entity:'FA', arch:'Behavioral',
+    ports:[{n:'af',d:'in'},{n:'bf',d:'in'},{n:'c_in',d:'in'},{n:'sf',d:'out'},{n:'c_out',d:'out'}],
+    sub:{ entity:'HA', arch:'Behavioral', ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'s',d:'out'},{n:'c',d:'out'}] } },
+  { section:'fa2ha', entity:'full_adder', arch:'Structural',
+    ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'cin',d:'in'},{n:'sum',d:'out'},{n:'cout',d:'out'}],
+    sub:{ entity:'half_adder', arch:'Behavioral', ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'s',d:'out'},{n:'c',d:'out'}] } },
+  { section:'faBeh', entity:'full_adder_bh', arch:'Behavioral',
+    ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'cin',d:'in'},{n:'sum',d:'out'},{n:'cout',d:'out'}] },
+  { section:'fs2hs', entity:'full_subtractor', arch:'Structural',
+    ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'bin',d:'in'},{n:'diff',d:'out'},{n:'bout',d:'out'}],
+    sub:{ entity:'half_subtractor', arch:'Behavioral', ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'d',d:'out'},{n:'bo',d:'out'}] } },
+  { section:'fsBeh', entity:'full_sub_bh', arch:'Behavioral',
+    ports:[{n:'a',d:'in'},{n:'b',d:'in'},{n:'bin',d:'in'},{n:'diff',d:'out'},{n:'bout',d:'out'}] },
+  { section:'add8', entity:'add_8', arch:'Behavioral',
+    ports:[{n:'a',d:'in',bus:1,msb:7,lsb:0},{n:'b',d:'in',bus:1,msb:7,lsb:0},{n:'s',d:'out',bus:1,msb:7,lsb:0}] },
+  { section:'dff', entity:'d_ff', arch:'Behavioral',
+    ports:[{n:'d',d:'in'},{n:'clk',d:'in'},{n:'r',d:'in'},{n:'q',d:'out'}] },
+  { section:'mul8', entity:'mul_8', arch:'Behavioral',
+    ports:[{n:'x',d:'in',bus:1,msb:7,lsb:0},{n:'y',d:'in',bus:1,msb:7,lsb:0},{n:'r',d:'out',bus:1,msb:15,lsb:0}] },
+  { section:'srlatch', entity:'Latch', arch:'Behavioral',
+    ports:[{n:'r',d:'in'},{n:'s',d:'in'},{n:'q',d:'inout'},{n:'q_b',d:'inout'}] },
+  { section:'sub8', entity:'sub_8', arch:'Behavioral',
+    ports:[{n:'a',d:'in',bus:1,msb:7,lsb:0},{n:'b',d:'in',bus:1,msb:7,lsb:0},{n:'s',d:'out',bus:1,msb:7,lsb:0}] }
+];
+function wizRow(p){
+  const chk = p.bus ? '<span class="wiz-chk on"></span>' : '<span class="wiz-chk"></span>';
+  return `<tr><td>${p.n}</td><td>${p.d}</td><td style="text-align:center">${chk}</td><td>${p.bus?p.msb:''}</td><td>${p.bus?p.lsb:''}</td></tr>`;
+}
+function wizTable(entity, arch, ports){
+  return `<div class="wiz-field"><label>Entity Name</label><div class="wiz-val">${entity}</div></div>`+
+         `<div class="wiz-field"><label>Architecture Name</label><div class="wiz-val">${arch}</div></div>`+
+         `<table class="wiz"><thead><tr><th>Port Name</th><th>Direction</th><th>Bus</th><th>MSB</th><th>LSB</th></tr></thead>`+
+         `<tbody>${ports.map(wizRow).join('')}</tbody></table>`;
+}
+function renderWizards(){
+  wizardSpecs.forEach(spec=>{
+    const sec = document.getElementById('section-'+spec.section);
+    if(!sec) return;
+    const cont = sec.querySelector('.container');
+    if(!cont) return;
+    const card = document.createElement('div');
+    card.className = 'card';
+    let html = '<div class="card-title">▸ ISE New Source Wizard — Define Module</div>'+
+               '<p style="font-size:11px;color:var(--muted);margin-bottom:12px;">Fill exactly as shown when you create the VHDL Module (New Source → VHDL Module). Tick <strong>Bus</strong> for vectors and set MSB/LSB.</p>'+
+               '<div class="wizard-box">'+ wizTable(spec.entity, spec.arch, spec.ports);
+    if(spec.sub){ html += `<div class="wiz-sub">Sub-component (create this first): ${spec.sub.entity}</div>` + wizTable(spec.sub.entity, spec.sub.arch, spec.sub.ports); }
+    html += '</div>';
+    card.innerHTML = html;
+    cont.appendChild(card);
+  });
+}
+renderWizards();
 
 // init gates with inverted defaults
 updateGate('not');
